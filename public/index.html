@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บัวทองไรซ์ | ข้าวสารคุณภาพพรีเมียม ส่งตรงจากโรงสี</title>
+<meta name="description" content="บริษัท บัวทองไรซ์ จำกัด จำหน่ายข้าวสารคุณภาพพรีเมียม ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว ขายส่ง-ขายปลีก ราคาโรงสี">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --g1:#0D2B1A;--g2:#1B4332;--g3:#2D6A4F;--g4:#52B788;--g5:#D8F3DC;
+  --gold:#C9940B;--goldb:#E8AB14;--goldc:#F5CC5A;--goldd:#FFF8E1;
+  --cream:#FBF7F0;--cream2:#F5EFE4;
+  --br1:#3D2600;--br2:#6B4C1E;--br3:#9E7035;
+  --tx1:#1A1A1A;--tx2:#4A4A4A;--tx3:#888;
+  --wh:#fff;--rd:#E53E3E;--ln:#06C755;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans Thai',sans-serif;background:var(--cream);color:var(--tx1);overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(13,43,26,0.97);backdrop-filter:blur(12px);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:68px;border-bottom:1px solid rgba(201,148,11,0.25)}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;cursor:pointer}
+.logo-lotus{width:44px;height:44px;background:linear-gradient(135deg,var(--goldb),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 15px rgba(201,148,11,0.4)}
+.logo-text{color:#fff;font-size:15px;font-weight:700;line-height:1.2}
+.logo-text small{color:var(--goldc);font-size:11px;font-weight:400;display:block;letter-spacing:0.5px}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;font-size:14px;font-weight:400;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent}
+.nav-links a:hover{color:var(--goldc);border-bottom-color:var(--goldc)}
+.cart-btn{position:relative;background:var(--goldb);border:none;border-radius:50px;padding:9px 22px;color:var(--br1);font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'Noto Sans Thai',sans-serif;transition:all .25s;white-space:nowrap}
+.cart-btn:hover{background:var(--goldc);transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,148,11,0.4)}
+.cart-badge{position:absolute;top:-7px;right:-7px;background:var(--rd);color:#fff;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid rgba(13,43,26,0.97)}
+.cart-badge.show{display:flex}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger span{width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
+.mobile-menu{display:none;position:fixed;top:68px;left:0;width:100%;background:rgba(13,43,26,0.98);z-index:999;flex-direction:column;padding:16px 5%}
+.mobile-menu.open{display:flex}
+.mobile-menu a{color:rgba(255,255,255,0.8);text-decoration:none;padding:14px 0;font-size:15px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.mobile-menu a:last-child{border-bottom:none}
+
+/* HERO */
+.hero{min-height:100vh;background:var(--g1);display:flex;align-items:center;padding:100px 5% 60px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-bg svg{position:absolute;right:-80px;top:50%;transform:translateY(-50%);opacity:0.055;width:700px}
+.hero-glow{position:absolute;right:0;top:0;width:60%;height:100%;background:radial-gradient(ellipse at 80% 40%,rgba(201,148,11,0.18) 0%,transparent 65%)}
+.hero-glow2{position:absolute;left:0;bottom:0;width:40%;height:60%;background:radial-gradient(ellipse at 20% 80%,rgba(82,183,136,0.1) 0%,transparent 60%)}
+.hero-content{max-width:680px;position:relative;z-index:1;animation:fadeUp 1s ease forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(201,148,11,0.15);border:1px solid rgba(201,148,11,0.4);color:var(--goldc);padding:7px 18px;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:28px;letter-spacing:0.8px}
+.hero-pill span{width:6px;height:6px;border-radius:50%;background:var(--goldc);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(40px,6.5vw,82px);font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px}
+.hero h1 .em{color:var(--goldb);display:block}
+.hero-sub{font-size:clamp(16px,2vw,21px);color:rgba(255,255,255,0.75);margin-bottom:18px;font-weight:300}
+.hero-desc{font-size:15px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:44px;max-width:520px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn-g{background:linear-gradient(135deg,var(--goldb),var(--gold));color:var(--br1);padding:14px 32px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all .3s;border:none;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;box-shadow:0 6px 24px rgba(201,148,11,0.35)}
+.btn-g:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(201,148,11,0.5)}
+.btn-w{background:transparent;color:#fff;padding:14px 32px;border-radius:50px;font-size:15px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all .3s;border:1.5px solid rgba(255,255,255,0.35);cursor:pointer;font-family:'Noto Sans Thai',sans-serif}
+.btn-w:hover{background:rgba(255,255,255,0.1);border-color:#fff}
+.hero-stats{display:flex;gap:48px;margin-top:64px;padding-top:40px;border-top:1px solid rgba(255,255,255,0.1);flex-wrap:wrap}
+.hstat-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--goldb)}
+.hstat-lbl{font-size:12px;color:rgba(255,255,255,0.5);margin-top:5px;letter-spacing:0.5px}
+
+/* TRUST BAR */
+.trust-bar{background:linear-gradient(135deg,var(--goldb),var(--gold));padding:16px 5%;display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--br1);white-space:nowrap}
+.trust-icon{font-size:20px}
+
+/* SECTION */
+section{padding:88px 5%}
+.sl{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px}
+.st{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,46px);font-weight:700;color:var(--tx1);line-height:1.15;margin-bottom:14px}
+.sd{font-size:15px;color:var(--tx2);line-height:1.85;max-width:600px}
+
+/* PRODUCTS */
+#products{background:#fff}
+.prod-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:44px;flex-wrap:wrap;gap:20px}
+.filter-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.ftab{padding:9px 22px;border-radius:50px;border:1.5px solid #E5E7EB;background:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--tx2);font-family:'Noto Sans Thai',sans-serif}
+.ftab.active{background:var(--g2);border-color:var(--g2);color:#fff}
+.ftab:hover:not(.active){border-color:var(--g3);color:var(--g3)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:24px}
+.pcard{border-radius:20px;overflow:hidden;border:1.5px solid #F0F0F0;transition:all .35s;background:#fff;cursor:default}
+.pcard:hover{transform:translateY(-8px);box-shadow:0 24px 64px rgba(27,67,50,0.13);border-color:var(--g4)}
+.pcard-img{height:200px;display:flex;align-items:center;justify-content:center;font-size:88px;position:relative}
+.pbadge{position:absolute;top:14px;left:14px;background:var(--g2);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:50px;letter-spacing:0.5px}
+.pbadge.hot{background:#E53E3E}
+.pbadge.new{background:var(--goldb);color:var(--br1)}
+.pcard-body{padding:22px}
+.pcat{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g3);margin-bottom:6px}
+.pname{font-size:18px;font-weight:800;color:var(--tx1);margin-bottom:6px;line-height:1.3}
+.pdesc{font-size:13px;color:var(--tx3);line-height:1.65;margin-bottom:16px;min-height:42px}
+.pprow{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.pprice{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--g2)}
+.punit{font-size:13px;color:var(--tx3)}
+.pmin{font-size:11px;color:var(--br2);background:var(--goldd);padding:4px 12px;border-radius:50px;margin-bottom:18px;display:inline-block;font-weight:600}
+.add-btn{width:100%;background:var(--g2);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s;font-family:'Noto Sans Thai',sans-serif}
+.add-btn:hover{background:var(--g3)}
+.add-btn.added{background:linear-gradient(135deg,var(--goldb),var(--gold));color:var(--br1)}
+.pcard.hidden{display:none}
+
+/* WHY */
+#why{background:var(--cream)}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:22px;margin-top:52px}
+.wcard{background:#fff;border-radius:20px;padding:34px 28px;border:1.5px solid #F0F0F0;transition:all .3s}
+.wcard:hover{border-color:var(--g4);transform:translateY(-5px);box-shadow:0 16px 50px rgba(27,67,50,0.1)}
+.wicon{width:58px;height:58px;border-radius:16px;background:var(--g5);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px}
+.wtitle{font-size:17px;font-weight:800;color:var(--tx1);margin-bottom:10px}
+.wdesc{font-size:14px;color:var(--tx2);line-height:1.75}
+
+/* CONTACT */
+#contact{background:var(--g2);position:relative;overflow:hidden}
+#contact::before{content:'';position:absolute;top:-120px;right:-120px;width:450px;height:450px;background:radial-gradient(circle,rgba(201,148,11,0.18) 0%,transparent 65%)}
+#contact::after{content:'';position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(82,183,136,0.12) 0%,transparent 60%)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:1}
+.cleft .sl{color:var(--goldc)}
+.cleft .st{color:#fff}
+.cleft .sd{color:rgba(255,255,255,0.65)}
+.citems{display:flex;flex-direction:column;gap:14px;margin-top:32px}
+.citem{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:16px 20px;text-decoration:none;transition:all .25s;color:#fff}
+.citem:hover{background:rgba(255,255,255,0.15);transform:translateX(6px)}
+.citem-icon{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.ci-line{background:rgba(6,199,85,0.2)}
+.ci-phone{background:rgba(82,183,136,0.2)}
+.ci-map{background:rgba(201,148,11,0.2)}
+.citem strong{display:block;font-size:15px;font-weight:700;margin-bottom:2px}
+.citem small{color:rgba(255,255,255,0.6);font-size:13px}
+.cright{background:#fff;border-radius:24px;padding:36px}
+.form-title{font-size:21px;font-weight:800;color:var(--tx1);margin-bottom:6px}
+.form-sub{font-size:13px;color:var(--tx3);margin-bottom:24px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px}
+.fg input,.fg select,.fg textarea{width:100%;padding:12px 16px;border:1.5px solid #E5E7EB;border-radius:12px;font-size:14px;color:var(--tx1);font-family:'Noto Sans Thai',sans-serif;transition:border-color .2s;outline:none;background:#fff;appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--g3)}
+.fg textarea{height:90px;resize:none}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ABOUT */
+#about{background:#fff}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.about-img-wrap{position:relative}
+.about-img{background:linear-gradient(135deg,var(--g5),var(--cream2));border-radius:24px;height:420px;display:flex;align-items:center;justify-content:center;font-size:120px;position:relative;overflow:hidden}
+.about-chip{position:absolute;bottom:24px;left:24px;background:#fff;border-radius:16px;padding:16px 20px;box-shadow:0 8px 30px rgba(0,0,0,0.1);display:flex;align-items:center;gap:12px}
+.about-chip-icon{font-size:32px}
+.about-chip strong{font-size:17px;font-weight:800;color:var(--g2)}
+.about-chip small{font-size:12px;color:var(--tx3);display:block}
+.about-body .sl{color:var(--g3)}
+.about-list{list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:14px}
+.about-list li{display:flex;align-items:flex-start;gap:12px;font-size:15px;color:var(--tx2);line-height:1.65}
+.about-list li::before{content:'✓';display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--g5);color:var(--g2);font-weight:800;font-size:12px;flex-shrink:0;margin-top:2px}
+
+/* CART SIDEBAR */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2000;opacity:0;visibility:hidden;transition:all .3s}
+.cart-overlay.open{opacity:1;visibility:visible}
+.cart-side{position:fixed;top:0;right:-440px;width:440px;max-width:100vw;height:100vh;background:#fff;z-index:2001;display:flex;flex-direction:column;transition:right .35s cubic-bezier(.4,0,.2,1);box-shadow:-12px 0 48px rgba(0,0,0,0.18)}
+.cart-side.open{right:0}
+.cart-hdr{padding:22px 24px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;justify-content:space-between}
+.cart-hdr h2{font-size:20px;font-weight:800;color:var(--tx1)}
+.cart-hdr small{font-size:13px;color:var(--tx3);font-weight:400}
+.close-x{width:36px;height:36px;border:none;background:#F5F5F5;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.close-x:hover{background:#E5E7EB}
+.cart-body{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-empty{text-align:center;padding:70px 20px;color:var(--tx3)}
+.ce-icon{font-size:64px;margin-bottom:16px}
+.ce-text{font-size:16px;font-weight:600;margin-bottom:6px;color:var(--tx2)}
+.ce-sub{font-size:13px}
+.ci{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #F9F9F9;align-items:flex-start}
+.ci-img{width:62px;height:62px;border-radius:12px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-size:15px;font-weight:700;color:var(--tx1);margin-bottom:3px}
+.ci-price{font-size:14px;color:var(--g3);font-weight:600}
+.ci-ctrl{display:flex;align-items:center;gap:8px;margin-top:10px}
+.qbtn{width:30px;height:30px;border:1.5px solid #E5E7EB;border-radius:8px;background:#fff;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--tx1)}
+.qbtn:hover{border-color:var(--g3);color:var(--g3)}
+.qdsp{font-size:15px;font-weight:700;min-width:28px;text-align:center}
+.ci-rm{background:none;border:none;color:#E53E3E;cursor:pointer;font-size:20px;padding:0;margin-left:auto;line-height:1;transition:transform .2s}
+.ci-rm:hover{transform:scale(1.2)}
+.cart-ftr{padding:20px 24px;border-top:1px solid #F0F0F0}
+.tot-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.tot-lbl{font-size:15px;color:var(--tx2);font-weight:500}
+.tot-amt{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--g2)}
+.co-btn{width:100%;background:var(--g2);color:#fff;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:all .25s;font-family:'Noto Sans Thai',sans-serif}
+.co-btn:hover{background:var(--g3)}
+.ln-btn{width:100%;background:var(--ln);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Noto Sans Thai',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.ln-btn:hover{background:#05a847}
+
+/* MODAL */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .3s}
+.modal-wrap.open{opacity:1;visibility:visible}
+.modal{background:#fff;border-radius:24px;padding:36px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;transform:scale(0.95);transition:transform .3s}
+.modal-wrap.open .modal{transform:scale(1)}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.modal-hdr h2{font-size:22px;font-weight:800;color:var(--tx1)}
+.order-sum{background:var(--cream);border-radius:16px;padding:20px;margin-bottom:24px}
+.order-sum h3{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.orow{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;color:var(--tx1)}
+.otot{display:flex;justify-content:space-between;font-size:17px;font-weight:800;padding-top:12px;margin-top:8px;border-top:1.5px solid #E5E7EB;color:var(--g2)}
+.success-msg{text-align:center;padding:20px 0}
+.success-icon{font-size:72px;margin-bottom:16px}
+.success-msg h3{font-size:22px;font-weight:800;color:var(--g2);margin-bottom:8px}
+.success-msg p{font-size:15px;color:var(--tx2);line-height:1.7}
+
+/* FOOTER */
+footer{background:#0A2116;color:rgba(255,255,255,0.6);padding:56px 5% 32px}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:52px}
+.fbrand{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:12px}
+.fbd{font-size:14px;line-height:1.85;color:rgba(255,255,255,0.45);max-width:290px}
+.fh{font-size:11px;font-weight:700;color:var(--goldc);text-transform:uppercase;letter-spacing:2px;margin-bottom:18px}
+.flinks{list-style:none;display:flex;flex-direction:column;gap:12px}
+.flinks a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:14px;transition:color .2s}
+.flinks a:hover{color:var(--goldc)}
+.fbot{border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:12px;flex-wrap:wrap;gap:10px}
+
+/* FLOAT */
+.fl-line{position:fixed;bottom:28px;right:28px;background:var(--ln);color:#fff;width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;box-shadow:0 8px 28px rgba(6,199,85,0.45);z-index:999;transition:all .3s;animation:pulse 2.5s infinite}
+.fl-line:hover{transform:scale(1.12);box-shadow:0 14px 40px rgba(6,199,85,0.6)}
+@keyframes pulse{0%,100%{box-shadow:0 8px 28px rgba(6,199,85,0.45)}50%{box-shadow:0 8px 44px rgba(6,199,85,0.75)}}
+.fl-tooltip{position:absolute;right:74px;background:#fff;color:var(--tx1);font-size:12px;font-weight:700;padding:6px 14px;border-radius:50px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.12);pointer-events:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:108px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--g1);color:#fff;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:all .35s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .cgrid{grid-template-columns:1fr}
+  .about-grid{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr}
+  .fgrid>*:not(:first-child){display:none}
+}
+@media(max-width:600px){
+  section{padding:60px 5%}
+  .hero-stats{gap:28px}
+  .hero-cta{flex-direction:column}
+  .btn-g,.btn-w{justify-content:center}
+  .trust-bar{gap:20px;padding:12px 5%}
+  .cart-side{width:100%}
+  .modal{padding:24px}
+  .frow{grid-template-columns:1fr}
+}
+@media(max-width:400px){
+  .hero h1{font-size:36px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a class="logo" href="#hero">
+    <div class="logo-lotus">🪷</div>
+    <div class="logo-text">บัวทองไรซ์<small>BUATHONG RICE Co.,Ltd.</small></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#products">สินค้า</a></li>
+    <li><a href="#why">ทำไมเลือกเรา</a></li>
+    <li><a href="#about">เกี่ยวกับเรา</a></li>
+    <li><a href="#contact">ติดต่อ</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="cart-btn" onclick="openCart()">
+      🛒 ตะกร้า
+      <div class="cart-badge" id="cartBadge">0</div>
+    </button>
+    <button class="hamburger" onclick="toggleMobile()" aria-label="เมนู">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#products" onclick="toggleMobile()">🌾 สินค้า</a>
+  <a href="#why" onclick="toggleMobile()">⭐ ทำไมเลือกเรา</a>
+  <a href="#about" onclick="toggleMobile()">🏢 เกี่ยวกับเรา</a>
+  <a href="#contact" onclick="toggleMobile()">📞 ติดต่อ</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+    <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="200" r="190" stroke="#C9940B" stroke-width="1.5"/>
+      <circle cx="200" cy="200" r="150" stroke="#C9940B" stroke-width="1"/>
+      <circle cx="200" cy="200" r="110" stroke="#C9940B" stroke-width="0.8"/>
+      <path d="M200 10 L390 200 L200 390 L10 200 Z" stroke="#C9940B" stroke-width="0.6"/>
+      <path d="M200 50 L350 200 L200 350 L50 200 Z" stroke="#C9940B" stroke-width="0.5"/>
+      <circle cx="200" cy="200" r="30" fill="#C9940B" fill-opacity="0.3"/>
+      <text x="200" y="215" text-anchor="middle" fill="#C9940B" font-size="40">🪷</text>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-pill"><span></span>ข้าวคุณภาพพรีเมียม ตั้งแต่ปี 2542</div>
+    <h1>ข้าวสารคุณภาพ<span class="em">บัวทองไรซ์</span></h1>
+    <p class="hero-sub">ส่งตรงจากโรงสี สู่มือคุณ</p>
+    <p class="hero-desc">ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว และข้าวอีกหลากหลายชนิด คัดสรรคุณภาพทุกเมล็ด พร้อมบริการขายส่งและขายปลีกสำหรับร้านค้า ห้างสรรพสินค้า และครัวเรือนทั่วไป</p>
+    <div class="hero-cta">
+      <a href="#products" class="btn-g">🌾 ดูสินค้าทั้งหมด</a>
+      <a href="#contact" class="btn-w">📞 ติดต่อสั่งซื้อ</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hstat-num">20+</div><div class="hstat-lbl">ปีประสบการณ์</div></div>
+      <div><div class="hstat-num">500+</div><div class="hstat-lbl">ร้านค้าที่ไว้วางใจ</div></div>
+      <div><div class="hstat-num">10+</div><div class="hstat-lbl">ชนิดข้าว</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item"><span class="trust-icon">🚛</span>ส่งทั่วประเทศ</div>
+  <div class="trust-item"><span class="trust-icon">✅</span>คัดคุณภาพทุกล็อต</div>
+  <div class="trust-item"><span class="trust-icon">💰</span>ราคาขายส่ง ไม่ผ่านพ่อค้าคนกลาง</div>
+  <div class="trust-item"><span class="trust-icon">📦</span>บรรจุสะอาด มาตรฐานสูง</div>
+  <div class="trust-item"><span class="trust-icon">🤝</span>ขายส่ง-ขายปลีก</div>
+</div>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="prod-header">
+    <div>
+      <div class="sl">สินค้าของเรา</div>
+      <div class="st">เลือกข้าวที่ใช่ สำหรับคุณ</div>
+      <div class="sd">ข้าวสารคุณภาพหลากหลายชนิด คัดสรรจากแหล่งผลิตชั้นดี พร้อมราคาขายส่งที่แข่งขันได้</div>
+    </div>
+    <div class="filter-tabs">
+      <button class="ftab active" onclick="filterProd('all',this)">ทั้งหมด</button>
+      <button class="ftab" onclick="filterProd('jasmine',this)">ข้าวหอมมะลิ</button>
+      <button class="ftab" onclick="filterProd('saohai',this)">ข้าวเสาไห้</button>
+      <button class="ftab" onclick="filterProd('sticky',this)">ข้าวเหนียว</button>
+      <button class="ftab" onclick="filterProd('other',this)">อื่นๆ</button>
+    </div>
+  </div>
+  <div class="pgrid" id="productGrid">
+
+    <div class="pcard" data-cat="jasmine">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">
+        🌾<span class="pbadge hot">ขายดีสุด</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวหอมมะลิ</div>
+        <div class="pname">ข้าวหอมมะลิ 100%<br>ตรา ดอกบัวรวง</div>
+        <div class="pdesc">ข้าวหอมมะลิแท้ 100% จากทุ่งกุลาร้องไห้ หุงขึ้นหม้อ นุ่มหอม น่ารับประทาน</div>
+        <div class="pprow"><span class="pprice" id="p1-price">฿320</span><span class="punit">/ กระสอบ 5 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 10 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(1,'ข้าวหอมมะลิ ดอกบัวรวง 5กก.',320,'🌾',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+    <div class="pcard" data-cat="jasmine">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#F1F8E9,#DCEDC8)">
+        🌿<span class="pbadge new">ใหม่</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวหอมมะลิ</div>
+        <div class="pname">ข้าวปลายทอน<br>หอมมะลิ พรีเมียม</div>
+        <div class="pdesc">ข้าวปลายทอนหอมมะลิ ราคาประหยัด เหมาะสำหรับร้านข้าวและครัวเรือน</div>
+        <div class="pprow"><span class="pprice">฿420</span><span class="punit">/ กระสอบ 5 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(2,'ข้าวปลายทอนหอมมะลิ พรีเมียม 5กก.',420,'🌿',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+    <div class="pcard" data-cat="saohai">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#FFF8E1,#FFECB3)">
+        🌻
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวเสาไห้</div>
+        <div class="pname">ข้าวเสาไห้<br>ตราดอกบัว</div>
+        <div class="pdesc">ข้าวเสาไห้แท้ หุงนุ่ม เมล็ดสวย ไม่แฉะ เหมาะสำหรับร้านอาหารทุกประเภท</div>
+        <div class="pprow"><span class="pprice">฿370</span><span class="punit">/ กระสอบ 5 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 10 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(3,'ข้าวเสาไห้ ตราดอกบัว 5กก.',370,'🌻',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+    <div class="pcard" data-cat="sticky">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD9)">
+        🌸<span class="pbadge" style="background:var(--g3)">นิยม</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวเหนียว</div>
+        <div class="pname">ข้าวเหนียวขาว<br>คุณภาพสูง</div>
+        <div class="pdesc">ข้าวเหนียวขาวเกรดพรีเมียม นึ่งสุกเร็ว เหนียวนุ่ม เหมาะสำหรับขายข้าวเหนียวและร้านส้มตำ</div>
+        <div class="pprow"><span class="pprice">฿350</span><span class="punit">/ กระสอบ 5 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 10 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(4,'ข้าวเหนียวขาวพรีเมียม 5กก.',350,'🌸',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+    <div class="pcard" data-cat="other">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)">
+        💎
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวอื่นๆ</div>
+        <div class="pname">ข้าวกล้อง<br>ออร์แกนิค</div>
+        <div class="pdesc">ข้าวกล้องเพื่อสุขภาพ ไม่ขัดสี เก็บรักษาคุณค่าทางโภชนาการ ตอบโจทย์ตลาดสุขภาพ</div>
+        <div class="pprow"><span class="pprice">฿480</span><span class="punit">/ กระสอบ 5 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(5,'ข้าวกล้องออร์แกนิค 5กก.',480,'💎',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+    <div class="pcard" data-cat="other">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#EDE7F6,#D1C4E9)">
+        🟣
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวอื่นๆ</div>
+        <div class="pname">ข้าวไรซ์เบอร์รี่<br>สีม่วง</div>
+        <div class="pdesc">ข้าวไรซ์เบอร์รี่สีม่วงเข้ม อุดมด้วยสารต้านอนุมูลอิสระ เหมาะสำหรับตลาดสุขภาพและผู้รักสุขภาพ</div>
+        <div class="pprow"><span class="pprice">฿560</span><span class="punit">/ กระสอบ 5 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(6,'ข้าวไรซ์เบอร์รี่ 5กก.',560,'🟣',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+    <div class="pcard" data-cat="jasmine">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7)">
+        🌾
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวหอมมะลิ</div>
+        <div class="pname">ข้าวหอมมะลิ<br>ขนาด 25 กก.</div>
+        <div class="pdesc">แพ็คใหญ่สำหรับขายส่งร้านค้า ประหยัดกว่า เหมาะสำหรับออเดอร์จำนวนมาก</div>
+        <div class="pprow"><span class="pprice">฿1,450</span><span class="punit">/ กระสอบ 25 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(7,'ข้าวหอมมะลิ 25กก.',1450,'🌾',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+    <div class="pcard" data-cat="saohai">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#FFFDE7,#FFF9C4)">
+        ✨<span class="pbadge new">ราคาพิเศษ</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcat">ข้าวเสาไห้</div>
+        <div class="pname">ข้าวเสาไห้<br>ขนาด 25 กก.</div>
+        <div class="pdesc">แพ็คขนาดใหญ่ ราคาส่งสำหรับร้านอาหาร โรงแรม และสถาบันการศึกษา</div>
+        <div class="pprow"><span class="pprice">฿1,680</span><span class="punit">/ กระสอบ 25 กก.</span></div>
+        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
+        <button class="add-btn" onclick="addCart(8,'ข้าวเสาไห้ 25กก.',1680,'✨',this)">+ เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+
+  </div>
+  <div style="text-align:center;margin-top:48px">
+    <p style="font-size:15px;color:var(--tx3);margin-bottom:16px">มีสินค้าอื่นๆ อีกมากมาย ติดต่อเพื่อสอบถามข้อมูลเพิ่มเติม</p>
+    <a href="#contact" class="btn-g" style="display:inline-flex">📞 ติดต่อสอบถามราคา</a>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div style="text-align:center;margin-bottom:0">
+    <div class="sl" style="text-align:center">ทำไมต้องบัวทองไรซ์?</div>
+    <div class="st" style="text-align:center">มั่นใจทุกเมล็ด ทุกกระสอบ</div>
+    <div class="sd" style="margin:0 auto;text-align:center">เราใส่ใจคุณภาพทุกขั้นตอน ตั้งแต่การคัดเลือกวัตถุดิบ ไปจนถึงการส่งมอบถึงมือคุณ</div>
+  </div>
+  <div class="why-grid">
+    <div class="wcard">
+      <div class="wicon">🏆</div>
+      <div class="wtitle">คุณภาพมาตรฐานสูง</div>
+      <div class="wdesc">คัดสรรข้าวจากแหล่งผลิตชั้นดี ผ่านกระบวนการคัดคุณภาพทุกล็อต มั่นใจได้ว่าข้าวที่ได้รับมีคุณภาพสม่ำเสมอ</div>
+    </div>
+    <div class="wcard">
+      <div class="wicon">💰</div>
+      <div class="wtitle">ราคาแข่งขันได้</div>
+      <div class="wdesc">ตัดพ่อค้าคนกลางออก ส่งตรงจากโรงสีถึงมือคุณ ได้ราคาที่ดีกว่า มีกำไรมากกว่า เหมาะสำหรับขายส่ง</div>
+    </div>
+    <div class="wcard">
+      <div class="wicon">🚛</div>
+      <div class="wtitle">ส่งทั่วประเทศ</div>
+      <div class="wdesc">มีรถขนส่งของตัวเอง ครอบคลุมทั่วประเทศ จัดส่งรวดเร็ว ตรงเวลา สินค้าถึงมือในสภาพสมบูรณ์</div>
+    </div>
+    <div class="wcard">
+      <div class="wicon">📦</div>
+      <div class="wtitle">บรรจุภัณฑ์สะอาด</div>
+      <div class="wdesc">บรรจุด้วยกระสอบคุณภาพสูง ปิดผนึกมิดชิด ป้องกันความชื้นและสิ่งสกปรก ยืดอายุการเก็บรักษา</div>
+    </div>
+    <div class="wcard">
+      <div class="wicon">⚡</div>
+      <div class="wtitle">สั่งง่าย ผ่าน LINE</div>
+      <div class="wdesc">สะดวกสบาย สั่งซื้อผ่าน LINE ได้ตลอด 24 ชั่วโมง ทีมงานพร้อมตอบทุกคำถามและดูแลคุณ</div>
+    </div>
+    <div class="wcard">
+      <div class="wicon">🤝</div>
+      <div class="wtitle">บริการหลังการขาย</div>
+      <div class="wdesc">มีปัญหาเรื่องสินค้า? เราดูแล มั่นใจได้ว่าคุณจะได้รับสินค้าที่ดีที่สุด พร้อมบริการที่จริงใจ</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-img-wrap">
+      <div class="about-img">
+        🌾
+        <div class="about-chip">
+          <div class="about-chip-icon">🏅</div>
+          <div>
+            <strong>ก่อตั้งปี 2542</strong>
+            <small>ประสบการณ์กว่า 25 ปี</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="about-body">
+      <div class="sl">เกี่ยวกับบริษัท</div>
+      <div class="st">บัวทองไรซ์<br>ตำนานข้าวสารคุณภาพ</div>
+      <div class="sd">บริษัท บัวทองไรซ์ จำกัด ก่อตั้งมากว่า 25 ปี ด้วยความมุ่งมั่นในการนำข้าวสารคุณภาพดีที่สุดไปสู่ร้านค้าและครัวเรือนทั่วประเทศ เราเชื่อว่า "ข้าวดี = ชีวิตดี"</div>
+      <ul class="about-list">
+        <li>จำหน่ายข้าวสารทั้งขายส่งและขายปลีก มีสต็อกสินค้าพร้อมส่งตลอดเวลา</li>
+        <li>ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว ข้าวปลายทอน และอื่นๆ อีกมากมาย</li>
+        <li>มีรถขนส่งของตัวเอง บริการส่งทั่วประเทศ ส่งตรงถึงร้านค้าของคุณ</li>
+        <li>ราคาขายส่งที่แข่งขันได้ ไม่ผ่านพ่อค้าคนกลาง ประหยัดต้นทุนได้อย่างชัดเจน</li>
+        <li>ทีมงานดูแลลูกค้าอย่างใกล้ชิด ตอบคำถามและรับออเดอร์ทุกวัน</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="cgrid">
+    <div class="cleft">
+      <div class="sl">ติดต่อเรา</div>
+      <div class="st">สั่งซื้อได้เลย<br>วันนี้!</div>
+      <div class="sd">ต้องการสั่งซื้อหรือสอบถามราคาพิเศษสำหรับขายส่ง ติดต่อเราได้หลายช่องทาง ทีมงานพร้อมดูแลคุณทุกวัน</div>
+      <div class="citems">
+        <a href="https://line.me/ti/p/~@buathongrice" class="citem" target="_blank">
+          <div class="citem-icon ci-line">💚</div>
+          <div class="citem-icon" style="background:none;width:auto;height:auto;border-radius:0;font-size:inherit;padding:0">
+            <strong>LINE Official</strong>
+            <small>@buathongrice — ตอบเร็วที่สุด</small>
+          </div>
+        </a>
+        <a href="tel:+66XXXXXXXXX" class="citem">
+          <div class="citem-icon ci-phone">📞</div>
+          <div>
+            <strong>โทรศัพท์</strong>
+            <small>โทรหาเราได้เลย จันทร์–เสาร์ 8:00–17:00</small>
+          </div>
+        </a>
+        <a href="https://maps.app.goo.gl/oV8XPNYhnu6KvgTH6" class="citem" target="_blank">
+          <div class="citem-icon ci-map">📍</div>
+          <div>
+            <strong>แผนที่</strong>
+            <small>คลิกดูตำแหน่งร้านบน Google Maps</small>
+          </div>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=100063940624893" class="citem" target="_blank">
+          <div class="citem-icon" style="background:rgba(66,103,178,0.2)">👍</div>
+          <div>
+            <strong>Facebook</strong>
+            <small>ติดตามโปรโมชั่นและข่าวสาร</small>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="cright">
+      <div class="form-title">📋 ส่งข้อความสอบถาม</div>
+      <div class="form-sub">กรอกข้อมูลด้านล่าง เราจะติดต่อกลับโดยเร็วที่สุด</div>
+      <div id="contactForm">
+        <div class="frow">
+          <div class="fg"><label>ชื่อ-นามสกุล *</label><input type="text" id="cf-name" placeholder="ชื่อของคุณ" required></div>
+          <div class="fg"><label>เบอร์โทรศัพท์ *</label><input type="tel" id="cf-phone" placeholder="08X-XXX-XXXX" required></div>
+        </div>
+        <div class="fg"><label>ชื่อร้านค้า / บริษัท</label><input type="text" id="cf-shop" placeholder="ชื่อร้านค้าหรือบริษัทของคุณ"></div>
+        <div class="fg">
+          <label>สินค้าที่สนใจ</label>
+          <select id="cf-product">
+            <option value="">เลือกสินค้า...</option>
+            <option>ข้าวหอมมะลิ 100%</option>
+            <option>ข้าวปลายทอนหอมมะลิ</option>
+            <option>ข้าวเสาไห้</option>
+            <option>ข้าวเหนียวขาว</option>
+            <option>ข้าวกล้องออร์แกนิค</option>
+            <option>ข้าวไรซ์เบอร์รี่</option>
+            <option>สินค้าหลายชนิด</option>
+          </select>
+        </div>
+        <div class="fg"><label>ข้อความ / ปริมาณที่ต้องการ</label><textarea id="cf-msg" placeholder="เช่น ต้องการข้าวหอมมะลิ 50 กระสอบ ทุกเดือน..."></textarea></div>
+        <button class="btn-g" style="width:100%;justify-content:center" onclick="sendInquiry()">📨 ส่งข้อความ</button>
+      </div>
+      <div id="contactSuccess" style="display:none">
+        <div class="success-msg">
+          <div class="success-icon">✅</div>
+          <h3>ส่งข้อความสำเร็จ!</h3>
+          <p>เราได้รับข้อความของคุณแล้ว<br>ทีมงานจะติดต่อกลับภายใน 24 ชั่วโมง<br><br>หรือติดต่อผ่าน LINE ได้เลยเพื่อรับบริการเร็วขึ้น 💚</p>
+          <br>
+          <button class="ln-btn" onclick="window.open('https://www.facebook.com/profile.php?id=100063940624893','_blank')">💬 ติดต่อผ่าน Facebook</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fgrid">
+    <div>
+      <div class="fbrand">🪷 บัวทองไรซ์</div>
+      <div class="fbd">บริษัท บัวทองไรซ์ จำกัด ผู้จำหน่ายข้าวสารคุณภาพพรีเมียม ทั้งขายส่งและขายปลีก มาตรฐานสูง ราคายุติธรรม ส่งทั่วประเทศ</div>
+    </div>
+    <div>
+      <div class="fh">เมนูหลัก</div>
+      <ul class="flinks">
+        <li><a href="#products">สินค้าทั้งหมด</a></li>
+        <li><a href="#why">ทำไมเลือกเรา</a></li>
+        <li><a href="#about">เกี่ยวกับบริษัท</a></li>
+        <li><a href="#contact">ติดต่อสั่งซื้อ</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="fh">ติดต่อ</div>
+      <ul class="flinks">
+        <li><a href="https://www.facebook.com/profile.php?id=100063940624893" target="_blank">Facebook</a></li>
+        <li><a href="https://maps.app.goo.gl/oV8XPNYhnu6KvgTH6" target="_blank">Google Maps</a></li>
+        <li><a href="tel:+66XXXXXXXXX">โทรศัพท์</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="fbot">
+    <span>© 2025 บริษัท บัวทองไรซ์ จำกัด — สงวนลิขสิทธิ์</span>
+    <span style="color:rgba(255,255,255,0.3)">ข้าวดี = ชีวิตดี 🌾</span>
+  </div>
+</footer>
+
+<!-- FLOATING LINE BUTTON -->
+<a class="fl-line" href="https://www.facebook.com/profile.php?id=100063940624893" target="_blank" title="ติดต่อผ่าน Facebook">
+  <span style="font-size:28px">💬</span>
+  <div class="fl-tooltip">ติดต่อสั่งซื้อ</div>
+</a>
+
+<!-- CART OVERLAY + SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-side" id="cartSide">
+  <div class="cart-hdr">
+    <div>
+      <h2>🛒 ตะกร้าสินค้า</h2>
+      <small id="cartCount">0 รายการ</small>
+    </div>
+    <button class="close-x" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty" id="cartEmpty">
+      <div class="ce-icon">🛒</div>
+      <div class="ce-text">ตะกร้าของคุณว่างเปล่า</div>
+      <div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div>
+    </div>
+  </div>
+  <div class="cart-ftr" id="cartFooter" style="display:none">
+    <div class="tot-row">
+      <span class="tot-lbl">ยอดรวมประมาณ</span>
+      <span class="tot-amt" id="cartTotal">฿0</span>
+    </div>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:12px">* ราคาสุดท้ายขึ้นอยู่กับปริมาณการสั่งซื้อ</p>
+    <button class="co-btn" onclick="openModal()">✅ ยืนยันการสั่งซื้อ</button>
+    <button class="ln-btn" onclick="sendViaLine()">💚 สั่งผ่าน LINE</button>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="modal-wrap" id="orderModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>📋 แบบฟอร์มสั่งซื้อ</h2>
+      <button class="close-x" onclick="closeModal()">✕</button>
+    </div>
+    <div id="orderFormWrap">
+      <div class="order-sum">
+        <h3>รายการสั่งซื้อ</h3>
+        <div id="orderSumItems"></div>
+        <div class="otot"><span>ยอดรวม</span><span id="orderTotal">฿0</span></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>ชื่อผู้สั่ง *</label><input type="text" id="o-name" placeholder="ชื่อ-นามสกุล" required></div>
+        <div class="fg"><label>เบอร์โทร *</label><input type="tel" id="o-phone" placeholder="08X-XXX-XXXX" required></div>
+      </div>
+      <div class="fg"><label>ชื่อร้าน / บริษัท</label><input type="text" id="o-shop" placeholder="ชื่อร้านหรือบริษัท"></div>
+      <div class="fg"><label>ที่อยู่จัดส่ง *</label><textarea id="o-addr" placeholder="บ้านเลขที่ ถนน แขวง เขต จังหวัด รหัสไปรษณีย์" required></textarea></div>
+      <div class="fg"><label>หมายเหตุ</label><input type="text" id="o-note" placeholder="เช่น เวลาที่สะดวกรับสินค้า"></div>
+      <button class="btn-g" style="width:100%;justify-content:center;margin-bottom:10px" onclick="submitOrder()">🛒 ยืนยันคำสั่งซื้อ</button>
+      <button class="ln-btn" onclick="sendViaLine();closeModal()">💚 ส่งออเดอร์ผ่าน LINE แทน</button>
+    </div>
+    <div id="orderSuccess" style="display:none">
+      <div class="success-msg">
+        <div class="success-icon">🎉</div>
+        <h3>สั่งซื้อสำเร็จ!</h3>
+        <p>ขอบคุณสำหรับคำสั่งซื้อ<br>ทีมงานจะติดต่อยืนยันออเดอร์ภายใน 2-4 ชั่วโมง<br><br>หากต้องการความช่วยเหลือ ติดต่อเราผ่าน LINE หรือ Facebook ได้เลยครับ 🙏</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CART STATE =====
+let cart = {};
+
+function addCart(id, name, price, emoji, btn) {
+  if (cart[id]) {
+    cart[id].qty += 1;
+  } else {
+    cart[id] = { id, name, price, emoji, qty: 1 };
+  }
+  updateCartUI();
+  btn.classList.add('added');
+  btn.textContent = '✅ เพิ่มแล้ว';
+  setTimeout(() => {
+    btn.classList.remove('added');
+    btn.textContent = '+ เพิ่มลงตะกร้า';
+  }, 1800);
+  showToast('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
+}
+
+function updateCartUI() {
+  const items = Object.values(cart);
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+  // Badge
+  const badge = document.getElementById('cartBadge');
+  badge.textContent = count;
+  count > 0 ? badge.classList.add('show') : badge.classList.remove('show');
+
+  // Count label
+  document.getElementById('cartCount').textContent = count + ' รายการ';
+
+  // Cart body
+  const body = document.getElementById('cartBody');
+  const empty = document.getElementById('cartEmpty');
+  const footer = document.getElementById('cartFooter');
+
+  if (items.length === 0) {
+    empty.style.display = '';
+    footer.style.display = 'none';
+    body.innerHTML = '';
+    body.appendChild(empty);
+    return;
+  }
+
+  empty.style.display = 'none';
+  footer.style.display = '';
+
+  body.innerHTML = '';
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'ci';
+    div.innerHTML = `
+      <div class="ci-img">${item.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price">฿${item.price.toLocaleString()} / ชิ้น</div>
+        <div class="ci-ctrl">
+          <button class="qbtn" onclick="changeQty(${item.id},-1)">−</button>
+          <span class="qdsp">${item.qty}</span>
+          <button class="qbtn" onclick="changeQty(${item.id},1)">+</button>
+          <span style="font-size:13px;color:var(--tx3);margin-left:4px">รวม ฿${(item.price * item.qty).toLocaleString()}</span>
+          <button class="ci-rm" onclick="removeCart(${item.id})">🗑</button>
+        </div>
+      </div>`;
+    body.appendChild(div);
+  });
+
+  document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
+}
+
+function changeQty(id, delta) {
+  if (!cart[id]) return;
+  cart[id].qty += delta;
+  if (cart[id].qty <= 0) delete cart[id];
+  updateCartUI();
+}
+
+function removeCart(id) {
+  delete cart[id];
+  updateCartUI();
+  showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
+}
+
+function openCart() {
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartSide').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCart() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartSide').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ===== MODAL =====
+function openModal() {
+  if (Object.keys(cart).length === 0) { showToast('⚠️ กรุณาเพิ่มสินค้าก่อน'); return; }
+  const items = Object.values(cart);
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+  let html = '';
+  items.forEach(i => {
+    html += `<div class="orow"><span>${i.emoji} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`;
+  });
+  document.getElementById('orderSumItems').innerHTML = html;
+  document.getElementById('orderTotal').textContent = '฿' + total.toLocaleString();
+  document.getElementById('orderFormWrap').style.display = '';
+  document.getElementById('orderSuccess').style.display = 'none';
+  document.getElementById('orderModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('orderModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function submitOrder() {
+  const name = document.getElementById('o-name').value.trim();
+  const phone = document.getElementById('o-phone').value.trim();
+  const addr = document.getElementById('o-addr').value.trim();
+  const note = document.getElementById('o-note') ? document.getElementById('o-note').value.trim() : '';
+  if (!name || !phone || !addr) { showToast('⚠️ กรุณากรอกข้อมูลให้ครบ'); return; }
+
+  const items = Object.values(cart);
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer_name: name, customer_phone: phone, customer_addr: addr, note, items, total })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById('orderFormWrap').style.display = 'none';
+      document.getElementById('orderSuccess').style.display = '';
+      cart = {};
+      updateCartUI();
+      showToast('✅ ' + data.message);
+    } else {
+      showToast('❌ ' + (data.error || 'เกิดข้อผิดพลาด'));
+    }
+  } catch(e) {
+    showToast('❌ ไม่สามารถส่งออเดอร์ได้ กรุณาลองใหม่');
+  }
+}
+
+function sendViaLine() {
+  const items = Object.values(cart);
+  if (items.length === 0) { showToast('⚠️ ยังไม่มีสินค้าในตะกร้า'); return; }
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  let msg = '🌾 สั่งซื้อข้าวจากเว็บ บัวทองไรซ์\n\n';
+  items.forEach(i => { msg += `• ${i.name} × ${i.qty} = ฿${(i.price * i.qty).toLocaleString()}\n`; });
+  msg += `\n💰 ยอดรวม: ฿${total.toLocaleString()}\n\nขอสอบถามรายละเอียดเพิ่มเติมด้วยครับ/ค่ะ`;
+  window.open('https://www.facebook.com/profile.php?id=100063940624893', '_blank');
+  showToast('💚 เปิด Facebook เพื่อส่งออเดอร์แล้ว!');
+}
+
+// ===== FILTER =====
+function filterProd(cat, btn) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pcard').forEach(c => {
+    if (cat === 'all' || c.dataset.cat === cat) {
+      c.classList.remove('hidden');
+    } else {
+      c.classList.add('hidden');
+    }
+  });
+}
+
+// ===== CONTACT FORM =====
+async function sendInquiry() {
+  const name = document.getElementById('cf-name').value.trim();
+  const phone = document.getElementById('cf-phone').value.trim();
+  if (!name || !phone) { showToast('⚠️ กรุณากรอกชื่อและเบอร์โทรศัพท์'); return; }
+  try {
+    const res = await fetch('/api/contacts', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, phone })
+    });
+    if (res.ok) {
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('contactSuccess').style.display = '';
+    } else { showToast('❌ เกิดข้อผิดพลาด'); }
+  } catch(e) { showToast('❌ ส่งข้อมูลไม่ได้'); }
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ===== MOBILE MENU =====
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ===== NAV SCROLL =====
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  if (window.scrollY > 60) {
+    nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.3)';
+  } else {
+    nav.style.boxShadow = 'none';
+  }
+});
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.pcard, .wcard, .citem').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
