@@ -575,37 +575,71 @@ async function uploadImage(fileInputId) {
 }
 
 // โหลดสินค้า
-async function loadProducts() {
+// ===== FIX BUG สถิติหน้า Dashboard =====
+async function loadDashboard() {
   try {
-    const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
-    allProducts = await res.json();
-    const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
+    const res = await fetch(API + '/api/admin/stats', { headers: authHeader() });
+    const data = await res.json();
+    // แก้บั๊ก ID ให้ตรงกับ HTML
+    document.getElementById('s-orders').textContent = data.totalOrders;
+    document.getElementById('s-pending').textContent = data.pendingOrders;
+    document.getElementById('s-today').textContent = data.todayOrders;
+    document.getElementById('s-revenue').textContent = '฿' + data.totalRevenue.toLocaleString();
+    document.getElementById('s-contacts').textContent = data.totalContacts;
+
+    const res2 = await fetch(API + '/api/admin/orders', { headers: authHeader() });
+    allOrders = await res2.json(); 
+    const recent = allOrders.slice(0, 5);
     
-    document.getElementById('prodGrid').innerHTML = allProducts.map(p => {
-      const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
-      return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}">
-        <div class="pac-top" style="overflow:hidden; padding:0;">${imgHtml}</div>
-        <div class="pac-body">
-          <div class="pac-cat">${catName[p.category] || p.category} ${p.active ? '' : '· <span style="color:var(--red)">ซ่อนอยู่</span>'}</div>
-          <div class="pac-name">${p.name}</div>
-          <div style="margin-top:8px"><span class="pac-price">฿${p.price.toLocaleString()}</span> <span class="pac-unit">/ ${p.unit}</span></div>
-          <div style="font-size:12px;color:var(--tx3);margin-top:4px">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
-          <div class="pac-actions">
-            <button class="btn btn-sm btn-outline" onclick="openEditProduct('${p.id}')">✏️ แก้ไข</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
+    const tbody = document.getElementById('recentOrdersBody');
+    if (recent.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--tx3);padding:20px">ยังไม่มีออเดอร์</td></tr>`;
+      return;
+    }
+    
+    tbody.innerHTML = recent.map(o => `
+      <tr>
+        <td><strong>#${o.id}</strong></td>
+        <td>${o.customer_name}</td>
+        <td style="color:var(--green);font-weight:700">฿${o.total.toLocaleString()}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail('${o.id}')">ดู/แก้</button></td>
+      </tr>
+    `).join('');
+  } catch(e) { console.log('โหลด Dashboard ไม่สำเร็จ'); }
 }
 
-// เพิ่มสินค้าใหม่
+// ===== TIERED PRICING LOGIC =====
+function addTierRow(container, qty='', price='') {
+  const div = document.createElement('div');
+  div.style = "display:flex; gap:8px; margin-bottom:8px;";
+  div.innerHTML = `
+    <input type="number" placeholder="จำนวนขั้นต่ำ" class="t-qty" value="${qty}" style="flex:1" min="2">
+    <input type="number" placeholder="ราคาลดเหลือ" class="t-price" value="${price}" style="flex:1" min="0">
+    <button type="button" class="btn-sm btn-outline" style="color:#E53E3E; border-color:#E53E3E" onclick="this.parentElement.remove()">ลบ</button>
+  `;
+  container.appendChild(div);
+}
+
+function getTiers(modalId) {
+  const container = document.querySelector(`#${modalId} .tiers-container`);
+  const tiers = [];
+  for(let r of container.children) {
+    const q = parseInt(r.querySelector('.t-qty').value);
+    const p = parseFloat(r.querySelector('.t-price').value);
+    if(!isNaN(q) && !isNaN(p)) tiers.push({qty: q, price: p});
+  }
+  return JSON.stringify(tiers);
+}
+
+// ===== อัปเดตฟังก์ชันเพิ่ม/แก้สินค้า =====
 function openAddProduct() {
   document.getElementById('np-name').value = '';
   document.getElementById('np-price').value = '';
   document.getElementById('np-desc').value = '';
   document.getElementById('np-image').value = '';
   document.getElementById('np-preview').style.display = 'none';
+  document.querySelector('#addProductModal .tiers-container').innerHTML = ''; // ล้างราคาส่ง
   document.getElementById('addProductModal').classList.add('open');
 }
 
@@ -623,22 +657,19 @@ async function addProduct() {
     emoji: document.getElementById('np-emoji').value,
     badge: document.getElementById('np-badge').value,
     description: document.getElementById('np-desc').value,
-    image: imageUrl
+    image: imageUrl,
+    price_tiers: getTiers('addProductModal') // ดึงราคาส่ง
   };
   
   try {
     const res = await fetch(API + '/api/admin/products', { method: 'POST', headers: authHeader(), body: JSON.stringify(body) });
     if (res.ok) {
-      showToast('✅ เพิ่มสินค้าสำเร็จ');
-      closeModal('addProductModal');
-      loadProducts();
+      showToast('✅ เพิ่มสินค้าสำเร็จ'); closeModal('addProductModal'); loadProducts();
     } else showToast('❌ เกิดข้อผิดพลาด');
   } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
-  
   btn.textContent = '➕ เพิ่มสินค้า'; btn.disabled = false;
 }
 
-// แก้ไขสินค้า
 function openEditProduct(id) {
   const p = allProducts.find(x => String(x.id) === String(id));
   if (!p) return;
@@ -656,6 +687,14 @@ function openEditProduct(id) {
   if (p.image) { preview.src = p.image; preview.style.display = 'block'; } 
   else { preview.style.display = 'none'; }
   
+  // โหลดราคาส่งมาแสดง
+  const tContainer = document.querySelector('#editProductModal .tiers-container');
+  tContainer.innerHTML = '';
+  try {
+    const tArr = JSON.parse(p.price_tiers || '[]');
+    tArr.forEach(t => addTierRow(tContainer, t.qty, t.price));
+  } catch(e){}
+
   document.getElementById('editProductModal').classList.add('open');
 }
 
@@ -673,7 +712,8 @@ async function saveProduct() {
     min_order: parseInt(document.getElementById('ep-min').value),
     description: document.getElementById('ep-desc').value,
     active: parseInt(document.getElementById('ep-active').value),
-    image: imageUrl
+    image: imageUrl,
+    price_tiers: getTiers('editProductModal') // ดึงราคาส่ง
   };
   try {
     const res = await fetch(API + `/api/admin/products/${id}`, { method: 'PATCH', headers: authHeader(), body: JSON.stringify(body) });
