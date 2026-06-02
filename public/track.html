@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เช็คสถานะออเดอร์ | บัวทองไรซ์</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --g1:#2E7D32; --g2:#43A047; --goldb:#FBC02D; --bg:#FFFCF2; --tx1:#1A1A1A; --tx2:#4A4A4A; }
+  body { font-family: 'Noto Sans Thai', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--tx1); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .track-box { background: #fff; padding: 40px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); width: 90%; max-width: 500px; text-align: center; }
+  .track-icon { font-size: 48px; margin-bottom: 16px; }
+  h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; color: var(--g1); }
+  p { font-size: 14px; color: var(--tx2); margin-bottom: 24px; }
+  .input-wrap { display: flex; gap: 10px; margin-bottom: 24px; }
+  input { flex: 1; padding: 14px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 16px; font-family: inherit; outline: none; }
+  input:focus { border-color: var(--g2); }
+  button { background: var(--g2); color: #fff; border: none; padding: 14px 24px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+  button:hover { background: var(--g1); }
+  .result-area { text-align: left; margin-top: 20px; }
+  .order-card { border: 1.5px solid #eee; border-radius: 16px; padding: 16px; margin-bottom: 12px; background: #fafafa; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; background: var(--goldb); color: #3E2723; margin-bottom: 10px; }
+  .nav-back { position: absolute; top: 20px; left: 20px; text-decoration: none; color: var(--g1); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<a href="/" class="nav-back">← กลับหน้าหลัก</a>
+
+<div class="track-box">
+  <div class="track-icon">📦</div>
+  <h1>เช็คสถานะสินค้า</h1>
+  <p>กรอกเบอร์โทรศัพท์ 10 หลักของคุณ เพื่อตรวจสอบสถานะออเดอร์ล่าสุด</p>
+  
+  <div class="input-wrap">
+    <input type="tel" id="phoneInput" placeholder="08X-XXX-XXXX" maxlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+    <button onclick="trackOrder()">ค้นหา</button>
+  </div>
+
+  <div id="loading" style="display:none; color:var(--g2); font-weight:bold;">⏳ กำลังค้นหา...</div>
+  <div id="results" class="result-area"></div>
+</div>
+
+<script>
+  async function trackOrder() {
+    const phone = document.getElementById('phoneInput').value;
+    const resDiv = document.getElementById('results');
+    const loading = document.getElementById('loading');
+    
+    if(phone.length !== 10) {
+      alert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก"); return;
+    }
+
+    resDiv.innerHTML = ''; loading.style.display = 'block';
+
+    try {
+      const res = await fetch('/api/track/' + phone);
+      const data = await res.json();
+      loading.style.display = 'none';
+
+      if(data.error || data.length === 0) {
+        resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E; padding: 20px 0;">ไม่พบข้อมูลออเดอร์ของเบอร์นี้</div>`;
+        return;
+      }
+
+      data.forEach(o => {
+        let itemsHtml = o.items.map(i => `<div style="font-size:13px; color:#666;">- ${i.name} × ${i.qty}</div>`).join('');
+        resDiv.innerHTML += `
+          <div class="order-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+              <span style="font-size:12px; color:#888;">ออเดอร์ #${o.id}</span>
+              <span class="status-badge">${o.status}</span>
+            </div>
+            <div style="margin-bottom: 8px;">${itemsHtml}</div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; border-top: 1px solid #ddd; padding-top: 8px;">
+              <span>ยอดรวม</span>
+              <span style="color:var(--g1)">฿${o.total.toLocaleString()}</span>
+            </div>
+          </div>
+        `;
+      });
+    } catch(e) {
+      loading.style.display = 'none';
+      resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E;">เกิดข้อผิดพลาดในการเชื่อมต่อ</div>`;
+    }
+  }
+</script>
+</body>
+</html>
