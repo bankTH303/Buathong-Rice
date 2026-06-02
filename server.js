@@ -68,6 +68,26 @@ app.post('/api/contacts', (req, res) => {
   } catch(e) { res.status(500).json({ error: 'เกิดข้อผิดพลาด' }); }
 });
 
+app.get('/api/track/:phone', (req, res) => {
+  try {
+    const phone = req.params.phone.replace(/[^0-9]/g, '');
+    if(phone.length !== 10) return res.status(400).json({ error: 'เบอร์โทรไม่ถูกต้อง' });
+    
+    // ค้นหาออเดอร์ที่ตรงกับเบอร์โทร
+    const orders = db.prepare('SELECT id, total, status, created_at FROM orders WHERE customer_phone = ? ORDER BY created_at DESC').all(phone);
+    
+    // ดึงรายการสินค้าในแต่ละออเดอร์
+    const result = orders.map(o => {
+      const items = db.prepare('SELECT name, qty, price FROM order_items WHERE order_id = ?').all(o.id);
+      return { ...o, items, created_at: new Date(o.created_at).toLocaleString('th-TH') };
+    });
+    
+    res.json(result);
+  } catch(e) {
+    res.status(500).json({ error: 'ระบบขัดข้อง' });
+  }
+});
+
 // ===== ADMIN API =====
 app.post('/api/admin/login', (req, res) => {
   req.body.password === ADMIN_PASSWORD ? res.json({ success: true }) : res.status(401).json({ error: 'รหัสผ่านไม่ถูกต้อง' });
