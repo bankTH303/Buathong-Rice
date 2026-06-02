@@ -120,18 +120,18 @@ app.get('/api/admin/products', checkAdmin, (req, res) => {
 
 app.patch('/api/admin/products/:id', checkAdmin, (req, res) => {
   try {
-    const { name, price, unit, min_order, description, active, image } = req.body;
-    db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=? WHERE id=?`)
-      .run(name, price, unit, min_order, description, active, image, req.params.id);
+    const { name, price, unit, min_order, description, active, image, price_tiers } = req.body;
+    db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=?, price_tiers=? WHERE id=?`)
+      .run(name, price, unit, min_order, description, active, image, price_tiers || "[]", req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'อัปเดตไม่ได้' }); }
 });
 
 app.post('/api/admin/products', checkAdmin, (req, res) => {
   try {
-    const { name, category, price, unit, min_order, emoji, image, badge, description } = req.body;
-    const info = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, image, badge, description, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`)
-      .run(name, category, price, unit||'กระสอบ 5 กก.', min_order||1, emoji||'🌾', image||null, badge||null, description||'');
+    const { name, category, price, unit, min_order, emoji, image, badge, description, price_tiers } = req.body;
+    const info = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, image, badge, description, active, price_tiers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`)
+      .run(name, category, price, unit||'กระสอบ 5 กก.', min_order||1, emoji||'🌾', image||null, badge||null, description||'', price_tiers || "[]");
     res.json({ success: true, id: info.lastInsertRowid });
   } catch(e) { res.status(500).json({ error: 'เพิ่มสินค้าไม่ได้' }); }
 });
