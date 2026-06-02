@@ -629,67 +629,6 @@ footer{
 // ===== CART STATE =====
 let cart = {};
 
-function addCart(id, name, price, emoji, image, btn) {
-  id = String(id);
-  if (cart[id]) { cart[id].qty += 1; } 
-  else { cart[id] = { id, name, price, emoji, image, qty: 1 }; }
-  updateCartUI();
-  btn.classList.add('added'); btn.textContent = '✅ เพิ่มแล้ว';
-  setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+ เพิ่มลงตะกร้า'; }, 1800);
-  showToast('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
-}
-
-function updateCartUI() {
-  const items = Object.values(cart);
-  const count = items.reduce((s, i) => s + i.qty, 0);
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
-
-  document.getElementById('cartBadge').textContent = count;
-  count > 0 ? document.getElementById('cartBadge').classList.add('show') : document.getElementById('cartBadge').classList.remove('show');
-  document.getElementById('cartCount').textContent = count + ' รายการ';
-
-  const body = document.getElementById('cartBody');
-  const footer = document.getElementById('cartFooter');
-
-  // ถ้าตะกร้าว่างเปล่า ให้สร้างกล่องว่างเปล่าขึ้นมาใหม่
-  if (items.length === 0) {
-    footer.style.display = 'none';
-    body.innerHTML = `
-      <div class="cart-empty" id="cartEmpty">
-        <div class="ce-icon">🛒</div>
-        <div class="ce-text">ตะกร้าของคุณว่างเปล่า</div>
-        <div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div>
-      </div>
-    `;
-    return;
-  }
-
-  // ถ้ามีสินค้า ให้เคลียร์หน้าจอแล้ววาดรายการสินค้าลงไป (แก้จุดที่ Error แล้ว)
-  footer.style.display = '';
-  body.innerHTML = '';
-  
-  items.forEach(item => {
-    const imgHtml = item.image ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : (item.emoji || '🌾');
-    const div = document.createElement('div');
-    div.className = 'ci';
-    div.innerHTML = `
-      <div class="ci-img" style="overflow:hidden; padding:0;">${imgHtml}</div>
-      <div class="ci-info">
-        <div class="ci-name">${item.name}</div>
-        <div class="ci-price">฿${item.price.toLocaleString()} / ชิ้น</div>
-        <div class="ci-ctrl">
-          <button class="qbtn" onclick="changeQty('${item.id}',-1)">−</button>
-          <span class="qdsp">${item.qty}</span>
-          <button class="qbtn" onclick="changeQty('${item.id}',1)">+</button>
-          <span style="font-size:13px;color:var(--tx3);margin-left:4px">รวม ฿${(item.price * item.qty).toLocaleString()}</span>
-          <button class="ci-rm" onclick="removeCart('${item.id}')">🗑</button>
-        </div>
-      </div>`;
-    body.appendChild(div);
-  });
-  document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
-}
-
 function changeQty(id, delta) {
   id = String(id);
   if (!cart[id]) return;
@@ -857,7 +796,108 @@ document.querySelectorAll('.pcard, .wcard, .citem').forEach(el => {
   observer.observe(el);
 });
 
-//========CUSTOM PRODUCT FROM ADMIN PAGE==============
+// ===== CART & TIERED PRICING STATE =====
+function addCart(id, name, basePrice, emoji, image, safeTiers, btn) {
+  id = String(id);
+  const tiersStr = decodeURIComponent(safeTiers); // ถอดรหัส JSON
+  if (cart[id]) { cart[id].qty += 1; } 
+  else { cart[id] = { id, name, basePrice, price: basePrice, emoji, image, tiersStr, qty: 1 }; }
+  
+  updateCartUI();
+  btn.classList.add('added'); btn.textContent = '✅ เพิ่มแล้ว';
+  setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+ เพิ่มลงตะกร้า'; }, 1800);
+  showToast('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
+}
+
+function updateCartUI() {
+  const items = Object.values(cart);
+  
+  // คำนวณราคาส่งใหม่ให้สินค้าแต่ละชิ้น
+  items.forEach(item => {
+    let currentPrice = item.basePrice;
+    let tiers = [];
+    try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
+    
+    // เรียงขั้นบันไดจากมากไปน้อย เพื่อหาราคาที่ตรงเงื่อนไข
+    const descTiers = [...tiers].sort((a,b) => b.qty - a.qty);
+    for(let t of descTiers) {
+      if(item.qty >= t.qty) {
+        currentPrice = t.price;
+        break;
+      }
+    }
+    item.price = currentPrice; // อัปเดตราคาล่าสุด
+  });
+
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0); // รวมด้วยราคาใหม่
+
+  document.getElementById('cartBadge').textContent = count;
+  count > 0 ? document.getElementById('cartBadge').classList.add('show') : document.getElementById('cartBadge').classList.remove('show');
+  document.getElementById('cartCount').textContent = count + ' รายการ';
+
+  const body = document.getElementById('cartBody');
+  const footer = document.getElementById('cartFooter');
+
+  if (items.length === 0) {
+    footer.style.display = 'none';
+    body.innerHTML = `
+      <div class="cart-empty" id="cartEmpty">
+        <div class="ce-icon">🛒</div>
+        <div class="ce-text">ตะกร้าของคุณว่างเปล่า</div>
+        <div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div>
+      </div>
+    `;
+    return;
+  }
+
+  footer.style.display = '';
+  body.innerHTML = '';
+  
+  items.forEach(item => {
+    // คำนวณหาเป้าหมายราคาส่งขั้นถัดไป (Upsell)
+    let tiers = [];
+    try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
+    let nextTier = null;
+    const ascTiers = [...tiers].sort((a,b) => a.qty - b.qty);
+    for(let t of ascTiers) {
+      if(item.qty < t.qty) { nextTier = t; break; }
+    }
+
+    let upsellHtml = '';
+    if(nextTier) {
+      const diff = nextTier.qty - item.qty;
+      upsellHtml = `<div style="font-size:12px; color:#C9940B; font-weight:700; background:#FFF8E1; padding:4px 8px; border-radius:6px; margin-top:6px; display:inline-block; border: 1px solid #FBC02D;">
+        🚀 เพิ่มอีก ${diff} ชิ้น ลดเหลือ ฿${nextTier.price}/ชิ้น!
+      </div>`;
+    }
+
+    const isDiscounted = item.price < item.basePrice;
+    const imgHtml = item.image ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : (item.emoji || '🌾');
+    const div = document.createElement('div');
+    div.className = 'ci';
+    div.innerHTML = `
+      <div class="ci-img" style="overflow:hidden; padding:0;">${imgHtml}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price" style="${isDiscounted ? 'color:#E53E3E; font-weight:800;' : ''}">
+          ฿${item.price.toLocaleString()} / ชิ้น ${isDiscounted ? '<span style="font-size:10px">(ราคาส่ง)</span>' : ''}
+        </div>
+        ${upsellHtml}
+        <div class="ci-ctrl" style="margin-top:10px;">
+          <button class="qbtn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qdsp">${item.qty}</span>
+          <button class="qbtn" onclick="changeQty('${item.id}',1)">+</button>
+          <span style="font-size:13px;color:var(--tx3);margin-left:4px;font-weight:700;">รวม ฿${(item.price * item.qty).toLocaleString()}</span>
+          <button class="ci-rm" onclick="removeCart('${item.id}')">🗑</button>
+        </div>
+      </div>`;
+    body.appendChild(div);
+  });
+  document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
+}
+
+// ===== อัปเดตตอนโหลดสินค้าจากหลังบ้าน =====
 async function loadDynamicProducts() {
   try {
     const res = await fetch('/api/products');
@@ -878,6 +918,22 @@ async function loadDynamicProducts() {
       const safeEmoji = p.emoji ? p.emoji.replace(/'/g, "\\'") : '🌾';
       const safeImage = p.image ? p.image.replace(/'/g, "\\'") : '';
       
+      // เข้ารหัสข้อมูลขั้นบันไดราคา เพื่อแนบไปกับปุ่มกดใส่ตะกร้า
+      const safeTiers = encodeURIComponent(p.price_tiers || '[]');
+      
+      // ดึงข้อมูลมาแสดงป้ายราคาส่งสวยๆ
+      let tierInfoHtml = '';
+      try {
+        let tArr = JSON.parse(p.price_tiers || '[]');
+        if (tArr.length > 0) {
+          tArr.sort((a,b) => a.qty - b.qty);
+          tierInfoHtml = `<div style="background:var(--g5); padding:8px 12px; border-radius:10px; margin-bottom:12px; border:1px dashed var(--g3);">
+            <strong style="color:var(--g2); font-size:11px; display:block; margin-bottom:4px;">✨ โปรราคาส่ง:</strong>`;
+          tArr.forEach(t => { tierInfoHtml += `<div style="font-size:12px; color:var(--tx2); display:flex; justify-content:space-between;"><span>ซื้อ ${t.qty} ${p.unit} ขึ้นไป</span><strong style="color:var(--g1)">฿${t.price}</strong></div>`; });
+          tierInfoHtml += `</div>`;
+        }
+      } catch(e){}
+      
       return `
         <div class="pcard" data-cat="${p.category}">
           <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">
@@ -892,8 +948,9 @@ async function loadDynamicProducts() {
               <span class="pprice">฿${p.price.toLocaleString()}</span>
               <span class="punit">/ ${p.unit}</span>
             </div>
-            <div class="pmin">สั่งขั้นต่ำ ${p.min_order} กระสอบ</div>
-            <button class="add-btn" onclick="addCart('${p.id}', '${safeName}', ${p.price}, '${safeEmoji}', '${safeImage}', this)">+ เพิ่มลงตะกร้า</button>
+            ${tierInfoHtml}
+            <div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
+            <button class="add-btn" onclick="addCart('${p.id}', '${safeName}', ${p.price}, '${safeEmoji}', '${safeImage}', '${safeTiers}', this)">+ เพิ่มลงตะกร้า</button>
           </div>
         </div>
       `;
@@ -907,10 +964,7 @@ async function loadDynamicProducts() {
         observer.observe(el);
       });
     }
-
-  } catch (e) {
-    console.error('ไม่สามารถโหลดข้อมูลสินค้าแบบ Dynamic ได้:', e);
-  }
+  } catch (e) { console.error('Error Dynamic Product:', e); }
 }
 
 // สั่งให้ฟังก์ชันทำงานทันทีที่เปิดหน้าเว็บขึ้นมา
