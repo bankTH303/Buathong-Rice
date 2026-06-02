@@ -647,9 +647,9 @@ function updateCartUI() {
   const body = document.getElementById('cartBody');
   const footer = document.getElementById('cartFooter');
 
-  // ถ้าตะกร้าว่างเปล่า ให้สร้างกล่องว่างเปล่าขึ้นมาใหม่เลย
+  // ถ้าตะกร้าว่างเปล่า ให้สร้างกล่องว่างเปล่าขึ้นมาใหม่
   if (items.length === 0) {
-    footer.style.display = 'none'; 
+    footer.style.display = 'none';
     body.innerHTML = `
       <div class="cart-empty" id="cartEmpty">
         <div class="ce-icon">🛒</div>
@@ -660,7 +660,7 @@ function updateCartUI() {
     return;
   }
 
-  // ถ้ามีสินค้า ให้เคลียร์หน้าจอแล้ววาดรายการสินค้าลงไป
+  // ถ้ามีสินค้า ให้เคลียร์หน้าจอแล้ววาดรายการสินค้าลงไป (แก้จุดที่ Error แล้ว)
   footer.style.display = '';
   body.innerHTML = '';
   
