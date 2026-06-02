@@ -365,19 +365,8 @@ footer{
   </div>
   <div class="pgrid" id="productGrid">
 
-    <div class="pcard" data-cat="jasmine">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">
-        🌾<span class="pbadge hot">ขายดีสุด</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวหอมมะลิ</div>
-        <div class="pname">ข้าวหอมมะลิ 100%<br>ตรา ดอกบัวรวง</div>
-        <div class="pdesc">ข้าวหอมมะลิแท้ 100% จากทุ่งกุลาร้องไห้ หุงขึ้นหม้อ นุ่มหอม น่ารับประทาน</div>
-        <div class="pprow"><span class="pprice" id="p1-price">฿320</span><span class="punit">/ กระสอบ 5 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 10 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(1,'ข้าวหอมมะลิ ดอกบัวรวง 5กก.',320,'🌾',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
+    <div class="pgrid" id="productGrid">
+	</div>
 
     <div class="pcard" data-cat="jasmine">
       <div class="pcard-img" style="background:linear-gradient(135deg,#F1F8E9,#DCEDC8)">
@@ -1017,6 +1006,66 @@ async function fetchProducts() {
 // เรียกใช้เมื่อเปิดหน้าเว็บ
 window.addEventListener('DOMContentLoaded', () => {
   fetchProducts();
+});
+// เพิ่มฟังก์ชันนี้ลงไปท้ายสุดในแท็ก <script> ของไฟล์ public/index.html
+
+//========CUSTOM PRODUCT FROM ADMIN PAGE==============
+async function loadDynamicProducts() {
+  try {
+    // ดึงข้อมูลสินค้าจาก API ที่เชื่อมกับ SQLite
+    const res = await fetch('/api/products');
+    const products = await res.json();
+    
+    const grid = document.getElementById('productGrid');
+    if (!products || products.length === 0) {
+      grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--tx3); padding:40px;">กำลังอัปเดตระบบสินค้า กรุณารอสักครู่...</p>`;
+      return;
+    }
+
+    const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
+
+    // แปลงข้อมูลจากฐานข้อมูลออกมาเป็นกล่องสินค้าบนหน้าเว็บ
+    grid.innerHTML = products.map(p => {
+      const badgeHTML = p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : '';
+      
+      return `
+        <div class="pcard" data-cat="${p.category}">
+          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">
+            ${p.emoji || '🌾'}${badgeHTML}
+          </div>
+          <div class="pcard-body">
+            <div class="pcat">${catName[p.category] || p.category}</div>
+            <div class="pname">${p.name}</div>
+            <div class="pdesc">${p.description || ''}</div>
+            <div class="pprow">
+              <span class="pprice">฿${p.price.toLocaleString()}</span>
+              <span class="punit">/ ${p.unit}</span>
+            </div>
+            <div class="pmin">สั่งขั้นต่ำ ${p.min_order} กระสอบ</div>
+            <button class="add-btn" onclick="addCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.emoji || '🌾'}', this)">+ เพิ่มลงตะกร้า</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // สั่งให้ระบบอนิเมชั่น Scroll Reveal ทำงานกับสินค้าที่เพิ่งโหลดมาใหม่
+    if (typeof observer !== 'undefined') {
+      document.querySelectorAll('.pcard').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
+      });
+    }
+
+  } catch (e) {
+    console.error('ไม่สามารถโหลดข้อมูลสินค้าแบบ Dynamic ได้:', e);
+  }
+}
+
+// สั่งให้ฟังก์ชันทำงานทันทีที่เปิดหน้าเว็บขึ้นมา
+window.addEventListener('DOMContentLoaded', () => {
+  loadDynamicProducts();
 });
 </script>
 </body>
