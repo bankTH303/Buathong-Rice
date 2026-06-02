@@ -10,9 +10,7 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  /* โทนสีเขียวสว่างสดใส (ใบตอง/ธรรมชาติ) */
   --g1:#2E7D32;--g2:#43A047;--g3:#66BB6A;--g4:#A5D6A7;--g5:#E8F5E9;
-  /* โทนสีเหลืองทองน่าทาน (ข้าวสุก/รวงข้าว) */
   --gold:#F57F17;--goldb:#FBC02D;--goldc:#FFF176;--goldd:#FFFDE7;
   --cream:#FFFCF2;--cream2:#FFF8E1;
   --br1:#3E2723;--br2:#5D4037;--br3:#8D6E63;
@@ -25,7 +23,6 @@ body{font-family:'Noto Sans Thai',sans-serif;background:var(--cream);color:var(-
 /* NAV */
 nav{
   position:fixed;top:0;width:100%;z-index:1000;
-  /* เปลี่ยนสี Nav ให้สว่างขึ้นนิดหน่อย เข้ากับโทนเขียวใหม่ */
   background:rgba(46, 125, 50, 0.95);
   backdrop-filter:blur(12px);
   padding:0 5%;display:flex;align-items:center;justify-content:space-between;
@@ -46,7 +43,7 @@ nav{
 .hamburger span{width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
 .mobile-menu{
   display:none;position:fixed;top:68px;left:0;width:100%;
-  background:rgba(46, 125, 50, 0.98); /* สีเดียวกับ Nav */
+  background:rgba(46, 125, 50, 0.98); 
   z-index:999;flex-direction:column;padding:16px 5%;
 }
 .mobile-menu.open{display:flex}
@@ -56,7 +53,6 @@ nav{
 /* HERO */
 .hero{
   min-height:100vh;
-  /* ใส่รูป BG.jpg และไล่สีโทนเขียว-ทองบางๆ ทับรูปเพื่อให้ตัวหนังสือเด่น */
   background: linear-gradient(135deg, rgba(46, 125, 50, 0.8), rgba(245, 127, 23, 0.6)), url('BG.jpg') center/cover no-repeat;
   display:flex;
   align-items:center;
@@ -190,7 +186,7 @@ section{padding:88px 5%}
 .ce-text{font-size:16px;font-weight:600;margin-bottom:6px;color:var(--tx2)}
 .ce-sub{font-size:13px}
 .ci{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #F9F9F9;align-items:flex-start}
-.ci-img{width:62px;height:62px;border-radius:12px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.ci-img{width:62px;height:62px;border-radius:12px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden;}
 .ci-info{flex:1}
 .ci-name{font-size:15px;font-weight:700;color:var(--tx1);margin-bottom:3px}
 .ci-price{font-size:14px;color:var(--g3);font-weight:600}
@@ -227,7 +223,7 @@ section{padding:88px 5%}
 
 /* FOOTER */
 footer{
-  background:#1B5E20; /* สีเขียวเข้มธรรมชาติ */
+  background:#1B5E20;
   color:rgba(255,255,255,0.7);
   padding:56px 5% 32px;
 }
@@ -276,7 +272,6 @@ footer{
 </head>
 <body>
 
-<!-- NAVIGATION -->
 <nav>
   <a class="logo" href="#hero">
     <div class="logo-lotus">🪷</div>
@@ -306,7 +301,6 @@ footer{
   <a href="#contact" onclick="toggleMobile()">📞 ติดต่อ</a>
 </div>
 
-<!-- HERO -->
 <section class="hero" id="hero">
   <div class="hero-bg">
     <div class="hero-glow"></div>
@@ -338,7 +332,6 @@ footer{
   </div>
 </section>
 
-<!-- TRUST BAR -->
 <div class="trust-bar">
   <div class="trust-item"><span class="trust-icon">🚛</span>ส่งทั่วประเทศ</div>
   <div class="trust-item"><span class="trust-icon">✅</span>คัดคุณภาพทุกล็อต</div>
@@ -347,7 +340,6 @@ footer{
   <div class="trust-item"><span class="trust-icon">🤝</span>ขายส่ง-ขายปลีก</div>
 </div>
 
-<!-- PRODUCTS -->
 <section id="products">
   <div class="prod-header">
     <div>
@@ -363,117 +355,16 @@ footer{
       <button class="ftab" onclick="filterProd('other',this)">อื่นๆ</button>
     </div>
   </div>
+  
   <div class="pgrid" id="productGrid">
-
-    <div class="pgrid" id="productGrid">
-	</div>
-
-    <div class="pcard" data-cat="jasmine">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#F1F8E9,#DCEDC8)">
-        🌿<span class="pbadge new">ใหม่</span>
       </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวหอมมะลิ</div>
-        <div class="pname">ข้าวปลายทอน<br>หอมมะลิ พรีเมียม</div>
-        <div class="pdesc">ข้าวปลายทอนหอมมะลิ ราคาประหยัด เหมาะสำหรับร้านข้าวและครัวเรือน</div>
-        <div class="pprow"><span class="pprice">฿420</span><span class="punit">/ กระสอบ 5 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(2,'ข้าวปลายทอนหอมมะลิ พรีเมียม 5กก.',420,'🌿',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-
-    <div class="pcard" data-cat="saohai">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#FFF8E1,#FFECB3)">
-        🌻
-      </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวเสาไห้</div>
-        <div class="pname">ข้าวเสาไห้<br>ตราดอกบัว</div>
-        <div class="pdesc">ข้าวเสาไห้แท้ หุงนุ่ม เมล็ดสวย ไม่แฉะ เหมาะสำหรับร้านอาหารทุกประเภท</div>
-        <div class="pprow"><span class="pprice">฿370</span><span class="punit">/ กระสอบ 5 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 10 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(3,'ข้าวเสาไห้ ตราดอกบัว 5กก.',370,'🌻',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-
-    <div class="pcard" data-cat="sticky">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD9)">
-        🌸<span class="pbadge" style="background:var(--g3)">นิยม</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวเหนียว</div>
-        <div class="pname">ข้าวเหนียวขาว<br>คุณภาพสูง</div>
-        <div class="pdesc">ข้าวเหนียวขาวเกรดพรีเมียม นึ่งสุกเร็ว เหนียวนุ่ม เหมาะสำหรับขายข้าวเหนียวและร้านส้มตำ</div>
-        <div class="pprow"><span class="pprice">฿350</span><span class="punit">/ กระสอบ 5 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 10 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(4,'ข้าวเหนียวขาวพรีเมียม 5กก.',350,'🌸',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-
-    <div class="pcard" data-cat="other">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)">
-        💎
-      </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวอื่นๆ</div>
-        <div class="pname">ข้าวกล้อง<br>ออร์แกนิค</div>
-        <div class="pdesc">ข้าวกล้องเพื่อสุขภาพ ไม่ขัดสี เก็บรักษาคุณค่าทางโภชนาการ ตอบโจทย์ตลาดสุขภาพ</div>
-        <div class="pprow"><span class="pprice">฿480</span><span class="punit">/ กระสอบ 5 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(5,'ข้าวกล้องออร์แกนิค 5กก.',480,'💎',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-
-    <div class="pcard" data-cat="other">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#EDE7F6,#D1C4E9)">
-        🟣
-      </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวอื่นๆ</div>
-        <div class="pname">ข้าวไรซ์เบอร์รี่<br>สีม่วง</div>
-        <div class="pdesc">ข้าวไรซ์เบอร์รี่สีม่วงเข้ม อุดมด้วยสารต้านอนุมูลอิสระ เหมาะสำหรับตลาดสุขภาพและผู้รักสุขภาพ</div>
-        <div class="pprow"><span class="pprice">฿560</span><span class="punit">/ กระสอบ 5 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(6,'ข้าวไรซ์เบอร์รี่ 5กก.',560,'🟣',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-
-    <div class="pcard" data-cat="jasmine">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7)">
-        🌾
-      </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวหอมมะลิ</div>
-        <div class="pname">ข้าวหอมมะลิ<br>ขนาด 25 กก.</div>
-        <div class="pdesc">แพ็คใหญ่สำหรับขายส่งร้านค้า ประหยัดกว่า เหมาะสำหรับออเดอร์จำนวนมาก</div>
-        <div class="pprow"><span class="pprice">฿1,450</span><span class="punit">/ กระสอบ 25 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(7,'ข้าวหอมมะลิ 25กก.',1450,'🌾',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-
-    <div class="pcard" data-cat="saohai">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#FFFDE7,#FFF9C4)">
-        ✨<span class="pbadge new">ราคาพิเศษ</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcat">ข้าวเสาไห้</div>
-        <div class="pname">ข้าวเสาไห้<br>ขนาด 25 กก.</div>
-        <div class="pdesc">แพ็คขนาดใหญ่ ราคาส่งสำหรับร้านอาหาร โรงแรม และสถาบันการศึกษา</div>
-        <div class="pprow"><span class="pprice">฿1,680</span><span class="punit">/ กระสอบ 25 กก.</span></div>
-        <div class="pmin">สั่งขั้นต่ำ 5 กระสอบ</div>
-        <button class="add-btn" onclick="addCart(8,'ข้าวเสาไห้ 25กก.',1680,'✨',this)">+ เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-
-  </div>
+  
   <div style="text-align:center;margin-top:48px">
     <p style="font-size:15px;color:var(--tx3);margin-bottom:16px">มีสินค้าอื่นๆ อีกมากมาย ติดต่อเพื่อสอบถามข้อมูลเพิ่มเติม</p>
     <a href="#contact" class="btn-g" style="display:inline-flex">📞 ติดต่อสอบถามราคา</a>
   </div>
 </section>
 
-<!-- WHY US -->
 <section id="why">
   <div style="text-align:center;margin-bottom:0">
     <div class="sl" style="text-align:center">ทำไมต้องบัวทองไรซ์?</div>
@@ -514,7 +405,6 @@ footer{
   </div>
 </section>
 
-<!-- ABOUT -->
 <section id="about">
   <div class="about-grid">
     <div class="about-img-wrap">
@@ -544,7 +434,6 @@ footer{
   </div>
 </section>
 
-<!-- CONTACT -->
 <section id="contact">
   <div class="cgrid">
     <div class="cleft">
@@ -620,7 +509,6 @@ footer{
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="fgrid">
     <div>
@@ -651,13 +539,11 @@ footer{
   </div>
 </footer>
 
-<!-- FLOATING LINE BUTTON -->
 <a class="fl-line" href="https://www.facebook.com/profile.php?id=100063940624893" target="_blank" title="ติดต่อผ่าน Facebook">
   <span style="font-size:28px">💬</span>
   <div class="fl-tooltip">ติดต่อสั่งซื้อ</div>
 </a>
 
-<!-- CART OVERLAY + SIDEBAR -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
 <div class="cart-side" id="cartSide">
   <div class="cart-hdr">
@@ -685,7 +571,6 @@ footer{
   </div>
 </div>
 
-<!-- ORDER MODAL -->
 <div class="modal-wrap" id="orderModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -734,7 +619,6 @@ footer{
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -742,7 +626,7 @@ footer{
 let cart = {};
 
 function addCart(id, name, price, emoji, image, btn) {
-  id = String(id); // แปลงเป็นข้อความป้องกันบั๊กเวลากด + -
+  id = String(id);
   if (cart[id]) { cart[id].qty += 1; } 
   else { cart[id] = { id, name, price, emoji, image, qty: 1 }; }
   updateCartUI();
@@ -807,106 +691,6 @@ function removeCart(id) {
   showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
 }
 
-function openModal() {
-  if (Object.keys(cart).length === 0) { showToast('⚠️ กรุณาเพิ่มสินค้าก่อน'); return; }
-  closeCart(); // แก้ปัญหาตะกร้าไม่ยอมหายไปหลังจากกดสั่งซื้อ
-  
-  const items = Object.values(cart);
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
-  document.getElementById('orderSumItems').innerHTML = items.map(i => `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`).join('');
-  document.getElementById('orderTotal').textContent = '฿' + total.toLocaleString();
-  document.getElementById('orderFormWrap').style.display = '';
-  document.getElementById('orderSuccess').style.display = 'none';
-  document.getElementById('orderModal').classList.add('open');
-}
-
-// ในฟังก์ชัน loadDynamicProducts() แก้ไขการดึงรูปภาพลงการ์ดสินค้า
-// ค้นหาบริเวณ grid.innerHTML = products.map(p => { ... และเปลี่ยนเป็น:
-    grid.innerHTML = products.map(p => {
-      const badgeHTML = p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : '';
-      const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
-      const safeName = p.name.replace(/'/g, "\\'");
-      const safeEmoji = p.emoji ? p.emoji.replace(/'/g, "\\'") : '🌾';
-      const safeImage = p.image ? p.image.replace(/'/g, "\\'") : '';
-      
-      return `
-        <div class="pcard" data-cat="${p.category}">
-          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">
-            ${imgHtml}
-            ${badgeHTML}
-          </div>
-          <div class="pcard-body">
-            <div class="pcat">${catName[p.category] || p.category}</div>
-            <div class="pname">${p.name}</div>
-            <div class="pdesc">${p.description || ''}</div>
-            <div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>
-            <div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
-            <button class="add-btn" onclick="addCart('${p.id}', '${safeName}', ${p.price}, '${safeEmoji}', '${safeImage}', this)">+ เพิ่มลงตะกร้า</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-  // Badge
-  const badge = document.getElementById('cartBadge');
-  badge.textContent = count;
-  count > 0 ? badge.classList.add('show') : badge.classList.remove('show');
-
-  // Count label
-  document.getElementById('cartCount').textContent = count + ' รายการ';
-
-  // Cart body
-  const body = document.getElementById('cartBody');
-  const empty = document.getElementById('cartEmpty');
-  const footer = document.getElementById('cartFooter');
-
-  if (items.length === 0) {
-    empty.style.display = '';
-    footer.style.display = 'none';
-    body.innerHTML = '';
-    body.appendChild(empty);
-    return;
-  }
-
-  empty.style.display = 'none';
-  footer.style.display = '';
-
-  body.innerHTML = '';
-  items.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'ci';
-    div.innerHTML = `
-      <div class="ci-img">${item.emoji}</div>
-      <div class="ci-info">
-        <div class="ci-name">${item.name}</div>
-        <div class="ci-price">฿${item.price.toLocaleString()} / ชิ้น</div>
-        <div class="ci-ctrl">
-          <button class="qbtn" onclick="changeQty(${item.id},-1)">−</button>
-          <span class="qdsp">${item.qty}</span>
-          <button class="qbtn" onclick="changeQty(${item.id},1)">+</button>
-          <span style="font-size:13px;color:var(--tx3);margin-left:4px">รวม ฿${(item.price * item.qty).toLocaleString()}</span>
-          <button class="ci-rm" onclick="removeCart(${item.id})">🗑</button>
-        </div>
-      </div>`;
-    body.appendChild(div);
-  });
-
-  document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
-}
-
-function changeQty(id, delta) {
-  if (!cart[id]) return;
-  cart[id].qty += delta;
-  if (cart[id].qty <= 0) delete cart[id];
-  updateCartUI();
-}
-
-function removeCart(id) {
-  delete cart[id];
-  updateCartUI();
-  showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
-}
-
 function openCart() {
   document.getElementById('cartOverlay').classList.add('open');
   document.getElementById('cartSide').classList.add('open');
@@ -922,12 +706,14 @@ function closeCart() {
 // ===== MODAL =====
 function openModal() {
   if (Object.keys(cart).length === 0) { showToast('⚠️ กรุณาเพิ่มสินค้าก่อน'); return; }
+  closeCart(); // สั่งให้ตะกร้าปิดไปก่อนจะโชว์ฟอร์มสั่งซื้อ
+  
   const items = Object.values(cart);
   const total = items.reduce((s, i) => s + i.price * i.qty, 0);
 
   let html = '';
   items.forEach(i => {
-    html += `<div class="orow"><span>${i.emoji} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`;
+    html += `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`;
   });
   document.getElementById('orderSumItems').innerHTML = html;
   document.getElementById('orderTotal').textContent = '฿' + total.toLocaleString();
@@ -962,12 +748,12 @@ async function submitOrder() {
     if (res.ok) {
       document.getElementById('orderFormWrap').style.display = 'none';
       document.getElementById('orderSuccess').style.display = '';
-	  // -- ส่วนที่เพิ่มใหม่สำหรับ QR Code --
-      const PROMPTPAY_NUMBER = "0614799494"; // เบอร์พร้อมเพย์
+      
+      const PROMPTPAY_NUMBER = "0614799494"; 
       document.getElementById('pp-total').textContent = total.toLocaleString();
       document.getElementById('pp-qr').src = `https://promptpay.io/${PROMPTPAY_NUMBER}/${total}.png`;
-      // --------------------------------
-      cart = {};
+      
+      cart = {}; // ล้างตะกร้าสินค้าหลังจากกดสั่งซื้อสำเร็จ
       updateCartUI();
       showToast('✅ ' + data.message);
     } else {
@@ -1059,45 +845,9 @@ document.querySelectorAll('.pcard, .wcard, .citem').forEach(el => {
   observer.observe(el);
 });
 
-
-// ดึงสินค้าจากฐานข้อมูลมาแสดงแทนแบบ Hardcode
-async function fetchProducts() {
-  try {
-    const res = await fetch('/api/products');
-    const products = await res.json();
-    
-    const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
-    
-    document.getElementById('productGrid').innerHTML = products.map(p => `
-      <div class="pcard" data-cat="${p.category}">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">
-          ${p.emoji} ${p.badge ? `<span class="pbadge ${p.badge_type || ''}">${p.badge}</span>` : ''}
-        </div>
-        <div class="pcard-body">
-          <div class="pcat">${catName[p.category] || p.category}</div>
-          <div class="pname">${p.name}</div>
-          <div class="pdesc">${p.description}</div>
-          <div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>
-          <div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
-          <button class="add-btn" onclick="addCart(${p.id},'${p.name}',${p.price},'${p.emoji}',this)">+ เพิ่มลงตะกร้า</button>
-        </div>
-      </div>
-    `).join('');
-  } catch(e) {
-    console.log('Error fetching products');
-  }
-}
-
-// เรียกใช้เมื่อเปิดหน้าเว็บ
-window.addEventListener('DOMContentLoaded', () => {
-  fetchProducts();
-});
-// เพิ่มฟังก์ชันนี้ลงไปท้ายสุดในแท็ก <script> ของไฟล์ public/index.html
-
 //========CUSTOM PRODUCT FROM ADMIN PAGE==============
 async function loadDynamicProducts() {
   try {
-    // ดึงข้อมูลสินค้าจาก API ที่เชื่อมกับ SQLite
     const res = await fetch('/api/products');
     const products = await res.json();
     
@@ -1109,14 +859,18 @@ async function loadDynamicProducts() {
 
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
 
-    // แปลงข้อมูลจากฐานข้อมูลออกมาเป็นกล่องสินค้าบนหน้าเว็บ
     grid.innerHTML = products.map(p => {
       const badgeHTML = p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : '';
+      const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
+      const safeName = p.name.replace(/'/g, "\\'");
+      const safeEmoji = p.emoji ? p.emoji.replace(/'/g, "\\'") : '🌾';
+      const safeImage = p.image ? p.image.replace(/'/g, "\\'") : '';
       
       return `
         <div class="pcard" data-cat="${p.category}">
-          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">
-            ${p.emoji || '🌾'}${badgeHTML}
+          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">
+            ${imgHtml}
+            ${badgeHTML}
           </div>
           <div class="pcard-body">
             <div class="pcat">${catName[p.category] || p.category}</div>
@@ -1127,13 +881,12 @@ async function loadDynamicProducts() {
               <span class="punit">/ ${p.unit}</span>
             </div>
             <div class="pmin">สั่งขั้นต่ำ ${p.min_order} กระสอบ</div>
-            <button class="add-btn" onclick="addCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.emoji || '🌾'}', this)">+ เพิ่มลงตะกร้า</button>
+            <button class="add-btn" onclick="addCart('${p.id}', '${safeName}', ${p.price}, '${safeEmoji}', '${safeImage}', this)">+ เพิ่มลงตะกร้า</button>
           </div>
         </div>
       `;
     }).join('');
 
-    // สั่งให้ระบบอนิเมชั่น Scroll Reveal ทำงานกับสินค้าที่เพิ่งโหลดมาใหม่
     if (typeof observer !== 'undefined') {
       document.querySelectorAll('.pcard').forEach(el => {
         el.style.opacity = '0';
