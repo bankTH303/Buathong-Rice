@@ -1,4 +1,3 @@
-// database.js
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
@@ -11,7 +10,7 @@ if (!fs.existsSync(DATA_DIR)) {
 // เชื่อมต่อฐานข้อมูล SQLite
 const db = new Database(path.join(DATA_DIR, 'buathong.db'));
 
-// สร้างตาราง (Tables) - เพิ่มคอลัมน์ image
+// สร้างตาราง (Tables)
 db.exec(`
   CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,14 +44,16 @@ db.exec(`
 try { db.prepare('ALTER TABLE products ADD COLUMN image TEXT').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE order_items ADD COLUMN image TEXT').run(); } catch (e) {}
 
-// เพิ่มข้อมูลสินค้าเริ่มต้น
+// เพิ่มข้อมูลสินค้าเริ่มต้น (Seed) หากยังไม่มี
 const checkProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
 if (checkProducts.count === 0) {
   const insertStmt = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, badge, badge_type, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  
   const initialProducts = [
     ['ข้าวหอมมะลิ 100% ตรา ดอกบัวรวง', 'jasmine', 320, 'กระสอบ 5 กก.', 10, '🌾', 'ขายดีสุด', 'hot', 'ข้าวหอมมะลิแท้ 100% จากทุ่งกุลาร้องไห้'],
     ['ข้าวเสาไห้ ตราดอกบัว', 'saohai', 370, 'กระสอบ 5 กก.', 10, '🌻', null, null, 'ข้าวเสาไห้แท้ หุงนุ่ม เมล็ดสวย']
   ];
+
   initialProducts.forEach(p => insertStmt.run(p));
 }
 
