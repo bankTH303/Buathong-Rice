@@ -645,15 +645,23 @@ function updateCartUI() {
   document.getElementById('cartCount').textContent = count + ' รายการ';
 
   const body = document.getElementById('cartBody');
-  const empty = document.getElementById('cartEmpty');
   const footer = document.getElementById('cartFooter');
 
+  // ถ้าตะกร้าว่างเปล่า ให้สร้างกล่องว่างเปล่าขึ้นมาใหม่เลย
   if (items.length === 0) {
-    empty.style.display = ''; footer.style.display = 'none';
-    body.innerHTML = ''; body.appendChild(empty); return;
+    footer.style.display = 'none'; 
+    body.innerHTML = `
+      <div class="cart-empty" id="cartEmpty">
+        <div class="ce-icon">🛒</div>
+        <div class="ce-text">ตะกร้าของคุณว่างเปล่า</div>
+        <div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div>
+      </div>
+    `;
+    return;
   }
 
-  empty.style.display = 'none'; footer.style.display = '';
+  // ถ้ามีสินค้า ให้เคลียร์หน้าจอแล้ววาดรายการสินค้าลงไป
+  footer.style.display = '';
   body.innerHTML = '';
   
   items.forEach(item => {
