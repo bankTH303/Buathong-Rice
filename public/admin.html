@@ -291,6 +291,7 @@ tr:hover td{background:#FAFAFA}
     </div>
 
     <div class="fg"><label>ราคา (บาท)</label><input type="number" id="ep-price" min="0"></div>
+    
     <div class="fg" style="background:#F9FAFB; padding:12px; border-radius:10px; border:1px solid var(--border);">
       <label style="display:flex; justify-content:space-between;">
         ตั้งราคาส่ง (ขั้นบันได)
@@ -298,6 +299,7 @@ tr:hover td{background:#FAFAFA}
       </label>
       <div class="tiers-container" style="margin-top:8px;"></div>
     </div>
+
     <div class="fg"><label>หน่วย (เช่น กระสอบ 5 กก.)</label><input type="text" id="ep-unit"></div>
     <div class="fg"><label>ซื้อขั้นต่ำ (กระสอบ)</label><input type="number" id="ep-min" min="1"></div>
     <div class="fg"><label>รายละเอียด</label><textarea id="ep-desc"></textarea></div>
@@ -336,6 +338,15 @@ tr:hover td{background:#FAFAFA}
       </select>
     </div>
     <div class="fg"><label>ราคา (บาท) *</label><input type="number" id="np-price" min="0" placeholder="0"></div>
+    
+    <div class="fg" style="background:#F9FAFB; padding:12px; border-radius:10px; border:1px solid var(--border);">
+      <label style="display:flex; justify-content:space-between;">
+        ตั้งราคาส่ง (ขั้นบันได)
+        <button type="button" class="btn-sm btn-outline" style="padding:2px 8px; cursor:pointer;" onclick="addTierRow(this.parentElement.nextElementSibling)">+ เพิ่มขั้น</button>
+      </label>
+      <div class="tiers-container" style="margin-top:8px;"></div>
+    </div>
+
     <div class="fg"><label>หน่วย</label><input type="text" id="np-unit" placeholder="กระสอบ 5 กก." value="กระสอบ 5 กก."></div>
     <div class="fg"><label>ซื้อขั้นต่ำ</label><input type="number" id="np-min" min="1" value="1"></div>
     <div class="fg"><label>Emoji (กรณีไม่มีรูป)</label><input type="text" id="np-emoji" value="🌾" placeholder="🌾"></div>
@@ -378,7 +389,7 @@ let allOrders = [];
 let allProducts = []; 
 let currentOrderId = null;
 
-// ===== AUTH =====
+// ===== AUTH & NAVIGATION =====
 async function doLogin() {
   const pw = document.getElementById('pwInput').value;
   const res = await fetch(API + '/api/admin/login', {
@@ -407,7 +418,6 @@ function authHeader() {
   return { 'Content-Type':'application/json', 'x-admin-password': adminPw };
 }
 
-// ===== CLOCK =====
 function startClock() {
   function tick() {
     const now = new Date();
@@ -416,7 +426,6 @@ function startClock() {
   tick(); setInterval(tick, 30000);
 }
 
-// ===== NAVIGATION =====
 function goPage(page, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
@@ -435,9 +444,11 @@ async function loadDashboard() {
   try {
     const res = await fetch(API + '/api/admin/stats', { headers: authHeader() });
     const data = await res.json();
-    document.getElementById('stat-orders').textContent = data.totalOrders;
-    document.getElementById('stat-pending').textContent = data.pendingOrders;
-    document.getElementById('stat-revenue').textContent = '฿' + data.totalRevenue.toLocaleString();
+    document.getElementById('s-orders').textContent = data.totalOrders;
+    document.getElementById('s-pending').textContent = data.pendingOrders;
+    document.getElementById('s-today').textContent = data.todayOrders;
+    document.getElementById('s-revenue').textContent = '฿' + data.totalRevenue.toLocaleString();
+    document.getElementById('s-contacts').textContent = data.totalContacts;
 
     const res2 = await fetch(API + '/api/admin/orders', { headers: authHeader() });
     allOrders = await res2.json(); 
@@ -520,7 +531,6 @@ function openOrderDetail(id) {
   document.getElementById('orderDetailModal').classList.add('open');
 }
 
-// อัปเดตสถานะออเดอร์ (อันนี้ที่บอกว่าแอดมินบันทึกไม่ได้)
 async function updateOrderStatus() {
   const status = document.getElementById('od-status').value;
   try {
@@ -536,27 +546,20 @@ async function updateOrderStatus() {
   } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
 }
 
-
-// ===== PRODUCTS & IMAGES =====
-// พรีวิวรูปภาพ
+// ===== PRODUCTS, IMAGES & TIERED PRICING =====
 function previewImage(input, previewId) {
   const img = document.getElementById(previewId);
   if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function(e) {
-      img.src = e.target.result;
-      img.style.display = 'block';
-    }
+    reader.onload = function(e) { img.src = e.target.result; img.style.display = 'block'; }
     reader.readAsDataURL(input.files[0]);
   } else { img.style.display = 'none'; }
 }
 
-// อัปโหลดรูปลงเซิร์ฟเวอร์
 async function uploadImage(fileInputId) {
   const fileInput = document.getElementById(fileInputId);
   const file = fileInput.files[0];
   if(!file) return null;
-  
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -574,42 +577,6 @@ async function uploadImage(fileInputId) {
   });
 }
 
-// โหลดสินค้า
-// ===== FIX BUG สถิติหน้า Dashboard =====
-async function loadDashboard() {
-  try {
-    const res = await fetch(API + '/api/admin/stats', { headers: authHeader() });
-    const data = await res.json();
-    // แก้บั๊ก ID ให้ตรงกับ HTML
-    document.getElementById('s-orders').textContent = data.totalOrders;
-    document.getElementById('s-pending').textContent = data.pendingOrders;
-    document.getElementById('s-today').textContent = data.todayOrders;
-    document.getElementById('s-revenue').textContent = '฿' + data.totalRevenue.toLocaleString();
-    document.getElementById('s-contacts').textContent = data.totalContacts;
-
-    const res2 = await fetch(API + '/api/admin/orders', { headers: authHeader() });
-    allOrders = await res2.json(); 
-    const recent = allOrders.slice(0, 5);
-    
-    const tbody = document.getElementById('recentOrdersBody');
-    if (recent.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--tx3);padding:20px">ยังไม่มีออเดอร์</td></tr>`;
-      return;
-    }
-    
-    tbody.innerHTML = recent.map(o => `
-      <tr>
-        <td><strong>#${o.id}</strong></td>
-        <td>${o.customer_name}</td>
-        <td style="color:var(--green);font-weight:700">฿${o.total.toLocaleString()}</td>
-        <td>${statusBadge(o.status)}</td>
-        <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail('${o.id}')">ดู/แก้</button></td>
-      </tr>
-    `).join('');
-  } catch(e) { console.log('โหลด Dashboard ไม่สำเร็จ'); }
-}
-
-// ===== TIERED PRICING LOGIC =====
 function addTierRow(container, qty='', price='') {
   const div = document.createElement('div');
   div.style = "display:flex; gap:8px; margin-bottom:8px;";
@@ -632,7 +599,30 @@ function getTiers(modalId) {
   return JSON.stringify(tiers);
 }
 
-// ===== อัปเดตฟังก์ชันเพิ่ม/แก้สินค้า =====
+async function loadProducts() {
+  try {
+    const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
+    allProducts = await res.json();
+    const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
+    
+    document.getElementById('prodGrid').innerHTML = allProducts.map(p => {
+      const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
+      return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}">
+        <div class="pac-top" style="overflow:hidden; padding:0;">${imgHtml}</div>
+        <div class="pac-body">
+          <div class="pac-cat">${catName[p.category] || p.category} ${p.active ? '' : '· <span style="color:var(--red)">ซ่อนอยู่</span>'}</div>
+          <div class="pac-name">${p.name}</div>
+          <div style="margin-top:8px"><span class="pac-price">฿${p.price.toLocaleString()}</span> <span class="pac-unit">/ ${p.unit}</span></div>
+          <div style="font-size:12px;color:var(--tx3);margin-top:4px">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
+          <div class="pac-actions">
+            <button class="btn btn-sm btn-outline" onclick="openEditProduct('${p.id}')">✏️ แก้ไข</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
+}
+
 function openAddProduct() {
   document.getElementById('np-name').value = '';
   document.getElementById('np-price').value = '';
@@ -658,14 +648,13 @@ async function addProduct() {
     badge: document.getElementById('np-badge').value,
     description: document.getElementById('np-desc').value,
     image: imageUrl,
-    price_tiers: getTiers('addProductModal') // ดึงราคาส่ง
+    price_tiers: getTiers('addProductModal')
   };
   
   try {
     const res = await fetch(API + '/api/admin/products', { method: 'POST', headers: authHeader(), body: JSON.stringify(body) });
-    if (res.ok) {
-      showToast('✅ เพิ่มสินค้าสำเร็จ'); closeModal('addProductModal'); loadProducts();
-    } else showToast('❌ เกิดข้อผิดพลาด');
+    if (res.ok) { showToast('✅ เพิ่มสินค้าสำเร็จ'); closeModal('addProductModal'); loadProducts(); } 
+    else showToast('❌ เกิดข้อผิดพลาด');
   } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
   btn.textContent = '➕ เพิ่มสินค้า'; btn.disabled = false;
 }
@@ -687,14 +676,14 @@ function openEditProduct(id) {
   if (p.image) { preview.src = p.image; preview.style.display = 'block'; } 
   else { preview.style.display = 'none'; }
   
-  // โหลดราคาส่งมาแสดง
+  // โหลดราคาส่งเดิมมาแสดง
   const tContainer = document.querySelector('#editProductModal .tiers-container');
   tContainer.innerHTML = '';
   try {
     const tArr = JSON.parse(p.price_tiers || '[]');
     tArr.forEach(t => addTierRow(tContainer, t.qty, t.price));
   } catch(e){}
-
+  
   document.getElementById('editProductModal').classList.add('open');
 }
 
@@ -713,7 +702,7 @@ async function saveProduct() {
     description: document.getElementById('ep-desc').value,
     active: parseInt(document.getElementById('ep-active').value),
     image: imageUrl,
-    price_tiers: getTiers('editProductModal') // ดึงราคาส่ง
+    price_tiers: getTiers('editProductModal')
   };
   try {
     const res = await fetch(API + `/api/admin/products/${id}`, { method: 'PATCH', headers: authHeader(), body: JSON.stringify(body) });
@@ -722,7 +711,7 @@ async function saveProduct() {
   btn.textContent = '💾 บันทึก'; btn.disabled = false;
 }
 
-// ===== CONTACTS =====
+// ===== CONTACTS & UTILS =====
 async function loadContacts() {
   try {
     const res = await fetch(API + '/api/admin/contacts', { headers: authHeader() });
@@ -743,7 +732,6 @@ async function loadContacts() {
   } catch(e) { showToast('❌ โหลดข้อมูลไม่ได้'); }
 }
 
-// ===== UTILS =====
 function statusBadge(s) {
   const map = {
     'รอดำเนินการ':'s-wait', 'ยืนยันแล้ว':'s-confirm',
@@ -752,14 +740,11 @@ function statusBadge(s) {
   return `<span class="status ${map[s]||'s-wait'}">${s}</span>`;
 }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
