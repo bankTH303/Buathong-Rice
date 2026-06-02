@@ -694,12 +694,28 @@ footer{background:#0A2116;color:rgba(255,255,255,0.6);padding:56px 5% 32px}
       <button class="ln-btn" onclick="sendViaLine();closeModal()">💚 ส่งออเดอร์ผ่าน LINE แทน</button>
     </div>
     <div id="orderSuccess" style="display:none">
-      <div class="success-msg">
-        <div class="success-icon">🎉</div>
-        <h3>สั่งซื้อสำเร็จ!</h3>
-        <p>ขอบคุณสำหรับคำสั่งซื้อ<br>ทีมงานจะติดต่อยืนยันออเดอร์ภายใน 2-4 ชั่วโมง<br><br>หากต้องการความช่วยเหลือ ติดต่อเราผ่าน LINE หรือ Facebook ได้เลยครับ 🙏</p>
-      </div>
-    </div>
+	<div class="success-msg">
+		<div class="success-icon">🎉</div>
+		<h3 style="margin-bottom: 5px;">สั่งซื้อเรียบร้อย!</h3>
+		<p style="color:var(--tx2); font-size: 15px;">ยอดชำระเงินทั้งหมด: <span id="pp-total" style="color:var(--rd); font-weight: 800; font-size: 22px;"></span> บาท</p>
+    
+		<div style="margin: 20px auto; background: #fff; padding: 15px; border-radius: 16px; border: 2px solid var(--g3); display: inline-block;">
+		<p style="font-weight: 700; color: var(--g2); margin-bottom: 10px; font-size: 14px;">สแกนเพื่อชำระเงิน (พร้อมเพย์)</p>
+		<img id="pp-qr" src="" alt="QR Code พร้อมเพย์" style="width: 180px; height: 180px;">
+		</div>
+
+		<div style="background: var(--g5); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+		<p style="font-size:14px; color:var(--tx1); font-weight: 600; line-height: 1.6;">
+			ขั้นตอนสุดท้าย: เมื่อโอนเงินแล้ว<br>
+			กรุณาส่ง <b>"สลิปโอนเงิน + ที่อยู่จัดส่ง"</b> มาทาง Messenger
+		</p>
+		</div>
+    
+		<button class="ln-btn" style="background:#0084FF; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3);" onclick="window.open('https://m.me/YOUR_FACEBOOK_PAGE_ID','_blank')">
+		💬 ส่งสลิปและยืนยันผ่าน Facebook
+			</button>
+		</div>
+	</div>
   </div>
 </div>
 
@@ -846,6 +862,11 @@ async function submitOrder() {
     if (res.ok) {
       document.getElementById('orderFormWrap').style.display = 'none';
       document.getElementById('orderSuccess').style.display = '';
+	  // -- ส่วนที่เพิ่มใหม่สำหรับ QR Code --
+      const PROMPTPAY_NUMBER = "0614799494"; // เบอร์พร้อมเพย์
+      document.getElementById('pp-total').textContent = total.toLocaleString();
+      document.getElementById('pp-qr').src = `https://promptpay.io/${PROMPTPAY_NUMBER}/${total}.png`;
+      // --------------------------------
       cart = {};
       updateCartUI();
       showToast('✅ ' + data.message);
@@ -936,6 +957,40 @@ document.querySelectorAll('.pcard, .wcard, .citem').forEach(el => {
   el.style.transform = 'translateY(20px)';
   el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
   observer.observe(el);
+});
+
+
+// ดึงสินค้าจากฐานข้อมูลมาแสดงแทนแบบ Hardcode
+async function fetchProducts() {
+  try {
+    const res = await fetch('/api/products');
+    const products = await res.json();
+    
+    const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
+    
+    document.getElementById('productGrid').innerHTML = products.map(p => `
+      <div class="pcard" data-cat="${p.category}">
+        <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">
+          ${p.emoji} ${p.badge ? `<span class="pbadge ${p.badge_type || ''}">${p.badge}</span>` : ''}
+        </div>
+        <div class="pcard-body">
+          <div class="pcat">${catName[p.category] || p.category}</div>
+          <div class="pname">${p.name}</div>
+          <div class="pdesc">${p.description}</div>
+          <div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>
+          <div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
+          <button class="add-btn" onclick="addCart(${p.id},'${p.name}',${p.price},'${p.emoji}',this)">+ เพิ่มลงตะกร้า</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    console.log('Error fetching products');
+  }
+}
+
+// เรียกใช้เมื่อเปิดหน้าเว็บ
+window.addEventListener('DOMContentLoaded', () => {
+  fetchProducts();
 });
 </script>
 </body>
