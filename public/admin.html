@@ -360,6 +360,7 @@ tr:hover td{background:#FAFAFA}
 const API = '';  // same origin
 let adminPw = '';
 let allOrders = [];
+let allProducts = []; // แทรกเพิ่ม: สร้างตัวแปรพักข้อมูลสินค้าทั้งหมดไว้ที่นี่
 let currentOrderId = null;
 
 // ===== AUTH =====
@@ -474,7 +475,8 @@ async function loadOrders() {
 function filterOrders(status, btn) {
   document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
-  const filtered = status === 'all' ? allOrders : allOrders.filter(o => o.status === status);
+  // รองรับการเปรียบเทียบ ID ทั้งแบบ String และ Number
+  const filtered = status === 'all' ? allOrders : allOrders.filter(o => String(o.status) === String(status));
   renderOrders(filtered);
 }
 
@@ -495,13 +497,14 @@ function renderOrders(orders) {
       <td><strong style="color:var(--green)">฿${o.total.toLocaleString()}</strong></td>
       <td>${statusBadge(o.status)}</td>
       <td style="color:var(--tx3);font-size:11px;white-space:nowrap">${o.created_at}</td>
-      <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail(${o.id})">ดู/แก้</button></td>
+      <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail('${o.id}')">ดู/แก้</button></td>
     </tr>`;
   }).join('');
 }
 
 function openOrderDetail(id) {
-  const o = allOrders.find(x => x.id === id);
+  // ค้นหาข้อมูลออเดอร์จากอาเรย์ส่วนกลางเพื่อความเสถียร
+  const o = allOrders.find(x => String(x.id) === String(id));
   if (!o) return;
   currentOrderId = id;
   document.getElementById('od-id').textContent = `#${o.id}`;
@@ -521,30 +524,15 @@ function openOrderDetail(id) {
   document.getElementById('orderDetailModal').classList.add('open');
 }
 
-async function updateOrderStatus() {
-  const status = document.getElementById('od-status').value;
-  try {
-    const res = await fetch(API + `/api/admin/orders/${currentOrderId}`, {
-      method: 'PATCH',
-      headers: authHeader(),
-      body: JSON.stringify({ status })
-    });
-    if (res.ok) {
-      showToast('✅ อัปเดตสถานะแล้ว');
-      closeModal('orderDetailModal');
-      loadOrders();
-      loadDashboard();
-    }
-  } catch(e) { showToast('❌ อัปเดตไม่สำเร็จ'); }
-}
-
 // ===== PRODUCTS =====
 async function loadProducts() {
   try {
     const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
-    const products = await res.json();
+    allProducts = await res.json(); // บันทึกข้อมูลสินค้าทั้งหมดลงในอาเรย์ส่วนกลาง
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
-    document.getElementById('prodGrid').innerHTML = products.map(p => `
+    
+    // ส่งแค่ ID ไปยัง openEditProduct เพื่อป้องกันปัญหาอักขระพิเศษ/การขึ้นบรรทัดใหม่พังโค้ด
+    document.getElementById('prodGrid').innerHTML = allProducts.map(p => `
       <div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}">
         <div class="pac-top">${p.emoji || '🌾'}</div>
         <div class="pac-body">
@@ -553,7 +541,7 @@ async function loadProducts() {
           <div style="margin-top:8px"><span class="pac-price">฿${p.price.toLocaleString()}</span> <span class="pac-unit">/ ${p.unit}</span></div>
           <div style="font-size:12px;color:var(--tx3);margin-top:4px">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
           <div class="pac-actions">
-            <button class="btn btn-sm btn-outline" onclick="openEditProduct(${p.id},'${p.name.replace(/'/g,"\\'")}',${p.price},'${p.unit}',${p.min_order},'${(p.description||'').replace(/'/g,"\\'")}',${p.active})">✏️ แก้ไข</button>
+            <button class="btn btn-sm btn-outline" onclick="openEditProduct('${p.id}')">✏️ แก้ไข</button>
           </div>
         </div>
       </div>
@@ -561,14 +549,18 @@ async function loadProducts() {
   } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
 }
 
-function openEditProduct(id, name, price, unit, min, desc, active) {
-  document.getElementById('ep-id').value = id;
-  document.getElementById('ep-name').value = name;
-  document.getElementById('ep-price').value = price;
-  document.getElementById('ep-unit').value = unit;
-  document.getElementById('ep-min').value = min;
-  document.getElementById('ep-desc').value = desc;
-  document.getElementById('ep-active').value = active;
+function openEditProduct(id) {
+  // ดึงข้อมูลสินค้าตัวที่เลือกจากข้อมูลส่วนกลางมาป้อนใส่ฟอร์ม ปลอดภัย 100% แม้ข้อมูลมีตัวเอียงหรือเว้นบรรทัด
+  const p = allProducts.find(x => String(x.id) === String(id));
+  if (!p) return;
+  
+  document.getElementById('ep-id').value = p.id;
+  document.getElementById('ep-name').value = p.name;
+  document.getElementById('ep-price').value = p.price;
+  document.getElementById('ep-unit').value = p.unit;
+  document.getElementById('ep-min').value = p.min_order;
+  document.getElementById('ep-desc').value = p.description || '';
+  document.getElementById('ep-active').value = p.active ? "1" : "0";
   document.getElementById('editProductModal').classList.add('open');
 }
 
@@ -584,42 +576,18 @@ async function saveProduct() {
   };
   try {
     const res = await fetch(API + `/api/admin/products/${id}`, {
-      method: 'PATCH', headers: authHeader(), body: JSON.stringify(body)
+      method: 'PATCH', 
+      headers: authHeader(), 
+      body: JSON.stringify(body)
     });
     if (res.ok) {
       showToast('✅ บันทึกสำเร็จ! ราคาบนเว็บอัปเดตแล้ว');
       closeModal('editProductModal');
       loadProducts();
+    } else {
+      showToast('❌ บันทึกไม่สำเร็จ');
     }
   } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
-}
-
-function openAddProduct() {
-  document.getElementById('addProductModal').classList.add('open');
-}
-
-async function addProduct() {
-  const body = {
-    name: document.getElementById('np-name').value,
-    category: document.getElementById('np-cat').value,
-    price: parseFloat(document.getElementById('np-price').value),
-    unit: document.getElementById('np-unit').value,
-    min_order: parseInt(document.getElementById('np-min').value) || 1,
-    emoji: document.getElementById('np-emoji').value || '🌾',
-    badge: document.getElementById('np-badge').value || null,
-    description: document.getElementById('np-desc').value
-  };
-  if (!body.name || !body.price) { showToast('⚠️ กรุณากรอกชื่อและราคา'); return; }
-  try {
-    const res = await fetch(API + '/api/admin/products', {
-      method: 'POST', headers: authHeader(), body: JSON.stringify(body)
-    });
-    if (res.ok) {
-      showToast('✅ เพิ่มสินค้าใหม่แล้ว!');
-      closeModal('addProductModal');
-      loadProducts();
-    }
-  } catch(e) { showToast('❌ เพิ่มสินค้าไม่สำเร็จ'); }
 }
 
 // ===== CONTACTS =====
