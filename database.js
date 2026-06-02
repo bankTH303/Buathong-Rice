@@ -43,6 +43,7 @@ db.exec(`
 // อัปเดตตารางเก่าให้รองรับรูปภาพ (ถ้ามีตารางอยู่แล้ว)
 try { db.prepare('ALTER TABLE products ADD COLUMN image TEXT').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE order_items ADD COLUMN image TEXT').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE products ADD COLUMN price_tiers TEXT DEFAULT "[]"').run(); } catch (e) {}
 
 // เพิ่มข้อมูลสินค้าเริ่มต้น (Seed) หากยังไม่มี
 const checkProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
