@@ -10,10 +10,12 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --g1:#0D2B1A;--g2:#1B4332;--g3:#2D6A4F;--g4:#52B788;--g5:#D8F3DC;
-  --gold:#C9940B;--goldb:#E8AB14;--goldc:#F5CC5A;--goldd:#FFF8E1;
-  --cream:#FBF7F0;--cream2:#F5EFE4;
-  --br1:#3D2600;--br2:#6B4C1E;--br3:#9E7035;
+  /* โทนสีเขียวสว่างสดใส (ใบตอง/ธรรมชาติ) */
+  --g1:#2E7D32;--g2:#43A047;--g3:#66BB6A;--g4:#A5D6A7;--g5:#E8F5E9;
+  /* โทนสีเหลืองทองน่าทาน (ข้าวสุก/รวงข้าว) */
+  --gold:#F57F17;--goldb:#FBC02D;--goldc:#FFF176;--goldd:#FFFDE7;
+  --cream:#FFFCF2;--cream2:#FFF8E1;
+  --br1:#3E2723;--br2:#5D4037;--br3:#8D6E63;
   --tx1:#1A1A1A;--tx2:#4A4A4A;--tx3:#888;
   --wh:#fff;--rd:#E53E3E;--ln:#06C755;
 }
@@ -21,7 +23,14 @@ html{scroll-behavior:smooth}
 body{font-family:'Noto Sans Thai',sans-serif;background:var(--cream);color:var(--tx1);overflow-x:hidden}
 
 /* NAV */
-nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(13,43,26,0.97);backdrop-filter:blur(12px);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:68px;border-bottom:1px solid rgba(201,148,11,0.25)}
+nav{
+  position:fixed;top:0;width:100%;z-index:1000;
+  /* เปลี่ยนสี Nav ให้สว่างขึ้นนิดหน่อย เข้ากับโทนเขียวใหม่ */
+  background:rgba(46, 125, 50, 0.95);
+  backdrop-filter:blur(12px);
+  padding:0 5%;display:flex;align-items:center;justify-content:space-between;
+  height:68px;border-bottom:1px solid rgba(251, 192, 45, 0.3);
+}
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none;cursor:pointer}
 .logo-lotus{width:44px;height:44px;background:linear-gradient(135deg,var(--goldb),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 15px rgba(201,148,11,0.4)}
 .logo-text{color:#fff;font-size:15px;font-weight:700;line-height:1.2}
@@ -35,13 +44,26 @@ nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(13,43,26,0.97);
 .cart-badge.show{display:flex}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
-.mobile-menu{display:none;position:fixed;top:68px;left:0;width:100%;background:rgba(13,43,26,0.98);z-index:999;flex-direction:column;padding:16px 5%}
+.mobile-menu{
+  display:none;position:fixed;top:68px;left:0;width:100%;
+  background:rgba(46, 125, 50, 0.98); /* สีเดียวกับ Nav */
+  z-index:999;flex-direction:column;padding:16px 5%;
+}
 .mobile-menu.open{display:flex}
 .mobile-menu a{color:rgba(255,255,255,0.8);text-decoration:none;padding:14px 0;font-size:15px;border-bottom:1px solid rgba(255,255,255,0.08)}
 .mobile-menu a:last-child{border-bottom:none}
 
 /* HERO */
-.hero{min-height:100vh;background:var(--g1);display:flex;align-items:center;padding:100px 5% 60px;position:relative;overflow:hidden}
+.hero{
+  min-height:100vh;
+  /* ใส่รูป BG.jpg และไล่สีโทนเขียว-ทองบางๆ ทับรูปเพื่อให้ตัวหนังสือเด่น */
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.8), rgba(245, 127, 23, 0.6)), url('BG.jpg') center/cover no-repeat;
+  display:flex;
+  align-items:center;
+  padding:100px 5% 60px;
+  position:relative;
+  overflow:hidden;
+}
 .hero-bg{position:absolute;inset:0;overflow:hidden}
 .hero-bg svg{position:absolute;right:-80px;top:50%;transform:translateY(-50%);opacity:0.055;width:700px}
 .hero-glow{position:absolute;right:0;top:0;width:60%;height:100%;background:radial-gradient(ellipse at 80% 40%,rgba(201,148,11,0.18) 0%,transparent 65%)}
@@ -204,7 +226,11 @@ section{padding:88px 5%}
 .success-msg p{font-size:15px;color:var(--tx2);line-height:1.7}
 
 /* FOOTER */
-footer{background:#0A2116;color:rgba(255,255,255,0.6);padding:56px 5% 32px}
+footer{
+  background:#1B5E20; /* สีเขียวเข้มธรรมชาติ */
+  color:rgba(255,255,255,0.7);
+  padding:56px 5% 32px;
+}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:52px}
 .fbrand{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:12px}
 .fbd{font-size:14px;line-height:1.85;color:rgba(255,255,255,0.45);max-width:290px}
