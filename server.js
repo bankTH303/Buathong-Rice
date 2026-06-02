@@ -1,15 +1,25 @@
 // server.js (แก้ไขส่วน API)
+// นำโค้ดนี้ไปแทนที่ด้านบนของ server.js (ตั้งแต่บรรทัดแรก จนถึงก่อน // ===== PUBLIC API =====)
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { db } = require('./database'); // เปลี่ยนการเรียกใช้ db
+const fs = require('fs');
+const { db } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const UPLOAD_DIR = path.join(__dirname, 'data', 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
 app.use(cors());
-app.use(express.json());
+// ขยายขนาด limit เป็น 10mb เพื่อให้รองรับไฟล์รูปภาพ
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(UPLOAD_DIR)); // เปิดให้อ่านไฟล์รูปภาพได้
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'buathong2024';
 
@@ -131,3 +141,43 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.listen(PORT, () => console.log(`🚀 บัวทองไรซ์ Backend รันอยู่ที่พอร์ต ${PORT}`));
+
+// เพิ่ม API รับไฟล์รูปลงไปในกลุ่ม ADMIN API
+app.post('/api/admin/upload', checkAdmin, (req, res) => {
+  try {
+    const { imageBase64, fileName } = req.body;
+    if (!imageBase64) return res.status(400).json({ error: 'ไม่มีรูปภาพ' });
+    
+    const ext = path.extname(fileName) || '.jpg';
+    const filename = Date.now() + ext;
+    const filepath = path.join(UPLOAD_DIR, filename);
+    
+    // แปลง Base64 เป็นไฟล์ภาพบันทึกลงโฟลเดอร์ data/uploads
+    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+    fs.writeFileSync(filepath, base64Data, 'base64');
+    
+    res.json({ success: true, url: '/uploads/' + filename });
+  } catch(e) {
+    console.error(e);
+    res.status(500).json({ error: 'อัปโหลดไม่ได้' });
+  }
+});
+
+// แก้ไข API อัปเดตและเพิ่มสินค้าให้บันทึก image ลงไปด้วย
+app.patch('/api/admin/products/:id', checkAdmin, (req, res) => {
+  try {
+    const { name, price, unit, min_order, description, active, image } = req.body;
+    db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=? WHERE id=?`)
+      .run(name, price, unit, min_order, description, active, image, req.params.id);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'อัปเดตไม่ได้' }); }
+});
+
+app.post('/api/admin/products', checkAdmin, (req, res) => {
+  try {
+    const { name, category, price, unit, min_order, emoji, image, badge, description } = req.body;
+    const info = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, image, badge, description, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`)
+      .run(name, category, price, unit||'กระสอบ 5 กก.', min_order||1, emoji||'🌾', image||null, badge||null, description||'');
+    res.json({ success: true, id: info.lastInsertRowid });
+  } catch(e) { res.status(500).json({ error: 'เพิ่มสินค้าไม่ได้' }); }
+});
