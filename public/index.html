@@ -272,17 +272,17 @@ footer{
 </head>
 <body>
 
-<nav>
-  <a class="logo" href="#hero">
-    <div class="logo-lotus">🪷</div>
-    <div class="logo-text">บัวทองไรซ์<small>BUATHONG RICE Co.,Ltd.</small></div>
-  </a>
-  <ul class="nav-links">
-    <li><a href="#products">สินค้า</a></li>
-    <li><a href="#why">ทำไมเลือกเรา</a></li>
-    <li><a href="#about">เกี่ยวกับเรา</a></li>
-    <li><a href="#contact">ติดต่อ</a></li>
-  </ul>
+<a class="logo" href="/">
+  <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);">
+  <div class="logo-text">บัวทองไรซ์<small>BUATHONG RICE Co.,Ltd.</small></div>
+</a>
+<ul class="nav-links">
+  <li><a href="/#products">สินค้า</a></li>
+  <li><a href="/#why">ทำไมเลือกเรา</a></li>
+  <li><a href="/#about">เกี่ยวกับเรา</a></li>
+  <li><a href="/#contact">ติดต่อ</a></li>
+  <li><a href="/track.html" style="color: var(--goldc); font-weight: 700; border-bottom: 2px solid var(--goldc);">🔍 เช็คสถานะ</a></li>
+</ul>
   <div style="display:flex;align-items:center;gap:12px">
     <button class="cart-btn" onclick="openCart()">
       🛒 ตะกร้า
@@ -299,6 +299,7 @@ footer{
   <a href="#why" onclick="toggleMobile()">⭐ ทำไมเลือกเรา</a>
   <a href="#about" onclick="toggleMobile()">🏢 เกี่ยวกับเรา</a>
   <a href="#contact" onclick="toggleMobile()">📞 ติดต่อ</a>
+  <a href="/track.html">🔍 เช็คสถานะออเดอร์</a>
 </div>
 
 <section class="hero" id="hero">
@@ -585,8 +586,10 @@ footer{
       </div>
       <div class="frow">
         <div class="fg"><label>ชื่อผู้สั่ง *</label><input type="text" id="o-name" placeholder="ชื่อ-นามสกุล" required></div>
-        <div class="fg"><label>เบอร์โทร *</label><input type="tel" id="o-phone" placeholder="08X-XXX-XXXX" required></div>
-      </div>
+        <div class="fg">
+			<label>เบอร์โทร *</label>
+			<input type="tel" id="o-phone" placeholder="ระบุตัวเลข 10 หลัก (เช่น 0812345678)" maxlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+		</div>
       <div class="fg"><label>ชื่อร้าน / บริษัท</label><input type="text" id="o-shop" placeholder="ชื่อร้านหรือบริษัท"></div>
       <div class="fg"><label>ที่อยู่จัดส่ง *</label><textarea id="o-addr" placeholder="บ้านเลขที่ ถนน แขวง เขต จังหวัด รหัสไปรษณีย์" required></textarea></div>
       <div class="fg"><label>หมายเหตุ</label><input type="text" id="o-note" placeholder="เช่น เวลาที่สะดวกรับสินค้า"></div>
