@@ -165,9 +165,12 @@ tr:hover td{background:#FAFAFA}
 <body>
 
 <div id="loginScreen">
-  <div class="login-box">
-	<a class="logo" href="/">  <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width:80px; height:80px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);"></a>
-    <div class="login-title">Admin Panel</div>
+<!-- ในไฟล์ public/admin.html ส่วนหน้า Login -->
+<div class="login-box">
+  <div class="login-logo">
+    <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+  </div>
+  <div class="login-title">Admin Panel</div>
     <div class="login-sub">บริษัท บัวทองไรซ์ จำกัด</div>
     <input type="password" class="login-input" id="pwInput" placeholder="รหัสผ่าน Admin" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
@@ -176,11 +179,14 @@ tr:hover td{background:#FAFAFA}
 </div>
 
 <div id="app">
-  <aside class="sidebar">
-    <div class="sb-logo">
-	<a class="logo" href="/">  <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);"></div> </a>
-      <div class="sb-logo-name">บัวทองไรซ์</div>
-      <div class="sb-logo-sub">Admin Dashboard</div>
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover;">
+    </div>
+    <div class="sb-logo-name">บัวทองไรซ์</div>
+    <div class="sb-logo-sub">Admin Dashboard</div>
+  </div>
     </div>
     <nav class="sb-menu">
       <button class="sb-item active" onclick="goPage('dashboard',this)">
