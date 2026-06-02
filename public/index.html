@@ -741,19 +741,13 @@ footer{
 // ===== CART STATE =====
 let cart = {};
 
-function addCart(id, name, price, emoji, btn) {
-  if (cart[id]) {
-    cart[id].qty += 1;
-  } else {
-    cart[id] = { id, name, price, emoji, qty: 1 };
-  }
+function addCart(id, name, price, emoji, image, btn) {
+  id = String(id); // แปลงเป็นข้อความป้องกันบั๊กเวลากด + -
+  if (cart[id]) { cart[id].qty += 1; } 
+  else { cart[id] = { id, name, price, emoji, image, qty: 1 }; }
   updateCartUI();
-  btn.classList.add('added');
-  btn.textContent = '✅ เพิ่มแล้ว';
-  setTimeout(() => {
-    btn.classList.remove('added');
-    btn.textContent = '+ เพิ่มลงตะกร้า';
-  }, 1800);
+  btn.classList.add('added'); btn.textContent = '✅ เพิ่มแล้ว';
+  setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+ เพิ่มลงตะกร้า'; }, 1800);
   showToast('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
 }
 
@@ -761,6 +755,97 @@ function updateCartUI() {
   const items = Object.values(cart);
   const count = items.reduce((s, i) => s + i.qty, 0);
   const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+  document.getElementById('cartBadge').textContent = count;
+  count > 0 ? document.getElementById('cartBadge').classList.add('show') : document.getElementById('cartBadge').classList.remove('show');
+  document.getElementById('cartCount').textContent = count + ' รายการ';
+
+  const body = document.getElementById('cartBody');
+  const empty = document.getElementById('cartEmpty');
+  const footer = document.getElementById('cartFooter');
+
+  if (items.length === 0) {
+    empty.style.display = ''; footer.style.display = 'none';
+    body.innerHTML = ''; body.appendChild(empty); return;
+  }
+
+  empty.style.display = 'none'; footer.style.display = '';
+  body.innerHTML = '';
+  
+  items.forEach(item => {
+    const imgHtml = item.image ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : (item.emoji || '🌾');
+    const div = document.createElement('div');
+    div.className = 'ci';
+    div.innerHTML = `
+      <div class="ci-img" style="overflow:hidden; padding:0;">${imgHtml}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price">฿${item.price.toLocaleString()} / ชิ้น</div>
+        <div class="ci-ctrl">
+          <button class="qbtn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qdsp">${item.qty}</span>
+          <button class="qbtn" onclick="changeQty('${item.id}',1)">+</button>
+          <span style="font-size:13px;color:var(--tx3);margin-left:4px">รวม ฿${(item.price * item.qty).toLocaleString()}</span>
+          <button class="ci-rm" onclick="removeCart('${item.id}')">🗑</button>
+        </div>
+      </div>`;
+    body.appendChild(div);
+  });
+  document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
+}
+
+function changeQty(id, delta) {
+  id = String(id);
+  if (!cart[id]) return;
+  cart[id].qty += delta;
+  if (cart[id].qty <= 0) delete cart[id];
+  updateCartUI();
+}
+
+function removeCart(id) {
+  id = String(id); delete cart[id]; updateCartUI();
+  showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
+}
+
+function openModal() {
+  if (Object.keys(cart).length === 0) { showToast('⚠️ กรุณาเพิ่มสินค้าก่อน'); return; }
+  closeCart(); // แก้ปัญหาตะกร้าไม่ยอมหายไปหลังจากกดสั่งซื้อ
+  
+  const items = Object.values(cart);
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('orderSumItems').innerHTML = items.map(i => `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`).join('');
+  document.getElementById('orderTotal').textContent = '฿' + total.toLocaleString();
+  document.getElementById('orderFormWrap').style.display = '';
+  document.getElementById('orderSuccess').style.display = 'none';
+  document.getElementById('orderModal').classList.add('open');
+}
+
+// ในฟังก์ชัน loadDynamicProducts() แก้ไขการดึงรูปภาพลงการ์ดสินค้า
+// ค้นหาบริเวณ grid.innerHTML = products.map(p => { ... และเปลี่ยนเป็น:
+    grid.innerHTML = products.map(p => {
+      const badgeHTML = p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : '';
+      const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
+      const safeName = p.name.replace(/'/g, "\\'");
+      const safeEmoji = p.emoji ? p.emoji.replace(/'/g, "\\'") : '🌾';
+      const safeImage = p.image ? p.image.replace(/'/g, "\\'") : '';
+      
+      return `
+        <div class="pcard" data-cat="${p.category}">
+          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">
+            ${imgHtml}
+            ${badgeHTML}
+          </div>
+          <div class="pcard-body">
+            <div class="pcat">${catName[p.category] || p.category}</div>
+            <div class="pname">${p.name}</div>
+            <div class="pdesc">${p.description || ''}</div>
+            <div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>
+            <div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
+            <button class="add-btn" onclick="addCart('${p.id}', '${safeName}', ${p.price}, '${safeEmoji}', '${safeImage}', this)">+ เพิ่มลงตะกร้า</button>
+          </div>
+        </div>
+      `;
+    }).join('');
 
   // Badge
   const badge = document.getElementById('cartBadge');
