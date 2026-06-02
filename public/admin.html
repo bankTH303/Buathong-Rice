@@ -164,7 +164,6 @@ tr:hover td{background:#FAFAFA}
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">🌾</div>
@@ -176,9 +175,7 @@ tr:hover td{background:#FAFAFA}
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon">🪷</div>
@@ -205,7 +202,6 @@ tr:hover td{background:#FAFAFA}
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <div class="main">
     <div class="topbar">
       <div class="page-title" id="pageTitle">ภาพรวม</div>
@@ -217,7 +213,6 @@ tr:hover td{background:#FAFAFA}
 
     <div class="content">
 
-      <!-- PAGE: DASHBOARD -->
       <div class="page active" id="page-dashboard">
         <div class="stats-grid" id="statsGrid">
           <div class="stat-card"><div class="sc-icon sc-g">📦</div><div class="sc-val" id="s-orders">-</div><div class="sc-lbl">ออเดอร์ทั้งหมด</div></div>
@@ -239,7 +234,6 @@ tr:hover td{background:#FAFAFA}
         </div>
       </div>
 
-      <!-- PAGE: ORDERS -->
       <div class="page" id="page-orders">
         <div class="section-hdr">
           <div class="section-title">จัดการออเดอร์</div>
@@ -259,7 +253,6 @@ tr:hover td{background:#FAFAFA}
         </div>
       </div>
 
-      <!-- PAGE: PRODUCTS -->
       <div class="page" id="page-products">
         <div class="section-hdr">
           <div class="section-title">จัดการสินค้า & ราคา</div>
@@ -268,7 +261,6 @@ tr:hover td{background:#FAFAFA}
         <div class="prod-grid" id="prodGrid"></div>
       </div>
 
-      <!-- PAGE: CONTACTS -->
       <div class="page" id="page-contacts">
         <div class="section-hdr">
           <div class="section-title">ข้อมูลลูกค้าที่ติดต่อมา</div>
@@ -281,12 +273,19 @@ tr:hover td{background:#FAFAFA}
   </div>
 </div>
 
-<!-- EDIT PRODUCT MODAL -->
 <div class="modal-bg" id="editProductModal">
   <div class="modal-box">
     <div class="modal-title">✏️ แก้ไขสินค้า</div>
     <input type="hidden" id="ep-id">
     <div class="fg"><label>ชื่อสินค้า</label><input type="text" id="ep-name"></div>
+    
+    <div class="fg">
+      <label>เปลี่ยนรูปภาพสินค้า (อัปโหลด)</label>
+      <input type="file" id="ep-image" accept="image/*" onchange="previewImage(this, 'ep-preview')">
+      <img id="ep-preview" style="max-width:100px; margin-top:10px; display:none; border-radius:8px;">
+      <input type="hidden" id="ep-image-url">
+    </div>
+
     <div class="fg"><label>ราคา (บาท)</label><input type="number" id="ep-price" min="0"></div>
     <div class="fg"><label>หน่วย (เช่น กระสอบ 5 กก.)</label><input type="text" id="ep-unit"></div>
     <div class="fg"><label>ซื้อขั้นต่ำ (กระสอบ)</label><input type="number" id="ep-min" min="1"></div>
@@ -305,11 +304,17 @@ tr:hover td{background:#FAFAFA}
   </div>
 </div>
 
-<!-- ADD PRODUCT MODAL -->
 <div class="modal-bg" id="addProductModal">
   <div class="modal-box">
     <div class="modal-title">➕ เพิ่มสินค้าใหม่</div>
     <div class="fg"><label>ชื่อสินค้า *</label><input type="text" id="np-name" placeholder="เช่น ข้าวหอมมะลิ ตรา A"></div>
+    
+    <div class="fg">
+      <label>รูปภาพสินค้า (อัปโหลด)</label>
+      <input type="file" id="np-image" accept="image/*" onchange="previewImage(this, 'np-preview')">
+      <img id="np-preview" style="max-width:100px; margin-top:10px; display:none; border-radius:8px;">
+    </div>
+
     <div class="fg">
       <label>หมวดหมู่ *</label>
       <select id="np-cat">
@@ -322,7 +327,7 @@ tr:hover td{background:#FAFAFA}
     <div class="fg"><label>ราคา (บาท) *</label><input type="number" id="np-price" min="0" placeholder="0"></div>
     <div class="fg"><label>หน่วย</label><input type="text" id="np-unit" placeholder="กระสอบ 5 กก." value="กระสอบ 5 กก."></div>
     <div class="fg"><label>ซื้อขั้นต่ำ</label><input type="number" id="np-min" min="1" value="1"></div>
-    <div class="fg"><label>Emoji</label><input type="text" id="np-emoji" value="🌾" placeholder="🌾"></div>
+    <div class="fg"><label>Emoji (กรณีไม่มีรูป)</label><input type="text" id="np-emoji" value="🌾" placeholder="🌾"></div>
     <div class="fg"><label>Badge (เช่น ขายดี / ใหม่)</label><input type="text" id="np-badge" placeholder="ไม่ใส่ก็ได้"></div>
     <div class="fg"><label>รายละเอียด</label><textarea id="np-desc" placeholder="รายละเอียดสินค้า..."></textarea></div>
     <div class="modal-actions">
@@ -332,7 +337,6 @@ tr:hover td{background:#FAFAFA}
   </div>
 </div>
 
-<!-- ORDER DETAIL MODAL -->
 <div class="modal-bg" id="orderDetailModal">
   <div class="modal-box">
     <div class="modal-title">📦 รายละเอียดออเดอร์ <span id="od-id" style="color:var(--tx3);font-weight:400"></span></div>
@@ -360,23 +364,21 @@ tr:hover td{background:#FAFAFA}
 const API = '';  // same origin
 let adminPw = '';
 let allOrders = [];
-let allProducts = []; // แทรกเพิ่ม: สร้างตัวแปรพักข้อมูลสินค้าทั้งหมดไว้ที่นี่
+let allProducts = []; 
 let currentOrderId = null;
 
 // ===== AUTH =====
 async function doLogin() {
   const pw = document.getElementById('pwInput').value;
   const res = await fetch(API + '/api/admin/login', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ password: pw })
   });
   if (res.ok) {
     adminPw = pw;
     document.getElementById('loginScreen').classList.add('hide');
     document.getElementById('app').classList.add('show');
-    loadDashboard();
-    startClock();
+    loadDashboard(); startClock();
   } else {
     document.getElementById('loginErr').classList.add('show');
   }
@@ -400,8 +402,7 @@ function startClock() {
     const now = new Date();
     document.getElementById('clock').textContent = now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'});
   }
-  tick();
-  setInterval(tick, 30000);
+  tick(); setInterval(tick, 30000);
 }
 
 // ===== NAVIGATION =====
@@ -421,16 +422,14 @@ function goPage(page, btn) {
 // ===== DASHBOARD =====
 async function loadDashboard() {
   try {
-    // 1. โหลดสถิติด้านบน
     const res = await fetch(API + '/api/admin/stats', { headers: authHeader() });
     const data = await res.json();
     document.getElementById('stat-orders').textContent = data.totalOrders;
     document.getElementById('stat-pending').textContent = data.pendingOrders;
     document.getElementById('stat-revenue').textContent = '฿' + data.totalRevenue.toLocaleString();
 
-    // 2. โหลดออเดอร์ล่าสุด 5 รายการมาแสดง
     const res2 = await fetch(API + '/api/admin/orders', { headers: authHeader() });
-    allOrders = await res2.json(); // เซฟลงตัวแปรกลางที่สร้างไว้
+    allOrders = await res2.json(); 
     const recent = allOrders.slice(0, 5);
     
     const tbody = document.getElementById('recentOrdersBody');
@@ -439,7 +438,6 @@ async function loadDashboard() {
       return;
     }
     
-    // จุดที่แก้ไขคือบรรทัด button ด้านล่างนี้ (เติม '' ครอบ ${o.id})
     tbody.innerHTML = recent.map(o => `
       <tr>
         <td><strong>#${o.id}</strong></td>
@@ -449,9 +447,7 @@ async function loadDashboard() {
         <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail('${o.id}')">ดู/แก้</button></td>
       </tr>
     `).join('');
-  } catch(e) { 
-    console.log('โหลด Dashboard ไม่สำเร็จ'); 
-  }
+  } catch(e) { console.log('โหลด Dashboard ไม่สำเร็จ'); }
 }
 
 // ===== ORDERS =====
@@ -466,7 +462,6 @@ async function loadOrders() {
 function filterOrders(status, btn) {
   document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
-  // รองรับการเปรียบเทียบ ID ทั้งแบบ String และ Number
   const filtered = status === 'all' ? allOrders : allOrders.filter(o => String(o.status) === String(status));
   renderOrders(filtered);
 }
@@ -494,7 +489,6 @@ function renderOrders(orders) {
 }
 
 function openOrderDetail(id) {
-  // ค้นหาข้อมูลออเดอร์จากอาเรย์ส่วนกลางเพื่อความเสถียร
   const o = allOrders.find(x => String(x.id) === String(id));
   if (!o) return;
   currentOrderId = id;
@@ -515,17 +509,71 @@ function openOrderDetail(id) {
   document.getElementById('orderDetailModal').classList.add('open');
 }
 
-// ===== PRODUCTS =====
+// อัปเดตสถานะออเดอร์ (อันนี้ที่บอกว่าแอดมินบันทึกไม่ได้)
+async function updateOrderStatus() {
+  const status = document.getElementById('od-status').value;
+  try {
+    const res = await fetch(API + `/api/admin/orders/${currentOrderId}`, {
+      method: 'PATCH', headers: authHeader(), body: JSON.stringify({ status })
+    });
+    if (res.ok) {
+      showToast('✅ อัปเดตสถานะสำเร็จ');
+      closeModal('orderDetailModal');
+      loadOrders();
+      if(document.getElementById('pageTitle').textContent === 'ภาพรวม') loadDashboard();
+    } else { showToast('❌ บันทึกไม่สำเร็จ'); }
+  } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
+}
+
+
+// ===== PRODUCTS & IMAGES =====
+// พรีวิวรูปภาพ
+function previewImage(input, previewId) {
+  const img = document.getElementById(previewId);
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      img.src = e.target.result;
+      img.style.display = 'block';
+    }
+    reader.readAsDataURL(input.files[0]);
+  } else { img.style.display = 'none'; }
+}
+
+// อัปโหลดรูปลงเซิร์ฟเวอร์
+async function uploadImage(fileInputId) {
+  const fileInput = document.getElementById(fileInputId);
+  const file = fileInput.files[0];
+  if(!file) return null;
+  
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const res = await fetch(API + '/api/admin/upload', {
+          method: 'POST', headers: authHeader(),
+          body: JSON.stringify({ imageBase64: e.target.result, fileName: file.name })
+        });
+        const data = await res.json();
+        resolve(res.ok ? data.url : null);
+      } catch(err) { resolve(null); }
+    };
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
+// โหลดสินค้า
 async function loadProducts() {
   try {
     const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
-    allProducts = await res.json(); // บันทึกข้อมูลสินค้าทั้งหมดลงในอาเรย์ส่วนกลาง
+    allProducts = await res.json();
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
     
-    // ส่งแค่ ID ไปยัง openEditProduct เพื่อป้องกันปัญหาอักขระพิเศษ/การขึ้นบรรทัดใหม่พังโค้ด
-    document.getElementById('prodGrid').innerHTML = allProducts.map(p => `
-      <div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}">
-        <div class="pac-top">${p.emoji || '🌾'}</div>
+    document.getElementById('prodGrid').innerHTML = allProducts.map(p => {
+      const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
+      return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}">
+        <div class="pac-top" style="overflow:hidden; padding:0;">${imgHtml}</div>
         <div class="pac-body">
           <div class="pac-cat">${catName[p.category] || p.category} ${p.active ? '' : '· <span style="color:var(--red)">ซ่อนอยู่</span>'}</div>
           <div class="pac-name">${p.name}</div>
@@ -535,16 +583,54 @@ async function loadProducts() {
             <button class="btn btn-sm btn-outline" onclick="openEditProduct('${p.id}')">✏️ แก้ไข</button>
           </div>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
 }
 
+// เพิ่มสินค้าใหม่
+function openAddProduct() {
+  document.getElementById('np-name').value = '';
+  document.getElementById('np-price').value = '';
+  document.getElementById('np-desc').value = '';
+  document.getElementById('np-image').value = '';
+  document.getElementById('np-preview').style.display = 'none';
+  document.getElementById('addProductModal').classList.add('open');
+}
+
+async function addProduct() {
+  const btn = document.querySelector('#addProductModal .btn-primary');
+  btn.textContent = '⏳ กำลังบันทึก...'; btn.disabled = true;
+
+  const imageUrl = await uploadImage('np-image');
+  const body = {
+    name: document.getElementById('np-name').value,
+    category: document.getElementById('np-cat').value,
+    price: parseFloat(document.getElementById('np-price').value),
+    unit: document.getElementById('np-unit').value,
+    min_order: parseInt(document.getElementById('np-min').value),
+    emoji: document.getElementById('np-emoji').value,
+    badge: document.getElementById('np-badge').value,
+    description: document.getElementById('np-desc').value,
+    image: imageUrl
+  };
+  
+  try {
+    const res = await fetch(API + '/api/admin/products', { method: 'POST', headers: authHeader(), body: JSON.stringify(body) });
+    if (res.ok) {
+      showToast('✅ เพิ่มสินค้าสำเร็จ');
+      closeModal('addProductModal');
+      loadProducts();
+    } else showToast('❌ เกิดข้อผิดพลาด');
+  } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
+  
+  btn.textContent = '➕ เพิ่มสินค้า'; btn.disabled = false;
+}
+
+// แก้ไขสินค้า
 function openEditProduct(id) {
-  // ดึงข้อมูลสินค้าตัวที่เลือกจากข้อมูลส่วนกลางมาป้อนใส่ฟอร์ม ปลอดภัย 100% แม้ข้อมูลมีตัวเอียงหรือเว้นบรรทัด
   const p = allProducts.find(x => String(x.id) === String(id));
   if (!p) return;
-  
   document.getElementById('ep-id').value = p.id;
   document.getElementById('ep-name').value = p.name;
   document.getElementById('ep-price').value = p.price;
@@ -552,33 +638,37 @@ function openEditProduct(id) {
   document.getElementById('ep-min').value = p.min_order;
   document.getElementById('ep-desc').value = p.description || '';
   document.getElementById('ep-active').value = p.active ? "1" : "0";
+  
+  document.getElementById('ep-image').value = '';
+  document.getElementById('ep-image-url').value = p.image || '';
+  const preview = document.getElementById('ep-preview');
+  if (p.image) { preview.src = p.image; preview.style.display = 'block'; } 
+  else { preview.style.display = 'none'; }
+  
   document.getElementById('editProductModal').classList.add('open');
 }
 
 async function saveProduct() {
+  const btn = document.querySelector('#editProductModal .btn-primary');
+  btn.textContent = '⏳ กำลังบันทึก...'; btn.disabled = true;
   const id = document.getElementById('ep-id').value;
+  let imageUrl = await uploadImage('ep-image');
+  if (!imageUrl) imageUrl = document.getElementById('ep-image-url').value; 
+
   const body = {
     name: document.getElementById('ep-name').value,
     price: parseFloat(document.getElementById('ep-price').value),
     unit: document.getElementById('ep-unit').value,
     min_order: parseInt(document.getElementById('ep-min').value),
     description: document.getElementById('ep-desc').value,
-    active: parseInt(document.getElementById('ep-active').value)
+    active: parseInt(document.getElementById('ep-active').value),
+    image: imageUrl
   };
   try {
-    const res = await fetch(API + `/api/admin/products/${id}`, {
-      method: 'PATCH', 
-      headers: authHeader(), 
-      body: JSON.stringify(body)
-    });
-    if (res.ok) {
-      showToast('✅ บันทึกสำเร็จ! ราคาบนเว็บอัปเดตแล้ว');
-      closeModal('editProductModal');
-      loadProducts();
-    } else {
-      showToast('❌ บันทึกไม่สำเร็จ');
-    }
+    const res = await fetch(API + `/api/admin/products/${id}`, { method: 'PATCH', headers: authHeader(), body: JSON.stringify(body) });
+    if (res.ok) { showToast('✅ บันทึกสำเร็จ!'); closeModal('editProductModal'); loadProducts(); } 
   } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
+  btn.textContent = '💾 บันทึก'; btn.disabled = false;
 }
 
 // ===== CONTACTS =====
@@ -622,7 +712,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ปิด modal ถ้าคลิกนอก
 document.querySelectorAll('.modal-bg').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
 });
