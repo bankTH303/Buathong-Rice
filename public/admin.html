@@ -421,46 +421,37 @@ function goPage(page, btn) {
 // ===== DASHBOARD =====
 async function loadDashboard() {
   try {
-    const [sRes, oRes] = await Promise.all([
-      fetch(API + '/api/admin/stats', { headers: authHeader() }),
-      fetch(API + '/api/admin/orders', { headers: authHeader() })
-    ]);
-    const stats = await sRes.json();
-    const orders = await oRes.json();
+    // 1. โหลดสถิติด้านบน
+    const res = await fetch(API + '/api/admin/stats', { headers: authHeader() });
+    const data = await res.json();
+    document.getElementById('stat-orders').textContent = data.totalOrders;
+    document.getElementById('stat-pending').textContent = data.pendingOrders;
+    document.getElementById('stat-revenue').textContent = '฿' + data.totalRevenue.toLocaleString();
 
-    document.getElementById('s-orders').textContent = stats.totalOrders.toLocaleString();
-    document.getElementById('s-pending').textContent = stats.pendingOrders.toLocaleString();
-    document.getElementById('s-today').textContent = stats.todayOrders.toLocaleString();
-    document.getElementById('s-revenue').textContent = '฿' + stats.totalRevenue.toLocaleString();
-    document.getElementById('s-contacts').textContent = stats.totalContacts.toLocaleString();
-
-    // pending badge
-    const badge = document.getElementById('pendingBadge');
-    if (stats.pendingOrders > 0) {
-      badge.textContent = stats.pendingOrders;
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
-
-    // recent orders (top 5)
+    // 2. โหลดออเดอร์ล่าสุด 5 รายการมาแสดง
+    const res2 = await fetch(API + '/api/admin/orders', { headers: authHeader() });
+    allOrders = await res2.json(); // เซฟลงตัวแปรกลางที่สร้างไว้
+    const recent = allOrders.slice(0, 5);
+    
     const tbody = document.getElementById('recentOrdersBody');
-    const recent = orders.slice(0, 5);
     if (recent.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:40px">ยังไม่มีออเดอร์</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--tx3);padding:20px">ยังไม่มีออเดอร์</td></tr>`;
       return;
     }
+    
+    // จุดที่แก้ไขคือบรรทัด button ด้านล่างนี้ (เติม '' ครอบ ${o.id})
     tbody.innerHTML = recent.map(o => `
       <tr>
         <td><strong>#${o.id}</strong></td>
         <td>${o.customer_name}</td>
-        <td>${o.customer_phone}</td>
-        <td><strong style="color:var(--green)">฿${o.total.toLocaleString()}</strong></td>
+        <td style="color:var(--green);font-weight:700">฿${o.total.toLocaleString()}</td>
         <td>${statusBadge(o.status)}</td>
-        <td style="color:var(--tx3);font-size:12px">${o.created_at}</td>
+        <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail('${o.id}')">ดู/แก้</button></td>
       </tr>
     `).join('');
-  } catch(e) { showToast('❌ โหลดข้อมูลไม่ได้'); }
+  } catch(e) { 
+    console.log('โหลด Dashboard ไม่สำเร็จ'); 
+  }
 }
 
 // ===== ORDERS =====
