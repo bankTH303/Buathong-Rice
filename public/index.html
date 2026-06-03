@@ -948,6 +948,13 @@ async function doRegister() {
 function doLogout() {
   currentUser = null;
   localStorage.removeItem('btr_user');
+  
+  // --- [ใส่ 3 บรรทัดนี้เพิ่มเข้าไปเพื่อเคลียร์ตะกร้า] ---
+  cart = {}; 
+  localStorage.removeItem('btr_cart');
+  updateCartUI(); 
+  // ---------------------------------------------
+
   updateAuthNavUI();
   document.getElementById('portalModal').classList.remove('open');
   showToast('👋 ออกจากระบบแล้ว');
