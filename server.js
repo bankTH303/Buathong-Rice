@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto'); // ระบบเข้ารหัสผ่าน
 const { db } = require('./database');
 
 const app = express();
@@ -14,11 +15,10 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 }
 
 app.use(cors());
-// ขยายลิมิตการอัปโหลดไฟล์เป็น 50MB ป้องกันไฟล์รูปภาพขนาดใหญ่
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(UPLOAD_DIR)); // เปิดให้อ่านไฟล์รูปภาพได้
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'buathong2024';
 
@@ -28,6 +28,60 @@ function checkAdmin(req, res, next) {
   }
   next();
 }
+
+// ฟังก์ชันเข้ารหัสผ่าน (SHA-256)
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+// ===== AUTH & USER API =====
+app.post('/api/auth/register', (req, res) => {
+  try {
+    const { name, email, phone, password, province, district, subdistrict, zipcode, address_detail } = req.body;
+    const hashedPw = hashPassword(password);
+    const info = db.prepare(`INSERT INTO users (name, email, phone, password, province, district, subdistrict, zipcode, address_detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(name, email, phone, hashedPw, province, district, subdistrict, zipcode, address_detail);
+    
+    res.json({ success: true, user: { id: info.lastInsertRowid, name, email, phone, province, district, subdistrict, zipcode, address_detail } });
+  } catch(e) {
+    if(e.message.includes('UNIQUE constraint failed')) {
+      res.status(400).json({ error: 'อีเมลนี้ถูกสมัครสมาชิกไปแล้ว' });
+    } else {
+      res.status(500).json({ error: 'สมัครสมาชิกไม่สำเร็จ' });
+    }
+  }
+});
+
+app.post('/api/auth/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const hashedPw = hashPassword(password);
+    const user = db.prepare('SELECT id, name, email, phone, province, district, subdistrict, zipcode, address_detail FROM users WHERE email = ? AND password = ?').get(email, hashedPw);
+    
+    if(user) res.json({ success: true, user });
+    else res.status(401).json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
+  } catch(e) { res.status(500).json({ error: 'ระบบขัดข้อง' }); }
+});
+
+app.patch('/api/user/:id', (req, res) => {
+  try {
+    const { name, phone, province, district, subdistrict, zipcode, address_detail } = req.body;
+    db.prepare(`UPDATE users SET name=?, phone=?, province=?, district=?, subdistrict=?, zipcode=?, address_detail=? WHERE id=?`)
+      .run(name, phone, province, district, subdistrict, zipcode, address_detail, req.params.id);
+    const user = db.prepare('SELECT id, name, email, phone, province, district, subdistrict, zipcode, address_detail FROM users WHERE id = ?').get(req.params.id);
+    res.json({ success: true, user });
+  } catch(e) { res.status(500).json({ error: 'อัปเดตข้อมูลไม่สำเร็จ' }); }
+});
+
+app.get('/api/user/:id/orders', (req, res) => {
+  try {
+    const orders = db.prepare('SELECT id, total, status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC').all(req.params.id);
+    const result = orders.map(o => {
+      const items = db.prepare('SELECT name, qty, price, image, emoji FROM order_items WHERE order_id = ?').all(o.id);
+      return { ...o, items, created_at: new Date(o.created_at).toLocaleString('th-TH') };
+    });
+    res.json(result);
+  } catch(e) { res.status(500).json({ error: 'โหลดประวัติไม่ได้' }); }
+});
 
 // ===== PUBLIC API =====
 app.get('/api/products', (req, res) => {
@@ -39,11 +93,11 @@ app.get('/api/products', (req, res) => {
 
 app.post('/api/orders', (req, res) => {
   try {
-    const { customer_name, customer_phone, customer_addr, note, items, total } = req.body;
+    const { user_id, customer_name, customer_phone, customer_addr, note, items, total } = req.body;
     
     const insertOrder = db.transaction((orderData, itemsData) => {
-      const stmt = db.prepare(`INSERT INTO orders (customer_name, customer_phone, customer_addr, note, total) VALUES (?, ?, ?, ?, ?)`);
-      const info = stmt.run(orderData.name, orderData.phone, orderData.addr, orderData.note, orderData.total);
+      const stmt = db.prepare(`INSERT INTO orders (user_id, customer_name, customer_phone, customer_addr, note, total) VALUES (?, ?, ?, ?, ?, ?)`);
+      const info = stmt.run(orderData.user_id || null, orderData.name, orderData.phone, orderData.addr, orderData.note, orderData.total);
       
       const insertItem = db.prepare(`INSERT INTO order_items (order_id, product_id, name, emoji, image, qty, price) VALUES (?, ?, ?, ?, ?, ?, ?)`);
       itemsData.forEach(item => {
@@ -52,7 +106,7 @@ app.post('/api/orders', (req, res) => {
       return info.lastInsertRowid;
     });
 
-    const orderId = insertOrder({ name: customer_name, phone: customer_phone, addr: customer_addr, note: note || '', total }, items);
+    const orderId = insertOrder({ user_id, name: customer_name, phone: customer_phone, addr: customer_addr, note: note || '', total }, items);
     res.json({ success: true, order_id: orderId, message: `รับออเดอร์เรียบร้อยแล้ว!` });
   } catch(e) { 
     console.error(e);
@@ -73,19 +127,13 @@ app.get('/api/track/:phone', (req, res) => {
     const phone = req.params.phone.replace(/[^0-9]/g, '');
     if(phone.length !== 10) return res.status(400).json({ error: 'เบอร์โทรไม่ถูกต้อง' });
     
-    // ค้นหาออเดอร์ที่ตรงกับเบอร์โทร
     const orders = db.prepare('SELECT id, total, status, created_at FROM orders WHERE customer_phone = ? ORDER BY created_at DESC').all(phone);
-    
-    // ดึงรายการสินค้าในแต่ละออเดอร์
     const result = orders.map(o => {
       const items = db.prepare('SELECT name, qty, price FROM order_items WHERE order_id = ?').all(o.id);
       return { ...o, items, created_at: new Date(o.created_at).toLocaleString('th-TH') };
     });
-    
     res.json(result);
-  } catch(e) {
-    res.status(500).json({ error: 'ระบบขัดข้อง' });
-  }
+  } catch(e) { res.status(500).json({ error: 'ระบบขัดข้อง' }); }
 });
 
 // ===== ADMIN API =====
@@ -136,7 +184,6 @@ app.post('/api/admin/products', checkAdmin, (req, res) => {
   } catch(e) { res.status(500).json({ error: 'เพิ่มสินค้าไม่ได้' }); }
 });
 
-// API สำหรับรับไฟล์รูปภาพจากแอดมิน
 app.post('/api/admin/upload', checkAdmin, (req, res) => {
   try {
     const { imageBase64, fileName } = req.body;
@@ -146,15 +193,11 @@ app.post('/api/admin/upload', checkAdmin, (req, res) => {
     const filename = Date.now() + ext;
     const filepath = path.join(UPLOAD_DIR, filename);
     
-    // แปลง Base64 เป็นไฟล์ภาพบันทึกลงระบบ
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     fs.writeFileSync(filepath, base64Data, 'base64');
     
     res.json({ success: true, url: '/uploads/' + filename });
-  } catch(e) {
-    console.error(e);
-    res.status(500).json({ error: 'อัปโหลดไม่ได้' });
-  }
+  } catch(e) { res.status(500).json({ error: 'อัปโหลดไม่ได้' }); }
 });
 
 app.get('/api/admin/contacts', checkAdmin, (req, res) => {
