@@ -732,12 +732,26 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 
 <script>
 // ===== GLOBAL STATE =====
-let cart = JSON.parse(localStorage.getItem('btr_cart')) || {};
 let currentUser = JSON.parse(localStorage.getItem('btr_user')) || null;
 let thaiAddressData = [];
 let currentShippingFee = 0;
+let cart = {};
+
+// ฟังก์ชันแยกตะกร้า Guest กับตะกร้า User
+function getCartKey() {
+  return currentUser ? 'btr_cart_user_' + currentUser.id : 'btr_cart_guest';
+}
+
+function loadCart() {
+  cart = JSON.parse(localStorage.getItem(getCartKey())) || {};
+}
+
+function saveCart() { 
+  localStorage.setItem(getCartKey(), JSON.stringify(cart)); 
+}
 
 window.addEventListener('DOMContentLoaded', async () => {
+  loadCart(); // โหลดตะกร้าให้ตรงกับสถานะล็อกอิน
   loadDynamicProducts();
   updateCartUI();
   updateAuthNavUI();
@@ -750,7 +764,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     initAddressDropdowns('p'); // Profile
   } catch(e) { console.error('Address Data Error', e); }
 });
-
 // ===== TOAST UTILS =====
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -905,9 +918,24 @@ async function doLogin() {
     });
     const data = await res.json();
     if(res.ok) {
+      // 1. เก็บตะกร้า Guest ไว้ก่อน
+      let guestCart = { ...cart }; 
+      
+      // 2. เซ็ต User ใหม่
       currentUser = data.user;
       localStorage.setItem('btr_user', JSON.stringify(currentUser));
       updateAuthNavUI();
+      
+      // 3. โหลดตะกร้าของ User นี้ แล้วรวมของที่หยิบไว้ตอนเป็น Guest เข้าไป
+      loadCart();
+      for(let k in guestCart) {
+        if(cart[k]) cart[k].qty += guestCart[k].qty;
+        else cart[k] = guestCart[k];
+      }
+      saveCart();
+      localStorage.removeItem('btr_cart_guest'); // ล้างตะกร้า Guest ทิ้ง
+      updateCartUI();
+
       document.getElementById('authModal').classList.remove('open');
       showToast('✅ ยินดีต้อนรับกลับมาครับ!');
     } else showToast('❌ ' + data.error);
@@ -936,25 +964,32 @@ async function doRegister() {
     });
     const data = await res.json();
     if(res.ok) {
+      // รวมตะกร้าแบบเดียวกับ Login
+      let guestCart = { ...cart };
       currentUser = data.user;
       localStorage.setItem('btr_user', JSON.stringify(currentUser));
       updateAuthNavUI();
+      
+      loadCart();
+      for(let k in guestCart) { cart[k] = guestCart[k]; }
+      saveCart();
+      localStorage.removeItem('btr_cart_guest');
+      updateCartUI();
+
       document.getElementById('authModal').classList.remove('open');
       showToast('🎉 สมัครสมาชิกสำเร็จ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
-
+  
 function doLogout() {
   currentUser = null;
   localStorage.removeItem('btr_user');
   
-  // --- [ใส่ 3 บรรทัดนี้เพิ่มเข้าไปเพื่อเคลียร์ตะกร้า] ---
-  cart = {}; 
-  localStorage.removeItem('btr_cart');
-  updateCartUI(); 
-  // ---------------------------------------------
-
+  // สลับกลับไปโหลดตะกร้า Guest (ซึ่งตอนนี้จะว่างเปล่าแล้ว)
+  loadCart();
+  updateCartUI();
+  
   updateAuthNavUI();
   document.getElementById('portalModal').classList.remove('open');
   showToast('👋 ออกจากระบบแล้ว');
