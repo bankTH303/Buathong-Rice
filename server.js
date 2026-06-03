@@ -218,14 +218,17 @@ app.post('/api/admin/upload', checkAdmin, (req, res) => {
   try {
     const { imageBase64, fileName } = req.body;
     if (!imageBase64) return res.status(400).json({ error: 'ไม่มีรูปภาพ' });
-    const ext = path.extname(fileName) || '.jpg';
+    
+    const ext = path.extname(fileName).toLowerCase() || '.jpg';
+    
+    // 🛡️ เพิ่มระบบตรวจสอบนามสกุลไฟล์ตรงนี้
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    if (!allowedExts.includes(ext)) {
+      return res.status(400).json({ error: '🚨 ไม่อนุญาตให้อัปโหลดไฟล์ประเภทนี้' });
+    }
+
     const filename = Date.now() + ext;
-    const filepath = path.join(UPLOAD_DIR, filename);
-    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-    fs.writeFileSync(filepath, base64Data, 'base64');
-    res.json({ success: true, url: '/uploads/' + filename });
-  } catch(e) { res.status(500).json({ error: 'อัปโหลดไม่ได้' }); }
-});
+    // ... โค้ดเดิม
 
 app.get('/api/admin/contacts', checkAdmin, (req, res) => {
   try {
