@@ -1096,24 +1096,66 @@ async function submitOrder() {
 
 async function loadDynamicProducts() {
   try {
-    const res = await fetch('/api/products'); const products = await res.json(); const grid = document.getElementById('productGrid');
-    if (!products || products.length === 0) return grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--tx3); padding:40px;">กำลังอัปเดตระบบสินค้า กรุณารอสักครู่...</p>`;
+    const res = await fetch('/api/products'); 
+    const products = await res.json(); 
+    const grid = document.getElementById('productGrid');
+    
+    // 🛡️ เช็คความถูกต้องของ Array
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      return grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--tx3); padding:40px;">กำลังอัปเดตระบบสินค้า กรุณารอสักครู่...</p>`;
+    }
+
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
+    
     grid.innerHTML = products.map(p => {
+      // 🛡️ Defensive: ป้องกัน Null และ XSS (Broken HTML attribute)
+      const price = p.price || 0;
+      const minOrder = p.min_order || 1;
+      const unit = p.unit || 'ชิ้น';
+      const rawName = p.name || 'สินค้าทั่วไป';
+      
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
+      const safeName = rawName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const safeEmoji = (p.emoji || '🌾').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const safeImage = (p.image || '').replace(/'/g, "\\'");
+      
       let tierInfoHtml = '';
       try {
         let tArr = JSON.parse(p.price_tiers || '[]');
         if (tArr.length > 0) {
           tArr.sort((a,b) => a.qty - b.qty);
           tierInfoHtml = `<div style="background:var(--g5); padding:8px 12px; border-radius:10px; margin-bottom:12px; border:1px dashed var(--g3);"><strong style="color:var(--g2); font-size:11px; display:block; margin-bottom:4px;">✨ โปรราคาส่ง:</strong>`;
-          tArr.forEach(t => { tierInfoHtml += `<div style="font-size:12px; color:var(--tx2); display:flex; justify-content:space-between;"><span>ซื้อ ${t.qty} ${p.unit} ขึ้นไป</span><strong style="color:var(--g1)">฿${t.price}</strong></div>`; });
+          tArr.forEach(t => { tierInfoHtml += `<div style="font-size:12px; color:var(--tx2); display:flex; justify-content:space-between;"><span>ซื้อ ${t.qty} ${unit} ขึ้นไป</span><strong style="color:var(--g1)">฿${t.price}</strong></div>`; });
           tierInfoHtml += `</div>`;
         }
       } catch(e){}
-      return `<div class="pcard" data-cat="${p.category}"><div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">${imgHtml}${p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : ''}</div><div class="pcard-body"><div class="pcat">${catName[p.category] || p.category}</div><div class="pname">${p.name}</div><div class="pdesc">${p.description || ''}</div><div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>${tierInfoHtml}<div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div><button class="add-btn" onclick="addCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${(p.emoji||'🌾').replace(/'/g, "\\'")}', '${p.image||''}', '${encodeURIComponent(p.price_tiers || '[]')}', this)">+ เพิ่มลงตะกร้า</button></div></div>`;
+
+      return `
+        <div class="pcard" data-cat="${p.category || 'other'}">
+          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">
+            ${imgHtml}
+            ${p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : ''}
+          </div>
+          <div class="pcard-body">
+            <div class="pcat">${catName[p.category] || p.category || 'ทั่วไป'}</div>
+            <div class="pname">${rawName}</div>
+            <div class="pdesc">${p.description || ''}</div>
+            <div class="pprow">
+              <span class="pprice">฿${price.toLocaleString()}</span>
+              <span class="punit">/ ${unit}</span>
+            </div>
+            ${tierInfoHtml}
+            <div class="pmin">สั่งขั้นต่ำ ${minOrder} ${unit}</div>
+            <button class="add-btn" onclick="addCart('${p.id}', '${safeName}', ${price}, '${safeEmoji}', '${safeImage}', '${encodeURIComponent(p.price_tiers || '[]')}', this)">+ เพิ่มลงตะกร้า</button>
+          </div>
+        </div>`;
     }).join('');
-    if (typeof observer !== 'undefined') { document.querySelectorAll('.pcard').forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(20px)'; el.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; observer.observe(el); }); }
+
+    if (typeof observer !== 'undefined') { 
+      document.querySelectorAll('.pcard').forEach(el => { 
+        el.style.opacity = '0'; el.style.transform = 'translateY(20px)'; el.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; observer.observe(el); 
+      }); 
+    }
   } catch (e) { console.error('Error Dynamic Product:', e); }
 }
 </script>
