@@ -29,7 +29,6 @@ nav{
   height:68px;border-bottom:1px solid rgba(251, 192, 45, 0.3);
 }
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none;cursor:pointer}
-.logo-lotus{width:44px;height:44px;background:linear-gradient(135deg,var(--goldb),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 15px rgba(201,148,11,0.4)}
 .logo-text{color:#fff;font-size:15px;font-weight:700;line-height:1.2}
 .logo-text small{color:var(--goldc);font-size:11px;font-weight:400;display:block;letter-spacing:0.5px}
 .nav-links{display:flex;gap:28px;list-style:none}
@@ -567,67 +566,110 @@ footer{
       <span class="tot-lbl">ยอดรวมประมาณ</span>
       <span class="tot-amt" id="cartTotal">฿0</span>
     </div>
-    <p style="font-size:12px;color:var(--tx3);margin-bottom:12px">* ราคาสุดท้ายขึ้นอยู่กับปริมาณการสั่งซื้อ</p>
-    <button class="co-btn" onclick="openModal()">✅ ยืนยันการสั่งซื้อ</button>
-    <button class="ln-btn" onclick="sendViaLine()">💚 สั่งผ่าน LINE</button>
+    <button class="co-btn" onclick="openModal()">✅ ดำเนินการชำระเงิน</button>
   </div>
 </div>
 
+<!-- ORDER MODAL -->
 <div class="modal-wrap" id="orderModal">
   <div class="modal">
     <div class="modal-hdr">
-      <h2>📋 แบบฟอร์มสั่งซื้อ</h2>
+      <h2>📋 แบบฟอร์มจัดส่ง</h2>
       <button class="close-x" onclick="closeModal()">✕</button>
     </div>
     <div id="orderFormWrap">
       <div class="order-sum">
+        <div style="font-size:11px; color:var(--g1); font-weight:700; margin-bottom:8px; text-align:right;">📍 จัดส่งจาก: อ.บางบัวทอง จ.นนทบุรี</div>
         <h3>รายการสั่งซื้อ</h3>
         <div id="orderSumItems"></div>
-        <div class="otot"><span>ยอดรวม</span><span id="orderTotal">฿0</span></div>
+        <div class="orow" style="border-top:1px dashed #ddd; margin-top:8px; padding-top:8px;">
+          <span>🚚 ค่าจัดส่ง <span style="font-size:11px;color:#888;">(อิงน้ำหนัก/พื้นที่)</span></span>
+          <span id="orderShippingFee">฿0</span>
+        </div>
+        <div class="otot"><span>ยอดรวมทั้งสิ้น</span><span id="orderTotal">฿0</span></div>
       </div>
+      
       <div class="frow">
         <div class="fg"><label>ชื่อผู้สั่ง *</label><input type="text" id="o-name" placeholder="ชื่อ-นามสกุล" required></div>
         <div class="fg">
-			<label>เบอร์โทร *</label>
-			<input type="tel" id="o-phone" placeholder="ระบุตัวเลข 10 หลัก (เช่น 0812345678)" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
-		</div>
-      <div class="fg"><label>ชื่อร้าน / บริษัท</label><input type="text" id="o-shop" placeholder="ชื่อร้านหรือบริษัท"></div>
-      <div class="fg"><label>ที่อยู่จัดส่ง *</label><textarea id="o-addr" placeholder="บ้านเลขที่ ถนน แขวง เขต จังหวัด รหัสไปรษณีย์" required></textarea></div>
-      <div class="fg"><label>หมายเหตุ</label><input type="text" id="o-note" placeholder="เช่น เวลาที่สะดวกรับสินค้า"></div>
-      <button class="btn-g" style="width:100%;justify-content:center;margin-bottom:10px" onclick="submitOrder()">🛒 ยืนยันคำสั่งซื้อ</button>
-      <button class="ln-btn" onclick="sendViaLine();closeModal()">💚 ส่งออเดอร์ผ่าน LINE แทน</button>
-    </div>
-    <div id="orderSuccess" style="display:none">
-	<div class="success-msg">
-		<div class="success-icon">🎉</div>
-		<h3 style="margin-bottom: 5px;">สั่งซื้อเรียบร้อย!</h3>
-		<p style="color:var(--tx2); font-size: 15px;">ยอดชำระเงินทั้งหมด: <span id="pp-total" style="color:var(--rd); font-weight: 800; font-size: 22px;"></span> บาท</p>
-    
-		<div style="margin: 20px auto; background: #fff; padding: 15px; border-radius: 16px; border: 2px solid var(--g3); display: inline-block;">
-		<p style="font-weight: 700; color: var(--g2); margin-bottom: 10px; font-size: 14px;">สแกนเพื่อชำระเงิน (พร้อมเพย์)</p>
-		<img id="pp-qr" src="" alt="QR Code พร้อมเพย์" style="width: 180px; height: 180px;">
-		</div>
+          <label>เบอร์โทร *</label>
+          <input type="tel" id="o-phone" placeholder="ระบุ 10 หลัก (08XXXXXXXX)" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+        </div>
+      </div>
 
-		<div style="background: var(--g5); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-		<p style="font-size:14px; color:var(--tx1); font-weight: 600; line-height: 1.6;">
-			ขั้นตอนสุดท้าย: เมื่อโอนเงินแล้ว<br>
-			กรุณาส่ง <b>"สลิปโอนเงิน + ที่อยู่จัดส่ง"</b> มาทาง Messenger
-		</p>
-		</div>
+      <div class="frow">
+        <div class="fg">
+          <label>จังหวัด *</label>
+          <select id="o-province" onchange="calculateShipping()" required>
+            <option value="">เลือกจังหวัด</option>
+          </select>
+        </div>
+        <div class="fg"><label>อำเภอ/เขต *</label><input type="text" id="o-district" required></div>
+      </div>
+
+      <div class="frow">
+        <div class="fg"><label>ตำบล/แขวง *</label><input type="text" id="o-subdistrict" required></div>
+        <div class="fg">
+          <label>รหัสไปรษณีย์ *</label>
+          <input type="text" id="o-zipcode" maxlength="5" pattern="[0-9]{5}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); calculateShipping();" required>
+        </div>
+      </div>
+
+      <div class="fg"><label>บ้านเลขที่, ถนน, หมู่บ้าน *</label><textarea id="o-addr-detail" placeholder="กรอกบ้านเลขที่ ซอย ถนน..." required></textarea></div>
+      <div class="fg"><label>หมายเหตุ</label><input type="text" id="o-note" placeholder="เช่น เวลาที่สะดวกรับสินค้า"></div>
+      
+      <button class="btn-g" style="width:100%;justify-content:center;margin-bottom:10px" onclick="submitOrder()">💳 ชำระเงิน</button>
+      <div style="font-size:12px; color:var(--tx3); text-align:center; line-height:1.5;">
+        * ค่าจัดส่ง Flash Express คำนวณจากน้ำหนักสินค้ารวมแพ็คเกจ<br>
+        (พื้นที่ห่างไกล / หมู่เกาะ / พื้นที่ท่องเที่ยว มีค่าบริการบวกเพิ่ม)
+      </div>
+    </div>
     
-		<button class="ln-btn" style="background:#0084FF; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3);" onclick="window.open('https://m.me/YOUR_FACEBOOK_PAGE_ID','_blank')">
-		💬 ส่งสลิปและยืนยันผ่าน Facebook
-			</button>
-		</div>
-	</div>
+    <div id="orderSuccess" style="display:none">
+      <div class="success-msg">
+        <div class="success-icon">🎉</div>
+        <h3 style="margin-bottom: 5px;">สั่งซื้อเรียบร้อย!</h3>
+        <p style="color:var(--tx2); font-size: 15px;">ยอดชำระเงินทั้งหมด: <span id="pp-total" style="color:var(--rd); font-weight: 800; font-size: 22px;"></span> บาท</p>
+        
+        <div style="margin: 20px auto; background: #fff; padding: 15px; border-radius: 16px; border: 2px solid var(--g3); display: inline-block;">
+        <p style="font-weight: 700; color: var(--g2); margin-bottom: 10px; font-size: 14px;">สแกนเพื่อชำระเงิน</p>
+        <img id="pp-qr" src="qr.jpg" alt="QR Code พร้อมเพย์" style="width: 100%; max-width: 220px; height: auto; border-radius: 8px;">
+        </div>
+
+        <div style="background: var(--g5); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+        <p style="font-size:14px; color:var(--tx1); font-weight: 600; line-height: 1.6;">
+          ขั้นตอนสุดท้าย: เมื่อโอนเงินแล้ว<br>
+          กรุณาส่ง <b>"สลิปโอนเงิน + แคปหน้าจอนี้"</b> มาทาง Messenger
+        </p>
+        </div>
+        
+        <button class="ln-btn" style="background:#0084FF; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3);" onclick="window.open('https://m.me/YOUR_FACEBOOK_PAGE_ID','_blank')">
+        💬 ส่งสลิปและยืนยันผ่าน Facebook
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== INITIALIZE PROVINCES =====
+const provincesList = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadDynamicProducts();
+  const provSelect = document.getElementById('o-province');
+  provincesList.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    provSelect.appendChild(opt);
+  });
+});
+
 // ===== CART STATE =====
 let cart = {};
+let currentShippingFee = 0;
 
 function changeQty(id, delta) {
   id = String(id);
@@ -635,10 +677,12 @@ function changeQty(id, delta) {
   cart[id].qty += delta;
   if (cart[id].qty <= 0) delete cart[id];
   updateCartUI();
+  calculateShipping();
 }
 
 function removeCart(id) {
   id = String(id); delete cart[id]; updateCartUI();
+  calculateShipping();
   showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
 }
 
@@ -654,20 +698,85 @@ function closeCart() {
   document.body.style.overflow = '';
 }
 
+// ===== SHIPPING CALCULATION (FLASH EXPRESS) =====
+function calculateShipping() {
+  const items = Object.values(cart);
+  if (items.length === 0) return;
+  
+  // น้ำหนักรวม: ข้าว 1 กระสอบ = 5kg, ค่าแพ็คเกจกล่อง = 0.5kg
+  const totalSacks = items.reduce((s, i) => s + i.qty, 0);
+  const totalWeight = (totalSacks * 5) + 0.5;
+  
+  const prov = document.getElementById('o-province').value;
+  const zip = document.getElementById('o-zipcode').value;
+  
+  if (!prov || !zip || zip.length < 5) {
+      document.getElementById('orderShippingFee').textContent = 'รอระบุที่อยู่...';
+      currentShippingFee = 0;
+      updateOrderTotalUI();
+      return;
+  }
+
+  // แยกกรุงเทพ/ปริมณฑล
+  const isBkkMetro = ["กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี", "สมุทรปราการ"].includes(prov);
+  
+  // เรทราคา 0-50 kg (Index คือจำนวนกิโลกรัม)
+  const upcRates = [0,35,40,45,50,60,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,420,430,440,450,460,500,510,520,530,540,550,560,570,580,590];
+  const bkkRates = [0,25,30,35,45,55,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,425,440,455,470,485,500,515,530,545,560,575,590,605,620,635];
+
+  let baseFee = 0;
+  let remainingWeight = Math.ceil(totalWeight);
+  
+  // คำนวณฐานราคา (ถ้าน้ำหนักเกิน 50kg ให้วนลูปคิดทีละ 50kg)
+  while (remainingWeight > 0) {
+      let checkW = remainingWeight > 50 ? 50 : remainingWeight;
+      baseFee += isBkkMetro ? bkkRates[checkW] : upcRates[checkW];
+      remainingWeight -= 50;
+  }
+
+  // คำนวณ Surcharge พื้นที่ห่างไกล / ท่องเที่ยว / หมู่เกาะ
+  let surcharge = 0;
+  const remoteProvinces = ['แม่ฮ่องสอน', 'นราธิวาส', 'ปัตตานี', 'ยะลา'];
+  const islandZips = ['84280', '84320', '84330', '20120', '23120', '82160', '81150', '21160', '83000', '83100', '83110', '83120', '83130', '83150'];
+  const touristProvinces = ['ภูเก็ต', 'กระบี่'];
+
+  if (islandZips.includes(zip)) {
+      surcharge += 80; // พื้นที่พิเศษ 50 + หมู่เกาะ 30
+  } else if (remoteProvinces.includes(prov)) {
+      surcharge += 50; // ห่างไกลทั่วไป 50
+  }
+
+  if (touristProvinces.includes(prov)) {
+      if (totalWeight > 20) surcharge += 200;
+      else if (totalWeight > 7) surcharge += 100;
+  }
+
+  currentShippingFee = baseFee + surcharge;
+  document.getElementById('orderShippingFee').textContent = `฿${currentShippingFee.toLocaleString()}`;
+  updateOrderTotalUI();
+}
+
+function updateOrderTotalUI() {
+  const items = Object.values(cart);
+  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const finalTotal = subtotal + currentShippingFee;
+  document.getElementById('orderTotal').textContent = `฿${finalTotal.toLocaleString()}`;
+}
+
 // ===== MODAL =====
 function openModal() {
   if (Object.keys(cart).length === 0) { showToast('⚠️ กรุณาเพิ่มสินค้าก่อน'); return; }
-  closeCart(); // สั่งให้ตะกร้าปิดไปก่อนจะโชว์ฟอร์มสั่งซื้อ
+  closeCart();
   
   const items = Object.values(cart);
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
-
   let html = '';
   items.forEach(i => {
     html += `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`;
   });
+  
   document.getElementById('orderSumItems').innerHTML = html;
-  document.getElementById('orderTotal').textContent = '฿' + total.toLocaleString();
+  calculateShipping(); // คำนวณใหม่เมื่อเปิดจอ
+  
   document.getElementById('orderFormWrap').style.display = '';
   document.getElementById('orderSuccess').style.display = 'none';
   document.getElementById('orderModal').classList.add('open');
@@ -682,29 +791,48 @@ function closeModal() {
 async function submitOrder() {
   const name = document.getElementById('o-name').value.trim();
   const phone = document.getElementById('o-phone').value.trim();
-  const addr = document.getElementById('o-addr').value.trim();
+  const prov = document.getElementById('o-province').value;
+  const dist = document.getElementById('o-district').value.trim();
+  const subdist = document.getElementById('o-subdistrict').value.trim();
+  const zip = document.getElementById('o-zipcode').value.trim();
+  const detail = document.getElementById('o-addr-detail').value.trim();
   const note = document.getElementById('o-note') ? document.getElementById('o-note').value.trim() : '';
-  if (!name || !phone || !addr) { showToast('⚠️ กรุณากรอกข้อมูลให้ครบ'); return; }
+  
+  if (!name || phone.length !== 10 || !prov || !dist || !subdist || zip.length !== 5 || !detail) { 
+    showToast('⚠️ กรุณากรอกข้อมูลและที่อยู่ให้ครบถ้วน'); return; 
+  }
 
-  const items = Object.values(cart);
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const fullAddr = `${detail} ต.${subdist} อ.${dist} จ.${prov} ${zip}`;
+
+  // เพิ่มค่าจัดส่งเข้าไปในรายการสินค้า เพื่อให้แอดมินเห็นในระบบหลังบ้านชัดเจน
+  const itemsToSubmit = [...Object.values(cart)];
+  if (currentShippingFee > 0) {
+      itemsToSubmit.push({
+          id: 'SHIP',
+          name: 'ค่าจัดส่ง (Flash Express)',
+          price: currentShippingFee,
+          qty: 1,
+          emoji: '🚚',
+          image: null
+      });
+  }
+  
+  const finalTotal = itemsToSubmit.reduce((s, i) => s + i.price * i.qty, 0);
 
   try {
     const res = await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer_name: name, customer_phone: phone, customer_addr: addr, note, items, total })
+      body: JSON.stringify({ customer_name: name, customer_phone: phone, customer_addr: fullAddr, note, items: itemsToSubmit, total: finalTotal })
     });
     const data = await res.json();
     if (res.ok) {
       document.getElementById('orderFormWrap').style.display = 'none';
       document.getElementById('orderSuccess').style.display = '';
       
-      const PROMPTPAY_NUMBER = "0614799494"; 
-      document.getElementById('pp-total').textContent = total.toLocaleString();
-      document.getElementById('pp-qr').src = `https://promptpay.io/${PROMPTPAY_NUMBER}/${total}.png`;
+      document.getElementById('pp-total').textContent = finalTotal.toLocaleString();
       
-      cart = {}; // ล้างตะกร้าสินค้าหลังจากกดสั่งซื้อสำเร็จ
+      cart = {}; 
       updateCartUI();
       showToast('✅ ' + data.message);
     } else {
@@ -713,17 +841,6 @@ async function submitOrder() {
   } catch(e) {
     showToast('❌ ไม่สามารถส่งออเดอร์ได้ กรุณาลองใหม่');
   }
-}
-
-function sendViaLine() {
-  const items = Object.values(cart);
-  if (items.length === 0) { showToast('⚠️ ยังไม่มีสินค้าในตะกร้า'); return; }
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
-  let msg = '🌾 สั่งซื้อข้าวจากเว็บ บัวทองไรซ์\n\n';
-  items.forEach(i => { msg += `• ${i.name} × ${i.qty} = ฿${(i.price * i.qty).toLocaleString()}\n`; });
-  msg += `\n💰 ยอดรวม: ฿${total.toLocaleString()}\n\nขอสอบถามรายละเอียดเพิ่มเติมด้วยครับ/ค่ะ`;
-  window.open('https://www.facebook.com/profile.php?id=100063940624893', '_blank');
-  showToast('💚 เปิด Facebook เพื่อส่งออเดอร์แล้ว!');
 }
 
 // ===== FILTER =====
@@ -789,17 +906,10 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1 });
 
-document.querySelectorAll('.pcard, .wcard, .citem').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(20px)';
-  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-  observer.observe(el);
-});
-
-// ===== CART & TIERED PRICING STATE =====
+// ===== DYNAMIC PRODUCTS & TIERED PRICING =====
 function addCart(id, name, basePrice, emoji, image, safeTiers, btn) {
   id = String(id);
-  const tiersStr = decodeURIComponent(safeTiers); // ถอดรหัส JSON
+  const tiersStr = decodeURIComponent(safeTiers);
   if (cart[id]) { cart[id].qty += 1; } 
   else { cart[id] = { id, name, basePrice, price: basePrice, emoji, image, tiersStr, qty: 1 }; }
   
@@ -818,7 +928,6 @@ function updateCartUI() {
     let tiers = [];
     try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
     
-    // เรียงขั้นบันไดจากมากไปน้อย เพื่อหาราคาที่ตรงเงื่อนไข
     const descTiers = [...tiers].sort((a,b) => b.qty - a.qty);
     for(let t of descTiers) {
       if(item.qty >= t.qty) {
@@ -826,11 +935,11 @@ function updateCartUI() {
         break;
       }
     }
-    item.price = currentPrice; // อัปเดตราคาล่าสุด
+    item.price = currentPrice;
   });
 
   const count = items.reduce((s, i) => s + i.qty, 0);
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0); // รวมด้วยราคาใหม่
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
 
   document.getElementById('cartBadge').textContent = count;
   count > 0 ? document.getElementById('cartBadge').classList.add('show') : document.getElementById('cartBadge').classList.remove('show');
@@ -855,7 +964,7 @@ function updateCartUI() {
   body.innerHTML = '';
   
   items.forEach(item => {
-    // คำนวณหาเป้าหมายราคาส่งขั้นถัดไป (Upsell)
+    // หาเป้าหมายราคาส่งขั้นถัดไป
     let tiers = [];
     try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
     let nextTier = null;
@@ -897,7 +1006,6 @@ function updateCartUI() {
   document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
 }
 
-// ===== อัปเดตตอนโหลดสินค้าจากหลังบ้าน =====
 async function loadDynamicProducts() {
   try {
     const res = await fetch('/api/products');
@@ -918,10 +1026,8 @@ async function loadDynamicProducts() {
       const safeEmoji = p.emoji ? p.emoji.replace(/'/g, "\\'") : '🌾';
       const safeImage = p.image ? p.image.replace(/'/g, "\\'") : '';
       
-      // เข้ารหัสข้อมูลขั้นบันไดราคา เพื่อแนบไปกับปุ่มกดใส่ตะกร้า
       const safeTiers = encodeURIComponent(p.price_tiers || '[]');
       
-      // ดึงข้อมูลมาแสดงป้ายราคาส่งสวยๆ
       let tierInfoHtml = '';
       try {
         let tArr = JSON.parse(p.price_tiers || '[]');
@@ -967,10 +1073,6 @@ async function loadDynamicProducts() {
   } catch (e) { console.error('Error Dynamic Product:', e); }
 }
 
-// สั่งให้ฟังก์ชันทำงานทันทีที่เปิดหน้าเว็บขึ้นมา
-window.addEventListener('DOMContentLoaded', () => {
-  loadDynamicProducts();
-});
 </script>
 </body>
 </html>
