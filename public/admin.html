@@ -445,6 +445,7 @@ let adminPw = '';
 let allOrders = [];
 let allProducts = []; 
 let currentOrderId = null;
+let prodSortable = null; // 🛡️ เพิ่มตัวแปรกัน Sortable ซ้ำซ้อน
 
 // ===== MOBILE MENU TOGGLE =====
 function toggleMenu() {
@@ -669,8 +670,6 @@ function getTiers(modalId) {
   return JSON.stringify(tiers);
 }
 
-// ===== PRODUCTS, IMAGES & TIERED PRICING =====
-
 async function loadProducts() {
   try {
     const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
@@ -690,7 +689,6 @@ async function loadProducts() {
       const name = p.name || 'สินค้าไม่มีชื่อ';
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
       
-      // 📍 จุดสำคัญที่สุด: เพิ่ม data-id="${p.id}" เข้าไปใน div หลัก
       return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}" data-id="${p.id}" style="position:relative;">
         <div class="pac-drag" style="position:absolute; top:8px; right:8px; cursor:grab; background:rgba(255,255,255,0.95); padding:6px 10px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.15); color:#555; font-size:16px; z-index:10; display:flex; align-items:center; justify-content:center;">☰</div>
         <div class="pac-top" style="overflow:hidden; padding:0;">${imgHtml}</div>
@@ -706,21 +704,22 @@ async function loadProducts() {
       </div>`;
     }).join('');
 
-    // 📍 ระบบลากจัดลำดับ + ยิง API ไปเซฟที่ Server ทันที
     setTimeout(() => {
-      new Sortable(document.getElementById('prodGrid'), {
+      // 🛡️ ทำลาย Sortable เก่าทิ้งก่อนสร้างใหม่ ป้องกันบั๊กส่งข้อมูลซ้ำ
+      if(prodSortable) { prodSortable.destroy(); }
+
+      prodSortable = new Sortable(document.getElementById('prodGrid'), {
         animation: 150,
         handle: '.pac-drag',
         onEnd: async function (evt) {
-          // ดึง ID ของสินค้าทั้งหมดเรียงตามหน้าจอที่ลากเสร็จแล้ว
           const cards = document.querySelectorAll('.prod-admin-card');
-          const newOrder = Array.from(cards).map(card => card.getAttribute('data-id'));
+          const newOrder = Array.from(cards).map(card => parseInt(card.getAttribute('data-id'), 10));
 
           try {
             const res = await fetch(API + '/api/admin/products/reorder', {
               method: 'PATCH',
               headers: authHeader(),
-              body: JSON.stringify({ order: newOrder }) // ส่ง Array ของ ID กลับไป
+              body: JSON.stringify({ order: newOrder })
             });
             if (res.ok) {
               showToast('✅ บันทึกลำดับสำเร็จ!');
@@ -737,6 +736,16 @@ async function loadProducts() {
   } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
 }
   
+function openAddProduct() {
+  document.getElementById('np-name').value = '';
+  document.getElementById('np-price').value = '';
+  document.getElementById('np-desc').value = '';
+  document.getElementById('np-image').value = '';
+  document.getElementById('np-preview').style.display = 'none';
+  document.querySelector('#addProductModal .tiers-container').innerHTML = ''; 
+  document.getElementById('addProductModal').classList.add('open');
+}
+
 async function addProduct() {
   const btn = document.querySelector('#addProductModal .btn-primary');
   btn.textContent = '⏳ กำลังบันทึก...'; btn.disabled = true;
@@ -773,8 +782,6 @@ function openEditProduct(id) {
   document.getElementById('ep-min').value = p.min_order || 1;
   document.getElementById('ep-desc').value = p.description || '';
   document.getElementById('ep-active').value = p.active ? "1" : "0";
-  
-  // 🛡️ เพิ่มส่วน Badge
   document.getElementById('ep-badge').value = p.badge || '';
   
   document.getElementById('ep-image').value = '';
@@ -801,7 +808,6 @@ async function saveProduct() {
   let imageUrl = await uploadImage('ep-image');
   if (!imageUrl) imageUrl = document.getElementById('ep-image-url').value; 
 
-  // 🛡️ รวม Badge เข้าไปใน Body
   const body = {
     name: document.getElementById('ep-name').value || 'ไม่มีชื่อ',
     price: parseFloat(document.getElementById('ep-price').value) || 0,
@@ -810,7 +816,7 @@ async function saveProduct() {
     description: document.getElementById('ep-desc').value || '',
     active: parseInt(document.getElementById('ep-active').value) || 0,
     image: imageUrl,
-    badge: document.getElementById('ep-badge').value || '', // เพิ่มช่องนี้
+    badge: document.getElementById('ep-badge').value || '', 
     price_tiers: getTiers('editProductModal')
   };
   
@@ -884,7 +890,6 @@ function statusBadge(s) {
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 document.querySelectorAll('.modal-bg').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }); });
-
 </script>
 </body>
 </html>
