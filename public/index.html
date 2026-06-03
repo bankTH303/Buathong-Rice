@@ -570,7 +570,6 @@ footer{
   </div>
 </div>
 
-<!-- ORDER MODAL -->
 <div class="modal-wrap" id="orderModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -600,18 +599,30 @@ footer{
       <div class="frow">
         <div class="fg">
           <label>จังหวัด *</label>
-          <select id="o-province" onchange="calculateShipping()" required>
+          <select id="o-province" onchange="populateDistricts()" required>
             <option value="">เลือกจังหวัด</option>
           </select>
         </div>
-        <div class="fg"><label>อำเภอ/เขต *</label><input type="text" id="o-district" required></div>
+        <div class="fg">
+          <label>อำเภอ/เขต *</label>
+          <select id="o-district" onchange="populateSubdistricts()" required>
+            <option value="">เลือกอำเภอ/เขต</option>
+          </select>
+        </div>
       </div>
 
       <div class="frow">
-        <div class="fg"><label>ตำบล/แขวง *</label><input type="text" id="o-subdistrict" required></div>
+        <div class="fg">
+          <label>ตำบล/แขวง *</label>
+          <select id="o-subdistrict" onchange="populateZipcode()" required>
+            <option value="">เลือกตำบล/แขวง</option>
+          </select>
+        </div>
         <div class="fg">
           <label>รหัสไปรษณีย์ *</label>
-          <input type="text" id="o-zipcode" maxlength="5" pattern="[0-9]{5}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); calculateShipping();" required>
+          <select id="o-zipcode" onchange="calculateShipping()" required>
+            <option value="">รหัสไปรษณีย์</option>
+          </select>
         </div>
       </div>
 
@@ -654,18 +665,58 @@ footer{
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== INITIALIZE PROVINCES =====
-const provincesList = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+// ===== THAI ADDRESS DATABASE & LOGIC =====
+let thaiAddressData = [];
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   loadDynamicProducts();
-  const provSelect = document.getElementById('o-province');
-  provincesList.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p; opt.textContent = p;
-    provSelect.appendChild(opt);
-  });
+  // โหลดฐานข้อมูลที่อยู่ประเทศไทยแบบดิบ (JSON)
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/earthchie/jquery.Thailand.js/master/jquery.Thailand.js/database/raw_database/raw_database.json');
+    thaiAddressData = await res.json();
+    const provSelect = document.getElementById('o-province');
+    // ดึงเฉพาะชื่อจังหวัดที่ไม่ซ้ำกัน
+    const provs = [...new Set(thaiAddressData.map(item => item.province))].sort();
+    provSelect.innerHTML = '<option value="">เลือกจังหวัด</option>' + provs.map(p => `<option value="${p}">${p}</option>`).join('');
+  } catch(e) {
+    console.error('ไม่สามารถโหลดข้อมูลที่อยู่ได้', e);
+  }
 });
+
+// ฟังก์ชันสร้างตัวเลือก อำเภอ
+function populateDistricts() {
+  const prov = document.getElementById('o-province').value;
+  const distSelect = document.getElementById('o-district');
+  const dists = [...new Set(thaiAddressData.filter(i => i.province === prov).map(i => i.amphoe))].sort();
+  distSelect.innerHTML = '<option value="">เลือกอำเภอ/เขต</option>' + dists.map(d => `<option value="${d}">${d}</option>`).join('');
+  populateSubdistricts(); // รีเซ็ตตำบลเมื่อเปลี่ยนอำเภอ
+  calculateShipping(); // คำนวณค่าส่งใหม่
+}
+
+// ฟังก์ชันสร้างตัวเลือก ตำบล
+function populateSubdistricts() {
+  const prov = document.getElementById('o-province').value;
+  const dist = document.getElementById('o-district').value;
+  const subdSelect = document.getElementById('o-subdistrict');
+  const subds = [...new Set(thaiAddressData.filter(i => i.province === prov && i.amphoe === dist).map(i => i.district))].sort();
+  subdSelect.innerHTML = '<option value="">เลือกตำบล/แขวง</option>' + subds.map(s => `<option value="${s}">${s}</option>`).join('');
+  populateZipcode(); // รีเซ็ตรหัสไปรษณีย์
+}
+
+// ฟังก์ชันดึงและเลือกรหัสไปรษณีย์
+function populateZipcode() {
+  const prov = document.getElementById('o-province').value;
+  const dist = document.getElementById('o-district').value;
+  const subd = document.getElementById('o-subdistrict').value;
+  const zipSelect = document.getElementById('o-zipcode');
+  const zips = [...new Set(thaiAddressData.filter(i => i.province === prov && i.amphoe === dist && i.district === subd).map(i => i.zipcode))].sort();
+  zipSelect.innerHTML = '<option value="">รหัสไปรษณีย์</option>' + zips.map(z => `<option value="${z}">${z}</option>`).join('');
+  
+  // ถ้ามีรหัสเดียวให้เลือกให้อัตโนมัติ
+  if(zips.length === 1) { zipSelect.value = zips[0]; }
+  calculateShipping();
+}
+
 
 // ===== CART STATE =====
 let cart = {};
@@ -703,7 +754,6 @@ function calculateShipping() {
   const items = Object.values(cart);
   if (items.length === 0) return;
   
-  // น้ำหนักรวม: ข้าว 1 กระสอบ = 5kg, ค่าแพ็คเกจกล่อง = 0.5kg
   const totalSacks = items.reduce((s, i) => s + i.qty, 0);
   const totalWeight = (totalSacks * 5) + 0.5;
   
@@ -717,33 +767,29 @@ function calculateShipping() {
       return;
   }
 
-  // แยกกรุงเทพ/ปริมณฑล
   const isBkkMetro = ["กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี", "สมุทรปราการ"].includes(prov);
   
-  // เรทราคา 0-50 kg (Index คือจำนวนกิโลกรัม)
   const upcRates = [0,35,40,45,50,60,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,420,430,440,450,460,500,510,520,530,540,550,560,570,580,590];
   const bkkRates = [0,25,30,35,45,55,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,425,440,455,470,485,500,515,530,545,560,575,590,605,620,635];
 
   let baseFee = 0;
   let remainingWeight = Math.ceil(totalWeight);
   
-  // คำนวณฐานราคา (ถ้าน้ำหนักเกิน 50kg ให้วนลูปคิดทีละ 50kg)
   while (remainingWeight > 0) {
       let checkW = remainingWeight > 50 ? 50 : remainingWeight;
       baseFee += isBkkMetro ? bkkRates[checkW] : upcRates[checkW];
       remainingWeight -= 50;
   }
 
-  // คำนวณ Surcharge พื้นที่ห่างไกล / ท่องเที่ยว / หมู่เกาะ
   let surcharge = 0;
   const remoteProvinces = ['แม่ฮ่องสอน', 'นราธิวาส', 'ปัตตานี', 'ยะลา'];
   const islandZips = ['84280', '84320', '84330', '20120', '23120', '82160', '81150', '21160', '83000', '83100', '83110', '83120', '83130', '83150'];
   const touristProvinces = ['ภูเก็ต', 'กระบี่'];
 
   if (islandZips.includes(zip)) {
-      surcharge += 80; // พื้นที่พิเศษ 50 + หมู่เกาะ 30
+      surcharge += 80; 
   } else if (remoteProvinces.includes(prov)) {
-      surcharge += 50; // ห่างไกลทั่วไป 50
+      surcharge += 50; 
   }
 
   if (touristProvinces.includes(prov)) {
@@ -775,7 +821,7 @@ function openModal() {
   });
   
   document.getElementById('orderSumItems').innerHTML = html;
-  calculateShipping(); // คำนวณใหม่เมื่อเปิดจอ
+  calculateShipping(); 
   
   document.getElementById('orderFormWrap').style.display = '';
   document.getElementById('orderSuccess').style.display = 'none';
@@ -804,7 +850,6 @@ async function submitOrder() {
 
   const fullAddr = `${detail} ต.${subdist} อ.${dist} จ.${prov} ${zip}`;
 
-  // เพิ่มค่าจัดส่งเข้าไปในรายการสินค้า เพื่อให้แอดมินเห็นในระบบหลังบ้านชัดเจน
   const itemsToSubmit = [...Object.values(cart)];
   if (currentShippingFee > 0) {
       itemsToSubmit.push({
@@ -922,7 +967,6 @@ function addCart(id, name, basePrice, emoji, image, safeTiers, btn) {
 function updateCartUI() {
   const items = Object.values(cart);
   
-  // คำนวณราคาส่งใหม่ให้สินค้าแต่ละชิ้น
   items.forEach(item => {
     let currentPrice = item.basePrice;
     let tiers = [];
@@ -964,7 +1008,6 @@ function updateCartUI() {
   body.innerHTML = '';
   
   items.forEach(item => {
-    // หาเป้าหมายราคาส่งขั้นถัดไป
     let tiers = [];
     try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
     let nextTier = null;
@@ -1072,7 +1115,6 @@ async function loadDynamicProducts() {
     }
   } catch (e) { console.error('Error Dynamic Product:', e); }
 }
-
 </script>
 </body>
 </html>
