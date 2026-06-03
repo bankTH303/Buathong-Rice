@@ -89,7 +89,8 @@ app.patch('/api/user/:id', authenticateToken, (req, res) => {
 app.get('/api/user/:id/orders', authenticateToken, (req, res) => {
   if (req.user.id !== parseInt(req.params.id)) return res.status(403).json({ error: '🚨 ปฏิเสธการเข้าถึง!' });
   try {
-    const orders = db.prepare('SELECT id, total, status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC').all(req.params.id);
+    // 🛡️ เพิ่มการดึง tracking_number ด้วย
+    const orders = db.prepare('SELECT id, total, status, tracking_number, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC').all(req.params.id);
     const result = orders.map(o => {
       const items = db.prepare('SELECT name, qty, price, image, emoji FROM order_items WHERE order_id = ?').all(o.id);
       return { ...o, items, created_at: new Date(o.created_at).toLocaleString('th-TH') };
@@ -101,7 +102,6 @@ app.get('/api/user/:id/orders', authenticateToken, (req, res) => {
 // ===== PUBLIC API =====
 app.get('/api/products', (req, res) => {
   try {
-    // 🛡️ แก้ไขให้เรียงลำดับด้วย sort_order และบังคับไทเบรกด้วย id ป้องกันสินค้าเด้งสลับตำแหน่ง
     const products = db.prepare('SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC, id ASC').all();
     res.json(products.map(p => ({ ...p, active: p.active === 1 })));
   } catch(e) { res.status(500).json({ error: 'โหลดสินค้าไม่ได้' }); }
@@ -151,7 +151,8 @@ app.get('/api/track/:phone', (req, res) => {
   try {
     const phone = req.params.phone.replace(/[^0-9]/g, '');
     if(phone.length !== 10) return res.status(400).json({ error: 'เบอร์โทรไม่ถูกต้อง' });
-    const orders = db.prepare('SELECT id, total, status, created_at FROM orders WHERE customer_phone = ? ORDER BY created_at DESC').all(phone);
+    // 🛡️ เพิ่มการดึง tracking_number ด้วย
+    const orders = db.prepare('SELECT id, total, status, tracking_number, created_at FROM orders WHERE customer_phone = ? ORDER BY created_at DESC').all(phone);
     const result = orders.map(o => {
       const items = db.prepare('SELECT name, qty, price FROM order_items WHERE order_id = ?').all(o.id);
       return { ...o, items, created_at: new Date(o.created_at).toLocaleString('th-TH') };
@@ -176,28 +177,27 @@ app.get('/api/admin/orders', checkAdmin, (req, res) => {
   } catch(e) { res.status(500).json({ error: 'โหลดออเดอร์ไม่ได้' }); }
 });
 
+// 🛡️ อัปเดตให้แอดมินเซฟ tracking_number ได้
 app.patch('/api/admin/orders/:id', checkAdmin, (req, res) => {
   try {
-    db.prepare(`UPDATE orders SET status = ? WHERE id = ?`).run(req.body.status, req.params.id);
+    const { status, tracking_number } = req.body;
+    db.prepare(`UPDATE orders SET status = ?, tracking_number = ? WHERE id = ?`).run(status, tracking_number || null, req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'อัปเดตไม่ได้' }); }
 });
 
 app.get('/api/admin/products', checkAdmin, (req, res) => {
   try {
-    // 🛡️ เรียงลำดับเหมือน Public
     const products = db.prepare('SELECT * FROM products ORDER BY sort_order ASC, id ASC').all();
     res.json(products);
   } catch(e) { res.status(500).json({ error: 'โหลดสินค้าไม่ได้' }); }
 });
 
-// 📍 พระเอกของเรา! ย้าย API reorder ขึ้นมาด้านบนสุดก่อนที่จะถึง /:id เพื่อไม่ให้มันชนกัน
 app.patch('/api/admin/products/reorder', checkAdmin, (req, res) => {
   try {
-    const { order } = req.body;
+    const { order } = req.body; 
     const updateOrder = db.transaction((ids) => {
       const stmt = db.prepare('UPDATE products SET sort_order = ? WHERE id = ?');
-      // 🛡️ แปลง ID เป็นตัวเลขให้ชัวร์ที่สุด 100%
       ids.forEach((id, index) => stmt.run(index, parseInt(id, 10))); 
     });
     updateOrder(order);
@@ -205,7 +205,6 @@ app.patch('/api/admin/products/reorder', checkAdmin, (req, res) => {
   } catch(e) { res.status(500).json({ error: 'อัปเดตลำดับไม่ได้' }); }
 });
 
-// API อัปเดตสินค้าด้วย ID (อยู่ข้างล่างจะไม่ชนกับ /reorder แล้ว)
 app.patch('/api/admin/products/:id', checkAdmin, (req, res) => {
   try {
     const { name, price, unit, min_order, description, active, image, badge, price_tiers } = req.body;
@@ -265,7 +264,10 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
     const totalContacts = db.prepare('SELECT COUNT(*) as c FROM contacts').get().c;
     const revenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE status IN ('ยืนยันแล้ว', 'กำลังจัดส่ง', 'จัดส่งแล้ว')").get().s || 0;
     
-    res.json({ totalOrders, pendingOrders, todayOrders, totalRevenue: revenue, totalContacts });
+    // 🛡️ คำนวณยอดขายเฉพาะของ "วันนี้" (เฉพาะสถานะที่ได้เงินแล้ว)
+    const todayRevenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE date(created_at) = date('now') AND status IN ('ยืนยันแล้ว', 'กำลังจัดส่ง', 'จัดส่งแล้ว')").get().s || 0;
+    
+    res.json({ totalOrders, pendingOrders, todayOrders, todayRevenue, totalRevenue: revenue, totalContacts });
   } catch(e) { res.status(500).json({ error: 'โหลดสถิติไม่ได้' }); }
 });
 
