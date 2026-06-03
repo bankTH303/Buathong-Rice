@@ -5,10 +5,6 @@ const fs = require('fs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken'); 
 const { db } = require('./database');
-try {
-  // สร้างคอลัมน์เก็บลำดับสินค้า (ถ้ามีอยู่แล้วมันจะข้ามไปเอง)
-  db.prepare("ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0").run();
-} catch (e) {}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -60,11 +56,8 @@ app.post('/api/auth/register', (req, res) => {
     const token = jwt.sign({ id: info.lastInsertRowid, email }, JWT_SECRET, { expiresIn: '7d' }); 
     res.json({ success: true, user: { id: info.lastInsertRowid, name, email, phone, province, district, subdistrict, zipcode, address_detail }, token });
   } catch(e) {
-    if(e.message.includes('UNIQUE constraint failed')) {
-      res.status(400).json({ error: 'อีเมลนี้ถูกสมัครสมาชิกไปแล้ว' });
-    } else {
-      res.status(500).json({ error: 'สมัครสมาชิกไม่สำเร็จ' });
-    }
+    if(e.message.includes('UNIQUE constraint failed')) res.status(400).json({ error: 'อีเมลนี้ถูกสมัครสมาชิกไปแล้ว' });
+    else res.status(500).json({ error: 'สมัครสมาชิกไม่สำเร็จ' });
   }
 });
 
@@ -108,7 +101,8 @@ app.get('/api/user/:id/orders', authenticateToken, (req, res) => {
 // ===== PUBLIC API =====
 app.get('/api/products', (req, res) => {
   try {
-    const products = db.prepare('SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC, created_at ASC').all();
+    // 🛡️ แก้ไขให้เรียงลำดับด้วย sort_order และบังคับไทเบรกด้วย id ป้องกันสินค้าเด้งสลับตำแหน่ง
+    const products = db.prepare('SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC, id ASC').all();
     res.json(products.map(p => ({ ...p, active: p.active === 1 })));
   } catch(e) { res.status(500).json({ error: 'โหลดสินค้าไม่ได้' }); }
 });
@@ -191,20 +185,32 @@ app.patch('/api/admin/orders/:id', checkAdmin, (req, res) => {
 
 app.get('/api/admin/products', checkAdmin, (req, res) => {
   try {
-    const products = db.prepare('SELECT * FROM products ORDER BY sort_order ASC, created_at ASC').all();
+    // 🛡️ เรียงลำดับเหมือน Public
+    const products = db.prepare('SELECT * FROM products ORDER BY sort_order ASC, id ASC').all();
     res.json(products);
   } catch(e) { res.status(500).json({ error: 'โหลดสินค้าไม่ได้' }); }
 });
 
+// 📍 พระเอกของเรา! ย้าย API reorder ขึ้นมาด้านบนสุดก่อนที่จะถึง /:id เพื่อไม่ให้มันชนกัน
+app.patch('/api/admin/products/reorder', checkAdmin, (req, res) => {
+  try {
+    const { order } = req.body;
+    const updateOrder = db.transaction((ids) => {
+      const stmt = db.prepare('UPDATE products SET sort_order = ? WHERE id = ?');
+      // 🛡️ แปลง ID เป็นตัวเลขให้ชัวร์ที่สุด 100%
+      ids.forEach((id, index) => stmt.run(index, parseInt(id, 10))); 
+    });
+    updateOrder(order);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'อัปเดตลำดับไม่ได้' }); }
+});
+
+// API อัปเดตสินค้าด้วย ID (อยู่ข้างล่างจะไม่ชนกับ /reorder แล้ว)
 app.patch('/api/admin/products/:id', checkAdmin, (req, res) => {
   try {
-    // 🛡️ เพิ่มการรับค่า badge เข้ามา
     const { name, price, unit, min_order, description, active, image, badge, price_tiers } = req.body;
-    
-    // 🛡️ อัปเดตคำสั่ง SQL ให้เซฟ badge ด้วย
     db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=?, badge=?, price_tiers=? WHERE id=?`)
       .run(name, price, unit, min_order, description, active, image, badge || '', price_tiers || "[]", req.params.id);
-      
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'อัปเดตไม่ได้' }); }
 });
@@ -224,8 +230,6 @@ app.post('/api/admin/upload', checkAdmin, (req, res) => {
     if (!imageBase64) return res.status(400).json({ error: 'ไม่มีรูปภาพ' });
     
     const ext = path.extname(fileName).toLowerCase() || '.jpg';
-    
-    // 🛡️ ป้องกันอัปโหลดสคริปต์อันตราย
     const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
     if (!allowedExts.includes(ext)) {
       return res.status(400).json({ error: '🚨 ไม่อนุญาตให้อัปโหลดไฟล์ประเภทนี้' });
@@ -235,7 +239,6 @@ app.post('/api/admin/upload', checkAdmin, (req, res) => {
     const filepath = path.join(UPLOAD_DIR, filename);
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     fs.writeFileSync(filepath, base64Data, 'base64');
-    
     res.json({ success: true, url: '/uploads/' + filename });
   } catch(e) { res.status(500).json({ error: 'อัปโหลดไม่ได้' }); }
 });
@@ -260,25 +263,10 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
     const pendingOrders = db.prepare("SELECT COUNT(*) as c FROM orders WHERE status = 'รอดำเนินการ'").get().c;
     const todayOrders = db.prepare("SELECT COUNT(*) as c FROM orders WHERE date(created_at) = date('now')").get().c;
     const totalContacts = db.prepare('SELECT COUNT(*) as c FROM contacts').get().c;
-    
-    // 📍 แก้ไขสูตร: รวมยอดเฉพาะ 3 สถานะที่ได้เงินชัวร์ๆ
     const revenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE status IN ('ยืนยันแล้ว', 'กำลังจัดส่ง', 'จัดส่งแล้ว')").get().s || 0;
     
     res.json({ totalOrders, pendingOrders, todayOrders, totalRevenue: revenue, totalContacts });
   } catch(e) { res.status(500).json({ error: 'โหลดสถิติไม่ได้' }); }
-});
-
-// API สำหรับรับค่าลำดับสินค้าใหม่ไปเซฟลง Database
-app.patch('/api/admin/products/reorder', checkAdmin, (req, res) => {
-  try {
-    const { order } = req.body; // รับ Array ของ ID สินค้าที่เรียงแล้วมา
-    const updateOrder = db.transaction((ids) => {
-      const stmt = db.prepare('UPDATE products SET sort_order = ? WHERE id = ?');
-      ids.forEach((id, index) => stmt.run(index, id)); // ไล่เซฟลำดับ 0, 1, 2, ...
-    });
-    updateOrder(order);
-    res.json({ success: true });
-  } catch(e) { res.status(500).json({ error: 'อัปเดตลำดับไม่ได้' }); }
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
