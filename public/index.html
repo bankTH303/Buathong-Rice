@@ -261,7 +261,7 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 
 <nav>
   <a class="logo" href="/">
-    <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);">
+    <img src="btrlogov2.jpg" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);">
     <div class="logo-text">บัวทองไรซ์<small>BUATHONG RICE Co.,Ltd.</small></div>
   </a>
   <ul class="nav-links">
@@ -614,7 +614,7 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
         <div style="background: var(--g5); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
           <p style="font-size:14px; color:var(--tx1); font-weight: 600; line-height: 1.6;">ขั้นตอนสุดท้าย: เมื่อโอนเงินแล้ว<br>กรุณาส่ง <b>"สลิปโอนเงิน + แคปหน้าจอนี้"</b> มาทาง Messenger</p>
         </div>
-        <button class="ln-btn" style="background:#0084FF; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3);" onclick="window.open('https://www.facebook.com/profile.php?id=100063940624893','_blank')">💬 ส่งสลิปและยืนยันผ่าน Facebook</button>
+        <button class="ln-btn" style="background:#0084FF; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3);" onclick="window.open('https://m.me/YOUR_FACEBOOK_PAGE_ID','_blank')">💬 ส่งสลิปและยืนยันผ่าน Facebook</button>
       </div>
     </div>
   </div>
@@ -731,27 +731,19 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== GLOBAL STATE =====
+// ===== GLOBAL STATE & LOCAL STORAGE =====
 let currentUser = JSON.parse(localStorage.getItem('btr_user')) || null;
 let thaiAddressData = [];
 let currentShippingFee = 0;
 let cart = {};
 
-// ฟังก์ชันแยกตะกร้า Guest กับตะกร้า User
-function getCartKey() {
-  return currentUser ? 'btr_cart_user_' + currentUser.id : 'btr_cart_guest';
-}
-
-function loadCart() {
-  cart = JSON.parse(localStorage.getItem(getCartKey())) || {};
-}
-
-function saveCart() { 
-  localStorage.setItem(getCartKey(), JSON.stringify(cart)); 
-}
+// 🛡️ แยกตะกร้า Guest กับตะกร้า User
+function getCartKey() { return currentUser ? 'btr_cart_user_' + currentUser.id : 'btr_cart_guest'; }
+function loadCart() { cart = JSON.parse(localStorage.getItem(getCartKey())) || {}; }
+function saveCart() { localStorage.setItem(getCartKey(), JSON.stringify(cart)); }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  loadCart(); // โหลดตะกร้าให้ตรงกับสถานะล็อกอิน
+  loadCart(); 
   loadDynamicProducts();
   updateCartUI();
   updateAuthNavUI();
@@ -764,112 +756,68 @@ window.addEventListener('DOMContentLoaded', async () => {
     initAddressDropdowns('p'); // Profile
   } catch(e) { console.error('Address Data Error', e); }
 });
+
 // ===== TOAST UTILS =====
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
 // ===== MOBILE MENU & UI UTILS =====
-function toggleMobile() {
-  document.getElementById('mobileMenu').classList.toggle('open');
-}
-
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('nav');
-  nav.style.boxShadow = window.scrollY > 60 ? '0 4px 30px rgba(0,0,0,0.3)' : 'none';
-});
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.style.opacity = '1';
-      e.target.style.transform = 'translateY(0)';
-    }
-  });
-}, { threshold: 0.1 });
+function toggleMobile() { document.getElementById('mobileMenu').classList.toggle('open'); }
+window.addEventListener('scroll', () => { document.querySelector('nav').style.boxShadow = window.scrollY > 60 ? '0 4px 30px rgba(0,0,0,0.3)' : 'none'; });
+const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; } }); }, { threshold: 0.1 });
 
 // ===== FILTER & CONTACT =====
 function filterProd(cat, btn) {
-  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.pcard').forEach(c => {
-    if (cat === 'all' || c.dataset.cat === cat) {
-      c.classList.remove('hidden');
-    } else {
-      c.classList.add('hidden');
-    }
-  });
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active')); btn.classList.add('active');
+  document.querySelectorAll('.pcard').forEach(c => { c.classList.remove('hidden'); if(cat!=='all' && c.dataset.cat!==cat) c.classList.add('hidden'); });
 }
-
 async function sendInquiry() {
-  const name = document.getElementById('cf-name').value.trim();
-  const phone = document.getElementById('cf-phone').value.trim();
+  const name = document.getElementById('cf-name').value.trim(); const phone = document.getElementById('cf-phone').value.trim();
   if (!name || !phone) return showToast('⚠️ กรุณากรอกชื่อและเบอร์โทรศัพท์');
   try {
-    const res = await fetch('/api/contacts', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ name, phone })
-    });
-    if (res.ok) {
-      document.getElementById('contactForm').style.display = 'none';
-      document.getElementById('contactSuccess').style.display = '';
-    } else showToast('❌ เกิดข้อผิดพลาด');
+    const res = await fetch('/api/contacts', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, phone }) });
+    if (res.ok) { document.getElementById('contactForm').style.display = 'none'; document.getElementById('contactSuccess').style.display = ''; } 
+    else showToast('❌ เกิดข้อผิดพลาด');
   } catch(e) { showToast('❌ ส่งข้อมูลไม่ได้'); }
 }
 
 // ===== ADDRESS DROPDOWN LOGIC =====
 function initAddressDropdowns(prefix) {
-  const p = document.getElementById(`${prefix}-province`);
-  const d = document.getElementById(`${prefix}-district`);
-  const s = document.getElementById(`${prefix}-subdistrict`);
-  const z = document.getElementById(`${prefix}-zipcode`);
-
+  const p = document.getElementById(`${prefix}-province`); const d = document.getElementById(`${prefix}-district`);
+  const s = document.getElementById(`${prefix}-subdistrict`); const z = document.getElementById(`${prefix}-zipcode`);
   const provs = [...new Set(thaiAddressData.map(i => i.province))].sort();
   p.innerHTML = '<option value="">เลือกจังหวัด</option>' + provs.map(x => `<option value="${x}">${x}</option>`).join('');
 
   p.addEventListener('change', () => {
     const dists = [...new Set(thaiAddressData.filter(i => i.province === p.value).map(i => i.amphoe))].sort();
     d.innerHTML = '<option value="">เลือกอำเภอ/เขต</option>' + dists.map(x => `<option value="${x}">${x}</option>`).join('');
-    s.innerHTML = '<option value="">เลือกตำบล/แขวง</option>';
-    z.innerHTML = '<option value="">รหัสไปรษณีย์</option>';
+    s.innerHTML = '<option value="">เลือกตำบล/แขวง</option>'; z.innerHTML = '<option value="">รหัสไปรษณีย์</option>';
     if(prefix === 'o') calculateShipping();
   });
-
   d.addEventListener('change', () => {
     const subds = [...new Set(thaiAddressData.filter(i => i.province === p.value && i.amphoe === d.value).map(i => i.district))].sort();
     s.innerHTML = '<option value="">เลือกตำบล/แขวง</option>' + subds.map(x => `<option value="${x}">${x}</option>`).join('');
     z.innerHTML = '<option value="">รหัสไปรษณีย์</option>';
     if(prefix === 'o') calculateShipping();
   });
-
   s.addEventListener('change', () => {
     const zips = [...new Set(thaiAddressData.filter(i => i.province === p.value && i.amphoe === d.value && i.district === s.value).map(i => i.zipcode))].sort();
     z.innerHTML = '<option value="">รหัสไปรษณีย์</option>' + zips.map(x => `<option value="${x}">${x}</option>`).join('');
     if(zips.length === 1) z.value = zips[0];
     if(prefix === 'o') calculateShipping();
   });
-  
   z.addEventListener('change', () => { if(prefix === 'o') calculateShipping(); });
 }
 
 function setAddressValues(prefix, prov, dist, sub, zip) {
   if(!prov) return;
-  const p = document.getElementById(`${prefix}-province`);
-  p.value = prov; p.dispatchEvent(new Event('change'));
-  setTimeout(() => {
-    const d = document.getElementById(`${prefix}-district`);
-    d.value = dist; d.dispatchEvent(new Event('change'));
-    setTimeout(() => {
-      const s = document.getElementById(`${prefix}-subdistrict`);
-      s.value = sub; s.dispatchEvent(new Event('change'));
-      setTimeout(() => {
-        const z = document.getElementById(`${prefix}-zipcode`);
-        z.value = zip;
-        if(prefix === 'o') calculateShipping();
-      }, 50);
+  const p = document.getElementById(`${prefix}-province`); p.value = prov; p.dispatchEvent(new Event('change'));
+  setTimeout(() => { const d = document.getElementById(`${prefix}-district`); d.value = dist; d.dispatchEvent(new Event('change'));
+    setTimeout(() => { const s = document.getElementById(`${prefix}-subdistrict`); s.value = sub; s.dispatchEvent(new Event('change'));
+      setTimeout(() => { const z = document.getElementById(`${prefix}-zipcode`); z.value = zip; if(prefix === 'o') calculateShipping(); }, 50);
     }, 50);
   }, 50);
 }
@@ -878,353 +826,181 @@ function setAddressValues(prefix, prov, dist, sub, zip) {
 function updateAuthNavUI() {
   const authArea = document.getElementById('navAuthArea');
   if(currentUser) {
-    authArea.innerHTML = `
-      <button class="profile-btn" onclick="openPortalModal()">
-        <div class="profile-btn-icon">👤</div>
-        <span class="profile-btn-name">${currentUser.name.split(' ')[0]}</span>
-      </button>
-    `;
-  } else {
-    authArea.innerHTML = `<button class="auth-btn" onclick="openAuthModal()">เข้าสู่ระบบ</button>`;
-  }
+    authArea.innerHTML = `<button class="profile-btn" onclick="openPortalModal()"><div class="profile-btn-icon">👤</div><span class="profile-btn-name">${currentUser.name.split(' ')[0]}</span></button>`;
+  } else authArea.innerHTML = `<button class="auth-btn" onclick="openAuthModal()">เข้าสู่ระบบ</button>`;
 }
 
-function openAuthModal() {
-  toggleAuthForm('login');
-  document.getElementById('authModal').classList.add('open');
-}
+function openAuthModal() { toggleAuthForm('login'); document.getElementById('authModal').classList.add('open'); }
 
 function toggleAuthForm(type) {
-  if(type === 'login') {
-    document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
-    document.getElementById('loginFormArea').style.display = 'block';
-    document.getElementById('registerFormArea').style.display = 'none';
-  } else {
-    document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
-    document.getElementById('loginFormArea').style.display = 'none';
-    document.getElementById('registerFormArea').style.display = 'block';
-  }
+  if(type === 'login') { document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ'; document.getElementById('loginFormArea').style.display = 'block'; document.getElementById('registerFormArea').style.display = 'none'; } 
+  else { document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก'; document.getElementById('loginFormArea').style.display = 'none'; document.getElementById('registerFormArea').style.display = 'block'; }
 }
 
 async function doLogin() {
-  const email = document.getElementById('l-email').value;
-  const password = document.getElementById('l-password').value;
+  const email = document.getElementById('l-email').value; const password = document.getElementById('l-password').value;
   if(!email || !password) return showToast('⚠️ กรุณากรอกอีเมลและรหัสผ่าน');
-  
   try {
-    const res = await fetch('/api/auth/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email, password})
-    });
+    const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password}) });
     const data = await res.json();
     if(res.ok) {
-      // 1. เก็บตะกร้า Guest ไว้ก่อน
-      let guestCart = { ...cart }; 
-      
-      // 2. เซ็ต User ใหม่
-      currentUser = data.user;
+      // 🛡️ ผสานตะกร้า Guest เข้ากับ User
+      let guestCart = { ...cart }; currentUser = data.user;
       localStorage.setItem('btr_user', JSON.stringify(currentUser));
+      localStorage.setItem('btr_token', data.token); 
       updateAuthNavUI();
       
-      // 3. โหลดตะกร้าของ User นี้ แล้วรวมของที่หยิบไว้ตอนเป็น Guest เข้าไป
-      loadCart();
-      for(let k in guestCart) {
-        if(cart[k]) cart[k].qty += guestCart[k].qty;
-        else cart[k] = guestCart[k];
-      }
-      saveCart();
-      localStorage.removeItem('btr_cart_guest'); // ล้างตะกร้า Guest ทิ้ง
+      loadCart(); // โหลดตะกร้าของ User
+      for(let k in guestCart) { if(cart[k]) cart[k].qty += guestCart[k].qty; else cart[k] = guestCart[k]; }
+      saveCart(); // เซฟตะกร้าที่รวมแล้วลง User
+      localStorage.removeItem('btr_cart_guest'); // ล้างตะกร้า Guest
       updateCartUI();
 
-      document.getElementById('authModal').classList.remove('open');
-      showToast('✅ ยินดีต้อนรับกลับมาครับ!');
+      document.getElementById('authModal').classList.remove('open'); showToast('✅ ยินดีต้อนรับกลับมาครับ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
 
 async function doRegister() {
-  const name = document.getElementById('r-name').value;
-  const phone = document.getElementById('r-phone').value;
-  const email = document.getElementById('r-email').value;
-  const password = document.getElementById('r-password').value;
-  const confirm = document.getElementById('r-confirm').value;
-  const province = document.getElementById('r-province').value;
-  const district = document.getElementById('r-district').value;
-  const subdistrict = document.getElementById('r-subdistrict').value;
-  const zipcode = document.getElementById('r-zipcode').value;
-  const address_detail = document.getElementById('r-addr-detail').value;
-
+  const name = document.getElementById('r-name').value; const phone = document.getElementById('r-phone').value;
+  const email = document.getElementById('r-email').value; const password = document.getElementById('r-password').value;
+  const confirm = document.getElementById('r-confirm').value; const province = document.getElementById('r-province').value;
+  const district = document.getElementById('r-district').value; const subdistrict = document.getElementById('r-subdistrict').value;
+  const zipcode = document.getElementById('r-zipcode').value; const address_detail = document.getElementById('r-addr-detail').value;
   if(!name||!phone||!email||!password||!province||!district||!subdistrict||!zipcode||!address_detail) return showToast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
   if(password !== confirm) return showToast('⚠️ รหัสผ่านไม่ตรงกัน');
 
   try {
-    const res = await fetch('/api/auth/register', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({name, email, phone, password, province, district, subdistrict, zipcode, address_detail})
-    });
+    const res = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, phone, password, province, district, subdistrict, zipcode, address_detail}) });
     const data = await res.json();
     if(res.ok) {
-      // รวมตะกร้าแบบเดียวกับ Login
-      let guestCart = { ...cart };
-      currentUser = data.user;
+      let guestCart = { ...cart }; currentUser = data.user;
       localStorage.setItem('btr_user', JSON.stringify(currentUser));
+      localStorage.setItem('btr_token', data.token); 
       updateAuthNavUI();
       
       loadCart();
       for(let k in guestCart) { cart[k] = guestCart[k]; }
-      saveCart();
-      localStorage.removeItem('btr_cart_guest');
-      updateCartUI();
+      saveCart(); localStorage.removeItem('btr_cart_guest'); updateCartUI();
 
-      document.getElementById('authModal').classList.remove('open');
-      showToast('🎉 สมัครสมาชิกสำเร็จ!');
+      document.getElementById('authModal').classList.remove('open'); showToast('🎉 สมัครสมาชิกสำเร็จ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
-  
+
 function doLogout() {
-  currentUser = null;
-  localStorage.removeItem('btr_user');
-  
-  // สลับกลับไปโหลดตะกร้า Guest (ซึ่งตอนนี้จะว่างเปล่าแล้ว)
-  loadCart();
-  updateCartUI();
-  
+  currentUser = null; 
+  localStorage.removeItem('btr_user'); 
+  localStorage.removeItem('btr_token');
+  loadCart(); // สลับกลับไปใช้ตะกร้า Guest (ซึ่งจะว่างเปล่า)
+  updateCartUI(); 
   updateAuthNavUI();
-  document.getElementById('portalModal').classList.remove('open');
-  showToast('👋 ออกจากระบบแล้ว');
+  document.getElementById('portalModal').classList.remove('open'); showToast('👋 ออกจากระบบแล้ว');
 }
 
 function openPortalModal() {
   if(!currentUser) return;
-  document.getElementById('p-name').value = currentUser.name;
-  document.getElementById('p-phone').value = currentUser.phone;
-  document.getElementById('p-addr-detail').value = currentUser.address_detail || '';
-  if(thaiAddressData.length > 0) {
-    setAddressValues('p', currentUser.province, currentUser.district, currentUser.subdistrict, currentUser.zipcode);
-  }
-  switchPortalTab('profile', document.querySelectorAll('.ptab')[0]);
-  document.getElementById('portalModal').classList.add('open');
+  document.getElementById('p-name').value = currentUser.name; document.getElementById('p-phone').value = currentUser.phone; document.getElementById('p-addr-detail').value = currentUser.address_detail || '';
+  if(thaiAddressData.length > 0) setAddressValues('p', currentUser.province, currentUser.district, currentUser.subdistrict, currentUser.zipcode);
+  switchPortalTab('profile', document.querySelectorAll('.ptab')[0]); document.getElementById('portalModal').classList.add('open');
 }
 
 function switchPortalTab(paneId, btn) {
-  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.portal-pane').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('pane-' + paneId).classList.add('active');
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active')); document.querySelectorAll('.portal-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active'); document.getElementById('pane-' + paneId).classList.add('active');
 }
 
 async function updateProfile() {
-  const name = document.getElementById('p-name').value;
-  const phone = document.getElementById('p-phone').value;
-  const province = document.getElementById('p-province').value;
-  const district = document.getElementById('p-district').value;
-  const subdistrict = document.getElementById('p-subdistrict').value;
-  const zipcode = document.getElementById('p-zipcode').value;
-  const address_detail = document.getElementById('p-addr-detail').value;
-
+  const name = document.getElementById('p-name').value; const phone = document.getElementById('p-phone').value;
+  const province = document.getElementById('p-province').value; const district = document.getElementById('p-district').value;
+  const subdistrict = document.getElementById('p-subdistrict').value; const zipcode = document.getElementById('p-zipcode').value;
+  const address_detail = document.getElementById('p-addr-detail').value; const token = localStorage.getItem('btr_token');
   try {
-    const res = await fetch(`/api/user/${currentUser.id}`, {
-      method:'PATCH', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({name, phone, province, district, subdistrict, zipcode, address_detail})
-    });
+    const res = await fetch(`/api/user/${currentUser.id}`, { method:'PATCH', headers:{'Content-Type':'application/json','Authorization': `Bearer ${token}`}, body: JSON.stringify({name, phone, province, district, subdistrict, zipcode, address_detail}) });
     const data = await res.json();
-    if(res.ok) {
-      currentUser = data.user;
-      localStorage.setItem('btr_user', JSON.stringify(currentUser));
-      updateAuthNavUI();
-      showToast('✅ บันทึกข้อมูลสำเร็จ');
-    }
-  } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
+    if(res.ok) { currentUser = data.user; localStorage.setItem('btr_user', JSON.stringify(currentUser)); updateAuthNavUI(); showToast('✅ บันทึกข้อมูลสำเร็จ'); }
+    else showToast('❌ ' + (data.error || 'บันทึกไม่สำเร็จ'));
+  } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
 
 async function loadMyOrders() {
-  const wrap = document.getElementById('myOrdersWrap');
-  wrap.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">⏳ กำลังโหลด...</div>';
+  const wrap = document.getElementById('myOrdersWrap'); wrap.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">⏳ กำลังโหลด...</div>';
+  const token = localStorage.getItem('btr_token');
   try {
-    const res = await fetch(`/api/user/${currentUser.id}/orders`);
+    const res = await fetch(`/api/user/${currentUser.id}/orders`, { headers: { 'Authorization': `Bearer ${token}` } });
     const orders = await res.json();
-    if(orders.length === 0) {
-      wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">คุณยังไม่มีประวัติการสั่งซื้อ</div>';
-      return;
-    }
+    if(orders.error) return wrap.innerHTML = `<div style="color:red; text-align:center;">${orders.error}</div>`;
+    if(orders.length === 0) return wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">คุณยังไม่มีประวัติการสั่งซื้อ</div>';
     wrap.innerHTML = orders.map(o => {
       let itemsHtml = o.items.map(i => `<div style="font-size:13px; color:var(--tx2); margin-top:4px;">- ${i.name} × ${i.qty}</div>`).join('');
-      return `
-        <div style="border:1.5px solid #eee; border-radius:16px; padding:16px; margin-bottom:12px; background:#fff;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span style="font-size:12px; color:var(--tx3); font-weight:700;">ออเดอร์ #${o.id} <br><span style="font-weight:400">${o.created_at}</span></span>
-            <span class="status-badge">${o.status}</span>
-          </div>
-          ${itemsHtml}
-          <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--g1); margin-top:12px; border-top:1px dashed #eee; padding-top:12px;">
-            <span>ยอดรวม</span><span>฿${o.total.toLocaleString()}</span>
-          </div>
-        </div>
-      `;
+      return `<div style="border:1.5px solid #eee; border-radius:16px; padding:16px; margin-bottom:12px; background:#fff;"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="font-size:12px; color:var(--tx3); font-weight:700;">ออเดอร์ #${o.id} <br><span style="font-weight:400">${o.created_at}</span></span><span class="status-badge">${o.status}</span></div>${itemsHtml}<div style="display:flex; justify-content:space-between; font-weight:800; color:var(--g1); margin-top:12px; border-top:1px dashed #eee; padding-top:12px;"><span>ยอดรวม</span><span>฿${o.total.toLocaleString()}</span></div></div>`;
     }).join('');
   } catch(e) { wrap.innerHTML = '<div style="color:red; text-align:center;">โหลดไม่สำเร็จ</div>'; }
 }
 
 // ===== TRACKING MODAL =====
-function openTrackModal() {
-  document.getElementById('trackResult').innerHTML = '';
-  document.getElementById('trackPhone').value = '';
-  document.getElementById('trackModal').classList.add('open');
-}
-
+function openTrackModal() { document.getElementById('trackResult').innerHTML = ''; document.getElementById('trackPhone').value = ''; document.getElementById('trackModal').classList.add('open'); }
 async function quickTrack() {
-  const phone = document.getElementById('trackPhone').value;
-  const resDiv = document.getElementById('trackResult');
-  const loading = document.getElementById('trackLoading');
-  
+  const phone = document.getElementById('trackPhone').value; const resDiv = document.getElementById('trackResult'); const loading = document.getElementById('trackLoading');
   if(phone.length !== 10) return showToast("⚠️ กรุณากรอกเบอร์โทร 10 หลัก");
   resDiv.innerHTML = ''; loading.style.display = 'block';
-
   try {
-    const res = await fetch('/api/track/' + phone);
-    const data = await res.json();
-    loading.style.display = 'none';
-
-    if(data.error || data.length === 0) {
-      resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E; padding: 20px 0; font-weight:700;">ไม่พบข้อมูลออเดอร์ของเบอร์นี้</div>`;
-      return;
-    }
-
+    const res = await fetch('/api/track/' + phone); const data = await res.json(); loading.style.display = 'none';
+    if(data.error || data.length === 0) return resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E; padding: 20px 0; font-weight:700;">ไม่พบข้อมูลออเดอร์ของเบอร์นี้</div>`;
     data.forEach(o => {
       let itemsHtml = o.items.map(i => `<div style="font-size:13px; color:#666;">- ${i.name} × ${i.qty}</div>`).join('');
-      resDiv.innerHTML += `
-        <div style="border: 1.5px solid #eee; border-radius: 16px; padding: 16px; margin-bottom: 12px; background: #fafafa;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-            <span style="font-size:12px; color:#888;">ออเดอร์ #${o.id}</span>
-            <span class="status-badge">${o.status}</span>
-          </div>
-          <div style="margin-bottom: 8px;">${itemsHtml}</div>
-          <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; border-top: 1px solid #ddd; padding-top: 8px;">
-            <span>ยอดรวม</span><span style="color:var(--g1)">฿${o.total.toLocaleString()}</span>
-          </div>
-        </div>
-      `;
+      resDiv.innerHTML += `<div style="border: 1.5px solid #eee; border-radius: 16px; padding: 16px; margin-bottom: 12px; background: #fafafa;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;"><span style="font-size:12px; color:#888;">ออเดอร์ #${o.id}</span><span class="status-badge">${o.status}</span></div><div style="margin-bottom: 8px;">${itemsHtml}</div><div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; border-top: 1px solid #ddd; padding-top: 8px;"><span>ยอดรวม</span><span style="color:var(--g1)">฿${o.total.toLocaleString()}</span></div></div>`;
     });
-  } catch(e) {
-    loading.style.display = 'none';
-    resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E;">เกิดข้อผิดพลาดในการเชื่อมต่อ</div>`;
-  }
+  } catch(e) { loading.style.display = 'none'; resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E;">เกิดข้อผิดพลาดในการเชื่อมต่อ</div>`; }
 }
 
-// ===== CART LOGIC (WITH LOCALSTORAGE) =====
-function saveCart() { localStorage.setItem('btr_cart', JSON.stringify(cart)); }
-
-function openCart() {
-  document.getElementById('cartOverlay').classList.add('open');
-  document.getElementById('cartSide').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeCart() {
-  document.getElementById('cartOverlay').classList.remove('open');
-  document.getElementById('cartSide').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function changeQty(id, delta) {
-  id = String(id);
-  if (!cart[id]) return;
-  cart[id].qty += delta;
-  if (cart[id].qty <= 0) delete cart[id];
-  updateCartUI(); saveCart();
-  if(document.getElementById('orderModal').classList.contains('open')) calculateShipping();
-}
-
-function removeCart(id) {
-  id = String(id); delete cart[id]; updateCartUI(); saveCart();
-  if(document.getElementById('orderModal').classList.contains('open')) calculateShipping();
-  showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
-}
+// ===== CART LOGIC =====
+function openCart() { document.getElementById('cartOverlay').classList.add('open'); document.getElementById('cartSide').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartSide').classList.remove('open'); document.body.style.overflow = ''; }
+function changeQty(id, delta) { id = String(id); if (!cart[id]) return; cart[id].qty += delta; if (cart[id].qty <= 0) delete cart[id]; updateCartUI(); saveCart(); if(document.getElementById('orderModal').classList.contains('open')) calculateShipping(); }
+function removeCart(id) { id = String(id); delete cart[id]; updateCartUI(); saveCart(); if(document.getElementById('orderModal').classList.contains('open')) calculateShipping(); showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว'); }
 
 function addCart(id, name, basePrice, emoji, image, safeTiers, btn) {
-  id = String(id);
-  const tiersStr = decodeURIComponent(safeTiers);
-  if (cart[id]) { cart[id].qty += 1; } 
-  else { cart[id] = { id, name, basePrice, price: basePrice, emoji, image, tiersStr, qty: 1 }; }
-  
+  id = String(id); const tiersStr = decodeURIComponent(safeTiers);
+  if (cart[id]) { cart[id].qty += 1; } else { cart[id] = { id, name, basePrice, price: basePrice, emoji, image, tiersStr, qty: 1 }; }
   updateCartUI(); saveCart();
   btn.classList.add('added'); btn.textContent = '✅ เพิ่มแล้ว';
-  setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+ เพิ่มลงตะกร้า'; }, 1800);
-  showToast('✅ เพิ่มลงตะกร้าแล้ว!');
+  setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+ เพิ่มลงตะกร้า'; }, 1800); showToast('✅ เพิ่มลงตะกร้าแล้ว!');
 }
 
 function updateCartUI() {
   const items = Object.values(cart);
   items.forEach(item => {
     let currentPrice = item.basePrice;
-    try { 
-      let tiers = JSON.parse(item.tiersStr || '[]'); 
-      const descTiers = [...tiers].sort((a,b) => b.qty - a.qty);
-      for(let t of descTiers) { if(item.qty >= t.qty) { currentPrice = t.price; break; } }
-    } catch(e){}
+    try { let tiers = JSON.parse(item.tiersStr || '[]'); const descTiers = [...tiers].sort((a,b) => b.qty - a.qty); for(let t of descTiers) { if(item.qty >= t.qty) { currentPrice = t.price; break; } } } catch(e){}
     item.price = currentPrice;
   });
 
-  const count = items.reduce((s, i) => s + i.qty, 0);
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
-
-  document.getElementById('cartBadge').textContent = count;
-  count > 0 ? document.getElementById('cartBadge').classList.add('show') : document.getElementById('cartBadge').classList.remove('show');
+  const count = items.reduce((s, i) => s + i.qty, 0); const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('cartBadge').textContent = count; count > 0 ? document.getElementById('cartBadge').classList.add('show') : document.getElementById('cartBadge').classList.remove('show');
   document.getElementById('cartCount').textContent = count + ' รายการ';
-
-  const body = document.getElementById('cartBody');
-  const footer = document.getElementById('cartFooter');
+  const body = document.getElementById('cartBody'); const footer = document.getElementById('cartFooter');
 
   if (items.length === 0) {
     footer.style.display = 'none';
-    body.innerHTML = `
-      <div class="cart-empty" id="cartEmpty">
-        <div class="ce-icon"><img src="basket.png" style="width:64px;opacity:0.5;"></div>
-        <div class="ce-text">ตะกร้าของคุณว่างเปล่า</div>
-        <div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div>
-      </div>
-    `;
+    body.innerHTML = `<div class="cart-empty" id="cartEmpty"><div class="ce-icon"><img src="basket.png" style="width:64px;opacity:0.5;"></div><div class="ce-text">ตะกร้าของคุณว่างเปล่า</div><div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div></div>`;
     return;
   }
-
   footer.style.display = ''; body.innerHTML = '';
   
   items.forEach(item => {
-    let tiers = [];
-    try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
-    let nextTier = null;
-    const ascTiers = [...tiers].sort((a,b) => a.qty - b.qty);
+    let tiers = []; try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
+    let nextTier = null; const ascTiers = [...tiers].sort((a,b) => a.qty - b.qty);
     for(let t of ascTiers) { if(item.qty < t.qty) { nextTier = t; break; } }
-
     let upsellHtml = '';
     if(nextTier) {
       const diff = nextTier.qty - item.qty;
-      upsellHtml = `<div style="font-size:12px; color:#C9940B; font-weight:700; background:#FFF8E1; padding:4px 8px; border-radius:6px; margin-top:6px; display:inline-block; border: 1px solid #FBC02D;">
-        🚀 เพิ่มอีก ${diff} ชิ้น ลดเหลือ ฿${nextTier.price}/ชิ้น!
-      </div>`;
+      upsellHtml = `<div style="font-size:12px; color:#C9940B; font-weight:700; background:#FFF8E1; padding:4px 8px; border-radius:6px; margin-top:6px; display:inline-block; border: 1px solid #FBC02D;">🚀 เพิ่มอีก ${diff} ชิ้น ลดเหลือ ฿${nextTier.price}/ชิ้น!</div>`;
     }
-
     const isDiscounted = item.price < item.basePrice;
     const imgHtml = item.image ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : (item.emoji || '🌾');
-    const div = document.createElement('div');
-    div.className = 'ci';
-    div.innerHTML = `
-      <div class="ci-img" style="overflow:hidden; padding:0;">${imgHtml}</div>
-      <div class="ci-info">
-        <div class="ci-name">${item.name}</div>
-        <div class="ci-price" style="${isDiscounted ? 'color:#E53E3E; font-weight:800;' : ''}">
-          ฿${item.price.toLocaleString()} / ชิ้น ${isDiscounted ? '<span style="font-size:10px">(ราคาส่ง)</span>' : ''}
-        </div>
-        ${upsellHtml}
-        <div class="ci-ctrl" style="margin-top:10px;">
-          <button class="qbtn" onclick="changeQty('${item.id}',-1)">−</button>
-          <span class="qdsp">${item.qty}</span>
-          <button class="qbtn" onclick="changeQty('${item.id}',1)">+</button>
-          <span style="font-size:13px;color:var(--tx3);margin-left:4px;font-weight:700;">รวม ฿${(item.price * item.qty).toLocaleString()}</span>
-          <button class="ci-rm" onclick="removeCart('${item.id}')">🗑</button>
-        </div>
-      </div>`;
+    const div = document.createElement('div'); div.className = 'ci';
+    div.innerHTML = `<div class="ci-img" style="overflow:hidden; padding:0;">${imgHtml}</div><div class="ci-info"><div class="ci-name">${item.name}</div><div class="ci-price" style="${isDiscounted ? 'color:#E53E3E; font-weight:800;' : ''}">฿${item.price.toLocaleString()} / ชิ้น ${isDiscounted ? '<span style="font-size:10px">(ราคาส่ง)</span>' : ''}</div>${upsellHtml}<div class="ci-ctrl" style="margin-top:10px;"><button class="qbtn" onclick="changeQty('${item.id}',-1)">−</button><span class="qdsp">${item.qty}</span><button class="qbtn" onclick="changeQty('${item.id}',1)">+</button><span style="font-size:13px;color:var(--tx3);margin-left:4px;font-weight:700;">รวม ฿${(item.price * item.qty).toLocaleString()}</span><button class="ci-rm" onclick="removeCart('${item.id}')">🗑</button></div></div>`;
     body.appendChild(div);
   });
   document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
@@ -1232,100 +1008,68 @@ function updateCartUI() {
 
 // ===== CHECKOUT MODAL & SHIPPING =====
 function calculateShipping() {
-  const items = Object.values(cart);
-  if (items.length === 0) return;
+  const items = Object.values(cart); if (items.length === 0) return;
   const totalWeight = (items.reduce((s, i) => s + i.qty, 0) * 5) + 0.5;
-  const prov = document.getElementById('o-province').value;
-  const zip = document.getElementById('o-zipcode').value;
+  const prov = document.getElementById('o-province').value; const zip = document.getElementById('o-zipcode').value;
   
-  if (!prov || !zip || zip.length < 5) {
-      document.getElementById('orderShippingFee').textContent = 'รอระบุที่อยู่...';
-      currentShippingFee = 0; updateOrderTotalUI(); return;
-  }
-
+  if (!prov || !zip || zip.length < 5) { document.getElementById('orderShippingFee').textContent = 'รอระบุที่อยู่...'; currentShippingFee = 0; updateOrderTotalUI(); return; }
   const isBkkMetro = ["กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี", "สมุทรปราการ"].includes(prov);
   const upcRates = [0,35,40,45,50,60,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,420,430,440,450,460,500,510,520,530,540,550,560,570,580,590];
   const bkkRates = [0,25,30,35,45,55,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,425,440,455,470,485,500,515,530,545,560,575,590,605,620,635];
 
   let baseFee = 0; let remainingWeight = Math.ceil(totalWeight);
-  while (remainingWeight > 0) {
-      let checkW = remainingWeight > 50 ? 50 : remainingWeight;
-      baseFee += isBkkMetro ? bkkRates[checkW] : upcRates[checkW];
-      remainingWeight -= 50;
-  }
+  while (remainingWeight > 0) { let checkW = remainingWeight > 50 ? 50 : remainingWeight; baseFee += isBkkMetro ? bkkRates[checkW] : upcRates[checkW]; remainingWeight -= 50; }
 
   let surcharge = 0;
   if (['84280','84320','84330','20120','23120','82160','81150','21160','83000','83100','83110','83120','83130','83150'].includes(zip)) surcharge += 80; 
   else if (['แม่ฮ่องสอน','นราธิวาส','ปัตตานี','ยะลา'].includes(prov)) surcharge += 50; 
+  if (['ภูเก็ต','กระบี่'].includes(prov)) { if (totalWeight > 20) surcharge += 200; else if (totalWeight > 7) surcharge += 100; }
 
-  if (['ภูเก็ต','กระบี่'].includes(prov)) {
-      if (totalWeight > 20) surcharge += 200;
-      else if (totalWeight > 7) surcharge += 100;
-  }
-
-  currentShippingFee = baseFee + surcharge;
-  document.getElementById('orderShippingFee').textContent = `฿${currentShippingFee.toLocaleString()}`;
-  updateOrderTotalUI();
+  currentShippingFee = baseFee + surcharge; document.getElementById('orderShippingFee').textContent = `฿${currentShippingFee.toLocaleString()}`; updateOrderTotalUI();
 }
 
 function updateOrderTotalUI() {
-  const items = Object.values(cart);
-  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const items = Object.values(cart); const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
   document.getElementById('orderTotal').textContent = `฿${(subtotal + currentShippingFee).toLocaleString()}`;
 }
 
 function openModal() {
   if (Object.keys(cart).length === 0) return showToast('⚠️ กรุณาเพิ่มสินค้าก่อน');
   closeCart();
-  
   document.getElementById('orderSumItems').innerHTML = Object.values(cart).map(i => `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`).join('');
   calculateShipping(); 
   
   if(currentUser) {
-    document.getElementById('o-name').value = currentUser.name;
-    document.getElementById('o-phone').value = currentUser.phone;
-    document.getElementById('o-addr-detail').value = currentUser.address_detail || '';
-    if(thaiAddressData.length > 0 && currentUser.province) {
-      setAddressValues('o', currentUser.province, currentUser.district, currentUser.subdistrict, currentUser.zipcode);
-    }
+    document.getElementById('o-name').value = currentUser.name; document.getElementById('o-phone').value = currentUser.phone; document.getElementById('o-addr-detail').value = currentUser.address_detail || '';
+    if(thaiAddressData.length > 0 && currentUser.province) setAddressValues('o', currentUser.province, currentUser.district, currentUser.subdistrict, currentUser.zipcode);
   }
-
-  document.getElementById('orderFormWrap').style.display = '';
-  document.getElementById('orderSuccess').style.display = 'none';
-  document.getElementById('orderModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.getElementById('orderFormWrap').style.display = ''; document.getElementById('orderSuccess').style.display = 'none'; document.getElementById('orderModal').classList.add('open'); document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
-  document.getElementById('orderModal').classList.remove('open');
-  document.body.style.overflow = '';
-}
+function closeModal() { document.getElementById('orderModal').classList.remove('open'); document.body.style.overflow = ''; }
 
 async function submitOrder() {
-  const name = document.getElementById('o-name').value.trim();
-  const phone = document.getElementById('o-phone').value.trim();
-  const prov = document.getElementById('o-province').value;
-  const dist = document.getElementById('o-district').value.trim();
-  const subdist = document.getElementById('o-subdistrict').value.trim();
-  const zip = document.getElementById('o-zipcode').value.trim();
-  const detail = document.getElementById('o-addr-detail').value.trim();
-  const note = document.getElementById('o-note') ? document.getElementById('o-note').value.trim() : '';
-  
+  const name = document.getElementById('o-name').value.trim(); const phone = document.getElementById('o-phone').value.trim();
+  const prov = document.getElementById('o-province').value; const dist = document.getElementById('o-district').value.trim();
+  const subdist = document.getElementById('o-subdistrict').value.trim(); const zip = document.getElementById('o-zipcode').value.trim();
+  const detail = document.getElementById('o-addr-detail').value.trim(); const note = document.getElementById('o-note') ? document.getElementById('o-note').value.trim() : '';
   if (!name || phone.length !== 10 || !prov || !dist || !subdist || zip.length !== 5 || !detail) return showToast('⚠️ กรุณากรอกข้อมูลและที่อยู่ให้ครบถ้วน'); 
 
   const itemsToSubmit = [...Object.values(cart)];
   if (currentShippingFee > 0) itemsToSubmit.push({ id: 'SHIP', name: 'ค่าจัดส่ง (Flash Express)', price: currentShippingFee, qty: 1, emoji: '🚚', image: null });
   const finalTotal = itemsToSubmit.reduce((s, i) => s + i.price * i.qty, 0);
+  const token = localStorage.getItem('btr_token');
 
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    if(token) headers['Authorization'] = `Bearer ${token}`;
+
     const res = await fetch('/api/orders', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: headers,
       body: JSON.stringify({ user_id: currentUser ? currentUser.id : null, customer_name: name, customer_phone: phone, customer_addr: `${detail} ต.${subdist} อ.${dist} จ.${prov} ${zip}`, note, items: itemsToSubmit, total: finalTotal })
     });
     if (res.ok) {
-      document.getElementById('orderFormWrap').style.display = 'none';
-      document.getElementById('orderSuccess').style.display = '';
-      document.getElementById('pp-total').textContent = finalTotal.toLocaleString();
+      document.getElementById('orderFormWrap').style.display = 'none'; document.getElementById('orderSuccess').style.display = ''; document.getElementById('pp-total').textContent = finalTotal.toLocaleString();
       cart = {}; updateCartUI(); saveCart();
     } else showToast('❌ เกิดข้อผิดพลาด');
   } catch(e) { showToast('❌ ไม่สามารถส่งออเดอร์ได้'); }
@@ -1333,11 +1077,8 @@ async function submitOrder() {
 
 async function loadDynamicProducts() {
   try {
-    const res = await fetch('/api/products');
-    const products = await res.json();
-    const grid = document.getElementById('productGrid');
+    const res = await fetch('/api/products'); const products = await res.json(); const grid = document.getElementById('productGrid');
     if (!products || products.length === 0) return grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--tx3); padding:40px;">กำลังอัปเดตระบบสินค้า กรุณารอสักครู่...</p>`;
-    
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
     grid.innerHTML = products.map(p => {
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
@@ -1351,20 +1092,9 @@ async function loadDynamicProducts() {
           tierInfoHtml += `</div>`;
         }
       } catch(e){}
-      return `
-        <div class="pcard" data-cat="${p.category}">
-          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">${imgHtml}${p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : ''}</div>
-          <div class="pcard-body">
-            <div class="pcat">${catName[p.category] || p.category}</div>
-            <div class="pname">${p.name}</div>
-            <div class="pdesc">${p.description || ''}</div>
-            <div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>
-            ${tierInfoHtml}
-            <div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
-            <button class="add-btn" onclick="addCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${(p.emoji||'🌾').replace(/'/g, "\\'")}', '${p.image||''}', '${encodeURIComponent(p.price_tiers || '[]')}', this)">+ เพิ่มลงตะกร้า</button>
-          </div>
-        </div>`;
+      return `<div class="pcard" data-cat="${p.category}"><div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">${imgHtml}${p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : ''}</div><div class="pcard-body"><div class="pcat">${catName[p.category] || p.category}</div><div class="pname">${p.name}</div><div class="pdesc">${p.description || ''}</div><div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>${tierInfoHtml}<div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div><button class="add-btn" onclick="addCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${(p.emoji||'🌾').replace(/'/g, "\\'")}', '${p.image||''}', '${encodeURIComponent(p.price_tiers || '[]')}', this)">+ เพิ่มลงตะกร้า</button></div></div>`;
     }).join('');
+    if (typeof observer !== 'undefined') { document.querySelectorAll('.pcard').forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(20px)'; el.style.transition = 'opacity 0.5s ease, transform 0.5s ease'; observer.observe(el); }); }
   } catch (e) { console.error('Error Dynamic Product:', e); }
 }
 </script>
