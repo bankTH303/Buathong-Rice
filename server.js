@@ -198,9 +198,13 @@ app.get('/api/admin/products', checkAdmin, (req, res) => {
 
 app.patch('/api/admin/products/:id', checkAdmin, (req, res) => {
   try {
-    const { name, price, unit, min_order, description, active, image, price_tiers } = req.body;
-    db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=?, price_tiers=? WHERE id=?`)
-      .run(name, price, unit, min_order, description, active, image, price_tiers || "[]", req.params.id);
+    // 🛡️ เพิ่มการรับค่า badge เข้ามา
+    const { name, price, unit, min_order, description, active, image, badge, price_tiers } = req.body;
+    
+    // 🛡️ อัปเดตคำสั่ง SQL ให้เซฟ badge ด้วย
+    db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=?, badge=?, price_tiers=? WHERE id=?`)
+      .run(name, price, unit, min_order, description, active, image, badge || '', price_tiers || "[]", req.params.id);
+      
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'อัปเดตไม่ได้' }); }
 });
