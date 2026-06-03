@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Admin — บัวทองไรซ์</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -17,12 +17,12 @@
   --sidebar:240px;
 }
 html{font-size:14px}
-body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);color:var(--tx1);min-height:100vh}
+body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);color:var(--tx1);min-height:100vh; overflow-x:hidden;}
 
 /* ===== LOGIN ===== */
-#loginScreen{position:fixed;inset:0;background:var(--green);display:flex;align-items:center;justify-content:center;z-index:9999}
+#loginScreen{position:fixed;inset:0;background:var(--green);display:flex;align-items:center;justify-content:center;z-index:9999; padding:20px;}
 #loginScreen.hide{display:none}
-.login-box{background:#fff;border-radius:24px;padding:48px 40px;width:360px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.3)}
+.login-box{background:#fff;border-radius:24px;padding:48px 32px;width:100%;max-width:380px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.3)}
 .login-logo{margin-bottom:16px}
 .login-title{font-size:22px;font-weight:800;color:var(--green);margin-bottom:4px}
 .login-sub{font-size:13px;color:var(--tx3);margin-bottom:32px}
@@ -35,10 +35,12 @@ body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);colo
 
 /* ===== LAYOUT ===== */
 #app{display:none}
-#app.show{display:flex;min-height:100vh}
+#app.show{display:flex;min-height:100vh;width:100%;}
 
-/* SIDEBAR */
-.sidebar{width:var(--sidebar);background:var(--green);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100}
+/* SIDEBAR & OVERLAY */
+.sidebar{width:var(--sidebar);background:var(--green);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:1000;transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+.sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:none;opacity:0;transition:opacity 0.3s;}
+.sb-overlay.show{display:block;opacity:1;}
 .sb-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.1)}
 .sb-logo-icon{margin-bottom:6px}
 .sb-logo-name{color:#fff;font-size:15px;font-weight:800;line-height:1.2}
@@ -54,12 +56,13 @@ body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);colo
 .logout-btn:hover{background:rgba(255,255,255,0.2);color:#fff}
 
 /* MAIN */
-.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;width:calc(100% - var(--sidebar)); transition:margin 0.3s;}
 .topbar{background:#fff;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.menu-toggle{display:none; background:none; border:none; font-size:24px; color:var(--tx1); cursor:pointer; margin-right:12px; padding:4px;}
 .page-title{font-size:18px;font-weight:800;color:var(--tx1)}
 .topbar-right{display:flex;align-items:center;gap:12px}
 .now-time{font-size:12px;color:var(--tx3);background:var(--bg);padding:6px 14px;border-radius:8px}
-.content{padding:28px;flex:1}
+.content{padding:28px;flex:1;}
 
 /* STATS CARDS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;margin-bottom:28px}
@@ -73,13 +76,13 @@ body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);colo
 .sc-val{font-size:30px;font-weight:800;color:var(--tx1);font-variant-numeric:tabular-nums}
 .sc-lbl{font-size:12px;color:var(--tx3);margin-top:4px}
 
-/* TABLES */
+/* TABLES (Horizontal Scroll for Mobile) */
 .section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px}
 .section-title{font-size:16px;font-weight:800;color:var(--tx1)}
-.tbl-wrap{background:#fff;border-radius:18px;border:1.5px solid var(--border);overflow:hidden}
-table{width:100%;border-collapse:collapse}
-th{padding:14px 18px;text-align:left;font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;background:var(--bg);border-bottom:1px solid var(--border)}
-td{padding:15px 18px;font-size:14px;color:var(--tx1);border-bottom:1px solid #F9FAFB}
+.tbl-wrap{background:#fff;border-radius:18px;border:1.5px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:700px;}
+th{padding:14px 18px;text-align:left;font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:15px 18px;font-size:14px;color:var(--tx1);border-bottom:1px solid #F9FAFB;}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#FAFAFA}
 
@@ -92,7 +95,7 @@ tr:hover td{background:#FAFAFA}
 .s-cancel{background:#F8D7DA;color:#721C24}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit}
 .btn-primary{background:var(--green);color:#fff}
 .btn-primary:hover{background:var(--green2)}
 .btn-gold{background:var(--goldb);color:#3D2600}
@@ -102,18 +105,18 @@ tr:hover td{background:#FAFAFA}
 .btn-outline:hover{border-color:var(--green);color:var(--green)}
 
 /* FILTERS */
-.filter-row{display:flex;gap:8px;flex-wrap:wrap}
-.fchip{padding:7px 16px;border-radius:50px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--tx2);font-family:inherit}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px;}
+.fchip{padding:7px 16px;border-radius:50px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--tx2);font-family:inherit; white-space:nowrap;}
 .fchip.active{background:var(--green);border-color:var(--green);color:#fff}
 
 /* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px;}
 .modal-bg.open{display:flex}
-.modal-box{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-box{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .modal-title{font-size:18px;font-weight:800;margin-bottom:20px;color:var(--tx1)}
 .fg{margin-bottom:16px}
 .fg label{display:block;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
-.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:var(--tx1)}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:var(--tx1);appearance:none;} /* font-size 16px ป้องกันซูมบน iOS */
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--green2)}
 .fg textarea{height:80px;resize:none}
 .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
@@ -133,6 +136,7 @@ tr:hover td{background:#FAFAFA}
 .pac-price{font-size:26px;font-weight:800;color:var(--green)}
 .pac-unit{font-size:12px;color:var(--tx3)}
 .pac-actions{display:flex;gap:8px;margin-top:14px}
+.pac-actions button{flex:1;}
 .pac-inactive{opacity:0.5}
 
 /* CONTACT CARDS */
@@ -155,10 +159,21 @@ tr:hover td{background:#FAFAFA}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx1);color:#fff;padding:11px 24px;border-radius:50px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%)}
 
-/* RESPONSIVE */
-@media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
-  .main{margin-left:0}
+/* ===== RESPONSIVE MOBILE ===== */
+@media(max-width:850px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0; width:100%;}
+  .menu-toggle{display:block;}
+  .topbar{padding:0 16px;}
+  .content{padding:16px;}
+  .stats-grid{grid-template-columns:repeat(2, 1fr);}
+  .modal-box{padding:24px 20px;}
+  .now-time{display:none;} /* ซ่อนนาฬิกาบนมือถือให้มีที่ว่าง */
+  .section-hdr{flex-direction:column; align-items:flex-start; gap:12px;}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -178,7 +193,8 @@ tr:hover td{background:#FAFAFA}
 </div>
 
 <div id="app">
-  <aside class="sidebar">
+  <div class="sb-overlay" id="sbOverlay" onclick="toggleMenu()"></div>
+  <aside class="sidebar" id="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon">
         <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover;">
@@ -208,7 +224,10 @@ tr:hover td{background:#FAFAFA}
 
   <div class="main">
     <div class="topbar">
-      <div class="page-title" id="pageTitle">ภาพรวม</div>
+      <div style="display:flex; align-items:center;">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <div class="page-title" id="pageTitle">ภาพรวม</div>
+      </div>
       <div class="topbar-right">
         <div class="now-time" id="clock">--:--</div>
         <a href="/" target="_blank" class="btn btn-outline btn-sm">🌐 ดูหน้าเว็บ</a>
@@ -229,7 +248,7 @@ tr:hover td{background:#FAFAFA}
         <div class="tbl-wrap">
           <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
             <div class="section-title">ออเดอร์ล่าสุด</div>
-            <button class="btn btn-outline btn-sm" onclick="goPage('orders',document.querySelector('[onclick*=orders]'))">ดูทั้งหมด →</button>
+            <button class="btn btn-outline btn-sm" onclick="goPage('orders',document.querySelectorAll('.sb-item')[1])">ดูทั้งหมด →</button>
           </div>
           <table id="recentOrdersTable">
             <thead><tr><th>#</th><th>ลูกค้า</th><th>เบอร์โทร</th><th>ยอดรวม</th><th>สถานะ</th><th>วันที่</th></tr></thead>
@@ -293,11 +312,11 @@ tr:hover td{background:#FAFAFA}
     <div class="fg"><label>ราคา (บาท)</label><input type="number" id="ep-price" min="0"></div>
     
     <div class="fg" style="background:#F9FAFB; padding:12px; border-radius:10px; border:1px solid var(--border);">
-      <label style="display:flex; justify-content:space-between;">
+      <label style="display:flex; justify-content:space-between; align-items:center;">
         ตั้งราคาส่ง (ขั้นบันได)
-        <button type="button" class="btn-sm btn-outline" style="padding:2px 8px; cursor:pointer;" onclick="addTierRow(this.parentElement.nextElementSibling)">+ เพิ่มขั้น</button>
+        <button type="button" class="btn-sm btn-outline" style="padding:4px 10px; cursor:pointer;" onclick="addTierRow(this.parentElement.nextElementSibling)">+ เพิ่มขั้น</button>
       </label>
-      <div class="tiers-container" style="margin-top:8px;"></div>
+      <div class="tiers-container" style="margin-top:12px;"></div>
     </div>
 
     <div class="fg"><label>หน่วย (เช่น กระสอบ 5 กก.)</label><input type="text" id="ep-unit"></div>
@@ -340,11 +359,11 @@ tr:hover td{background:#FAFAFA}
     <div class="fg"><label>ราคา (บาท) *</label><input type="number" id="np-price" min="0" placeholder="0"></div>
     
     <div class="fg" style="background:#F9FAFB; padding:12px; border-radius:10px; border:1px solid var(--border);">
-      <label style="display:flex; justify-content:space-between;">
+      <label style="display:flex; justify-content:space-between; align-items:center;">
         ตั้งราคาส่ง (ขั้นบันได)
-        <button type="button" class="btn-sm btn-outline" style="padding:2px 8px; cursor:pointer;" onclick="addTierRow(this.parentElement.nextElementSibling)">+ เพิ่มขั้น</button>
+        <button type="button" class="btn-sm btn-outline" style="padding:4px 10px; cursor:pointer;" onclick="addTierRow(this.parentElement.nextElementSibling)">+ เพิ่มขั้น</button>
       </label>
-      <div class="tiers-container" style="margin-top:8px;"></div>
+      <div class="tiers-container" style="margin-top:12px;"></div>
     </div>
 
     <div class="fg"><label>หน่วย</label><input type="text" id="np-unit" placeholder="กระสอบ 5 กก." value="กระสอบ 5 กก."></div>
@@ -389,6 +408,12 @@ let allOrders = [];
 let allProducts = []; 
 let currentOrderId = null;
 
+// ===== MOBILE MENU TOGGLE =====
+function toggleMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('show');
+}
+
 // ===== AUTH & NAVIGATION =====
 async function doLogin() {
   const pw = document.getElementById('pwInput').value;
@@ -430,9 +455,16 @@ function goPage(page, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   const titles = { dashboard:'ภาพรวม', orders:'จัดการออเดอร์', products:'สินค้า & ราคา', contacts:'ข้อมูลติดต่อ' };
   document.getElementById('pageTitle').textContent = titles[page];
+  
+  // ปิดเมนูอัตโนมัติเมื่อกดเลือกบนมือถือ
+  if(window.innerWidth <= 850) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sbOverlay').classList.remove('show');
+  }
+
   if (page === 'dashboard') loadDashboard();
   if (page === 'orders') loadOrders();
   if (page === 'products') loadProducts();
@@ -456,7 +488,7 @@ async function loadDashboard() {
     
     const tbody = document.getElementById('recentOrdersBody');
     if (recent.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--tx3);padding:20px">ยังไม่มีออเดอร์</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:20px">ยังไม่มีออเดอร์</td></tr>`;
       return;
     }
     
@@ -464,6 +496,7 @@ async function loadDashboard() {
       <tr>
         <td><strong>#${o.id}</strong></td>
         <td>${o.customer_name}</td>
+        <td>${o.customer_phone}</td>
         <td style="color:var(--green);font-weight:700">฿${o.total.toLocaleString()}</td>
         <td>${statusBadge(o.status)}</td>
         <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail('${o.id}')">ดู/แก้</button></td>
@@ -581,8 +614,8 @@ function addTierRow(container, qty='', price='') {
   const div = document.createElement('div');
   div.style = "display:flex; gap:8px; margin-bottom:8px;";
   div.innerHTML = `
-    <input type="number" placeholder="จำนวนขั้นต่ำ" class="t-qty" value="${qty}" style="flex:1" min="2">
-    <input type="number" placeholder="ราคาลดเหลือ" class="t-price" value="${price}" style="flex:1" min="0">
+    <input type="number" placeholder="จำนวน" class="t-qty" value="${qty}" style="flex:1" min="2">
+    <input type="number" placeholder="ราคาลด" class="t-price" value="${price}" style="flex:1" min="0">
     <button type="button" class="btn-sm btn-outline" style="color:#E53E3E; border-color:#E53E3E" onclick="this.parentElement.remove()">ลบ</button>
   `;
   container.appendChild(div);
@@ -629,7 +662,7 @@ function openAddProduct() {
   document.getElementById('np-desc').value = '';
   document.getElementById('np-image').value = '';
   document.getElementById('np-preview').style.display = 'none';
-  document.querySelector('#addProductModal .tiers-container').innerHTML = ''; // ล้างราคาส่ง
+  document.querySelector('#addProductModal .tiers-container').innerHTML = ''; 
   document.getElementById('addProductModal').classList.add('open');
 }
 
