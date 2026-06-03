@@ -738,9 +738,18 @@ let currentShippingFee = 0;
 let cart = {};
 
 // 🛡️ ระบบตะกร้าอัจฉริยะ (แยก Guest/User)
-function getCartKey() { return currentUser ? 'btr_cart_user_' + currentUser.id : 'btr_cart_guest'; }
-function loadCart() { let saved = localStorage.getItem(getCartKey()); cart = saved ? JSON.parse(saved) : {}; }
-function saveCart() { localStorage.setItem(getCartKey(), JSON.stringify(cart)); }
+function getCartKey(userObj) { 
+  return (userObj && userObj.id) ? 'btr_cart_user_' + userObj.id : 'btr_cart_guest'; 
+}
+
+function loadCart() { 
+  let saved = localStorage.getItem(getCartKey(currentUser)); 
+  cart = saved ? JSON.parse(saved) : {}; 
+}
+
+function saveCart() { 
+  localStorage.setItem(getCartKey(currentUser), JSON.stringify(cart)); 
+}
 
 window.addEventListener('DOMContentLoaded', async () => {
   loadCart(); loadDynamicProducts(); updateCartUI(); updateAuthNavUI();
@@ -824,23 +833,36 @@ function toggleAuthForm(type) {
 }
 
 async function doLogin() {
-  const email = document.getElementById('l-email').value; const password = document.getElementById('l-password').value;
+  const email = document.getElementById('l-email').value; 
+  const password = document.getElementById('l-password').value;
   if(!email || !password) return showToast('⚠️ กรุณากรอกอีเมลและรหัสผ่าน');
+  
   try {
     const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password}) });
     const data = await res.json();
+    
     if(res.ok) {
-      saveCart(); // เซฟตะกร้า Guest เผื่อไว้
-      let guestCart = JSON.parse(JSON.stringify(cart)); // คัดลอก Guest แบบสมบูรณ์
+      let guestCart = { ...cart }; // สำรองของที่หยิบตอนเป็น Guest
+      
       currentUser = data.user;
-      localStorage.setItem('btr_user', JSON.stringify(currentUser)); localStorage.setItem('btr_token', data.token); 
+      localStorage.setItem('btr_user', JSON.stringify(currentUser)); 
+      localStorage.setItem('btr_token', data.token); 
       updateAuthNavUI();
       
-      loadCart(); // โหลดตะกร้า User
-      for(let k in guestCart) { if(cart[k]) cart[k].qty += guestCart[k].qty; else cart[k] = guestCart[k]; }
-      saveCart(); // เซฟผสานเข้าบัญชี User
-      localStorage.removeItem('btr_cart_guest'); updateCartUI();
-      document.getElementById('authModal').classList.remove('open'); showToast('✅ ยินดีต้อนรับกลับมาครับ!');
+      loadCart(); // โหลดตะกร้าที่เคยเซฟไว้ของ User นี้ขึ้นมา
+      
+      // เอาของจาก Guest มาบวกทบ
+      for(let k in guestCart) { 
+        if(cart[k]) cart[k].qty += guestCart[k].qty; 
+        else cart[k] = guestCart[k]; 
+      }
+      
+      saveCart(); // เซฟอัปเดตลงบัญชี
+      localStorage.removeItem('btr_cart_guest'); 
+      updateCartUI();
+
+      document.getElementById('authModal').classList.remove('open'); 
+      showToast('✅ ยินดีต้อนรับกลับมาครับ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
@@ -851,27 +873,48 @@ async function doRegister() {
   const confirm = document.getElementById('r-confirm').value; const province = document.getElementById('r-province').value;
   const district = document.getElementById('r-district').value; const subdistrict = document.getElementById('r-subdistrict').value;
   const zipcode = document.getElementById('r-zipcode').value; const address_detail = document.getElementById('r-addr-detail').value;
+  
   if(!name||!phone||!email||!password||!province||!district||!subdistrict||!zipcode||!address_detail) return showToast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
   if(password !== confirm) return showToast('⚠️ รหัสผ่านไม่ตรงกัน');
+
   try {
     const res = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, phone, password, province, district, subdistrict, zipcode, address_detail}) });
     const data = await res.json();
+    
     if(res.ok) {
-      saveCart(); let guestCart = JSON.parse(JSON.stringify(cart)); currentUser = data.user;
-      localStorage.setItem('btr_user', JSON.stringify(currentUser)); localStorage.setItem('btr_token', data.token); updateAuthNavUI();
-      loadCart(); for(let k in guestCart) { cart[k] = guestCart[k]; }
-      saveCart(); localStorage.removeItem('btr_cart_guest'); updateCartUI();
-      document.getElementById('authModal').classList.remove('open'); showToast('🎉 สมัครสมาชิกสำเร็จ!');
+      let guestCart = { ...cart }; 
+      
+      currentUser = data.user;
+      localStorage.setItem('btr_user', JSON.stringify(currentUser)); 
+      localStorage.setItem('btr_token', data.token); 
+      updateAuthNavUI();
+      
+      loadCart(); 
+      for(let k in guestCart) { cart[k] = guestCart[k]; }
+      
+      saveCart(); 
+      localStorage.removeItem('btr_cart_guest'); 
+      updateCartUI();
+
+      document.getElementById('authModal').classList.remove('open'); 
+      showToast('🎉 สมัครสมาชิกสำเร็จ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
 
 function doLogout() {
-  saveCart(); // เซฟตะกร้าก่อนออก
-  currentUser = null; localStorage.removeItem('btr_user'); localStorage.removeItem('btr_token');
-  loadCart(); // ดึงตะกร้า Guest ขึ้นมา (ว่างเปล่า)
-  updateCartUI(); updateAuthNavUI();
-  document.getElementById('portalModal').classList.remove('open'); showToast('👋 ออกจากระบบแล้ว');
+  saveCart(); // เซฟตะกร้าลงบัญชี User ปัจจุบันก่อน
+  
+  currentUser = null; 
+  localStorage.removeItem('btr_user'); 
+  localStorage.removeItem('btr_token');
+  
+  loadCart(); // สลับกลับมาดึงตะกร้า Guest ทันที (จะว่างเปล่า)
+  updateCartUI(); 
+  updateAuthNavUI();
+  
+  document.getElementById('portalModal').classList.remove('open'); 
+  showToast('👋 ออกจากระบบแล้ว');
 }
 
 function openPortalModal() {
