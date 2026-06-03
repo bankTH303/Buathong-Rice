@@ -654,6 +654,7 @@ async function loadProducts() {
     const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
     allProducts = await res.json();
     
+    // 🛡️ ดักจับกรณี Server ส่ง Error กลับมา
     if (!Array.isArray(allProducts)) {
       document.getElementById('prodGrid').innerHTML = `<div class="empty-text">เกิดข้อผิดพลาดจากเซิร์ฟเวอร์</div>`;
       return;
@@ -662,14 +663,16 @@ async function loadProducts() {
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
     
     document.getElementById('prodGrid').innerHTML = allProducts.map(p => {
+      // 🛡️ ป้องกัน Null
       const price = p.price || 0;
       const minOrder = p.min_order || 1;
       const unit = p.unit || 'ชิ้น';
       const name = p.name || 'สินค้าไม่มีชื่อ';
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
       
-      return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}" data-id="${p.id}">
-        <div class="pac-drag" style="position:absolute; top:8px; right:8px; cursor:grab; color:#888; font-size:18px; z-index:10;">☰</div>
+      return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}" data-id="${p.id}" style="position:relative;">
+        <div class="pac-drag" style="position:absolute; top:8px; right:8px; cursor:grab; background:rgba(255,255,255,0.95); padding:6px 10px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.15); color:#555; font-size:16px; z-index:10; display:flex; align-items:center; justify-content:center;">☰</div>
+        
         <div class="pac-top" style="overflow:hidden; padding:0;">${imgHtml}</div>
         <div class="pac-body">
           <div class="pac-cat">${catName[p.category] || p.category || 'ทั่วไป'} ${p.active ? '' : '· <span style="color:var(--red)">ซ่อนอยู่</span>'}</div>
@@ -683,15 +686,38 @@ async function loadProducts() {
       </div>`;
     }).join('');
 
-    // ระบบลากจัดลำดับ
-    new Sortable(document.getElementById('prodGrid'), {
-      animation: 150,
-      handle: '.pac-drag'
-    });
+    // 📍 ระบบลากจัดลำดับ + ส่งไปเซฟที่หลังบ้าน
+    setTimeout(() => {
+      new Sortable(document.getElementById('prodGrid'), {
+        animation: 150,
+        handle: '.pac-drag',
+        onEnd: async function (evt) {
+          // ดึง ID ของสินค้าทั้งหมดที่ถูกเรียงลำดับใหม่แล้วบนหน้าจอ
+          const cards = document.querySelectorAll('.prod-admin-card');
+          const newOrder = Array.from(cards).map(card => card.getAttribute('data-id'));
+
+          // ส่งลำดับใหม่ไปเซฟที่ Server
+          try {
+            const res = await fetch(API + '/api/admin/products/reorder', {
+              method: 'PATCH',
+              headers: authHeader(),
+              body: JSON.stringify({ order: newOrder })
+            });
+            if (res.ok) {
+              showToast('✅ บันทึกลำดับสำเร็จ!');
+            } else {
+              showToast('❌ บันทึกลำดับไม่สำเร็จ');
+            }
+          } catch(e) {
+            showToast('❌ ระบบขัดข้อง');
+          }
+        }
+      });
+    }, 100);
 
   } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
 }
-
+  
 async function addProduct() {
   const btn = document.querySelector('#addProductModal .btn-primary');
   btn.textContent = '⏳ กำลังบันทึก...'; btn.disabled = true;
