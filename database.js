@@ -12,16 +12,24 @@ const db = new Database(path.join(DATA_DIR, 'buathong.db'));
 
 // สร้างตาราง (Tables)
 db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT, email TEXT UNIQUE, phone TEXT, password TEXT,
+    province TEXT, district TEXT, subdistrict TEXT, zipcode TEXT, address_detail TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT, category TEXT, price REAL, unit TEXT,
     min_order INTEGER, emoji TEXT, image TEXT, badge TEXT, badge_type TEXT,
-    description TEXT, active INTEGER DEFAULT 1, 
+    description TEXT, active INTEGER DEFAULT 1, price_tiers TEXT DEFAULT '[]',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
     customer_name TEXT, customer_phone TEXT, customer_addr TEXT,
     note TEXT, total REAL, status TEXT DEFAULT 'รอดำเนินการ', 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -40,12 +48,13 @@ db.exec(`
   );
 `);
 
-// อัปเดตตารางเก่าให้รองรับรูปภาพ (ถ้ามีตารางอยู่แล้ว)
+// อัปเดตตารางเก่าให้รองรับฟีเจอร์ใหม่ (ถ้ามีตารางอยู่แล้ว)
 try { db.prepare('ALTER TABLE products ADD COLUMN image TEXT').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE order_items ADD COLUMN image TEXT').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN price_tiers TEXT DEFAULT "[]"').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE orders ADD COLUMN user_id INTEGER').run(); } catch (e) {}
 
-// เพิ่มข้อมูลสินค้าเริ่มต้น (Seed) หากยังไม่มี
+// เพิ่มข้อมูลสินค้าเริ่มต้น
 const checkProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
 if (checkProducts.count === 0) {
   const insertStmt = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, badge, badge_type, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
