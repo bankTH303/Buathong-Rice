@@ -117,7 +117,7 @@ tr:hover td{background:#FAFAFA}
 .modal-title{font-size:18px;font-weight:800;margin-bottom:20px;color:var(--tx1)}
 .fg{margin-bottom:16px}
 .fg label{display:block;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
-.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:var(--tx1);appearance:none;} /* font-size 16px ป้องกันซูมบน iOS */
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:var(--tx1);appearance:none;} 
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--green2)}
 .fg textarea{height:80px;resize:none}
 .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
@@ -139,17 +139,7 @@ tr:hover td{background:#FAFAFA}
 .pac-actions{display:flex;gap:8px;margin-top:14px}
 .pac-actions button{flex:1;}
 .pac-inactive{opacity:0.5}
-.prod-admin-card {
-  position: relative; /* สำคัญมาก เพื่อให้ไอคอนแฮมเบอร์เกอร์วางตำแหน่งได้ */
-}
-.pac-drag {
-  display: flex !important; /* บังคับให้แสดง */
-  background: rgba(255, 255, 255, 0.8);
-  padding: 4px 8px;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-  
+
 /* CONTACT CARDS */
 .contact-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .ccard{background:#fff;border-radius:16px;border:1.5px solid var(--border);padding:20px;transition:all .25s}
@@ -180,34 +170,19 @@ tr:hover td{background:#FAFAFA}
   .content{padding:16px;}
   .stats-grid{grid-template-columns:repeat(2, 1fr);}
   .modal-box{padding:24px 20px;}
-  .now-time{display:none;} /* ซ่อนนาฬิกาบนมือถือให้มีที่ว่าง */
+  .now-time{display:none;}
   .section-hdr{flex-direction:column; align-items:flex-start; gap:12px;}
 }
 @media(max-width:480px){
   .stats-grid{grid-template-columns:1fr;}
 }
-/* 📍 ปรับขนาดกล่องสรุป Dashboard ให้เล็กลงและดูโปรขึ้น */
-.sgrid {
-  gap: 16px !important; /* ลดระยะห่างระหว่างกล่อง */
-}
-.scard {
-  padding: 16px 20px !important; /* ลด Padding ภายในกล่อง */
-  border-radius: 16px !important; 
-}
-.sc-icon {
-  width: 44px !important; 
-  height: 44px !important; 
-  font-size: 20px !important; /* ลดขนาดไอคอน */
-  border-radius: 12px !important;
-}
-.sc-title {
-  font-size: 13px !important; /* ลดขนาดตัวหนังสือหัวข้อ */
-  margin-bottom: 6px !important;
-}
-.sc-val {
-  font-size: 24px !important; /* ลดขนาดตัวเลขยอดรวม */
-}
-  
+
+/* 📍 สไตล์ปรับขนาด Dashboard ให้ดูโปรขึ้น */
+.sgrid { gap: 16px !important; }
+.scard { padding: 16px 20px !important; border-radius: 16px !important; }
+.sc-icon { width: 44px !important; height: 44px !important; font-size: 20px !important; border-radius: 12px !important; }
+.sc-title { font-size: 13px !important; margin-bottom: 6px !important; }
+.sc-val { font-size: 24px !important; }
 </style>
 </head>
 <body>
@@ -270,12 +245,18 @@ tr:hover td{background:#FAFAFA}
     <div class="content">
 
       <div class="page active" id="page-dashboard">
-        <div class="stats-grid" id="statsGrid">
-          <div class="stat-card"><div class="sc-icon sc-g">📦</div><div class="sc-val" id="s-orders">-</div><div class="sc-lbl">ออเดอร์ทั้งหมด</div></div>
-          <div class="stat-card"><div class="sc-icon sc-y">⏳</div><div class="sc-val" id="s-pending">-</div><div class="sc-lbl">รอดำเนินการ</div></div>
-          <div class="stat-card"><div class="sc-icon sc-b">🗓️</div><div class="sc-val" id="s-today">-</div><div class="sc-lbl">ออเดอร์วันนี้</div></div>
-          <div class="stat-card"><div class="sc-icon sc-g">💰</div><div class="sc-val" id="s-revenue">-</div><div class="sc-lbl">ยอดขายรวม (บาท)</div></div>
-          <div class="stat-card"><div class="sc-icon sc-b">💬</div><div class="sc-val" id="s-contacts">-</div><div class="sc-lbl">ข้อมูลติดต่อ</div></div>
+        <div class="stats-grid sgrid" id="statsGrid">
+          <div class="stat-card scard"><div class="sc-icon sc-g">📦</div><div class="sc-val" id="s-orders">-</div><div class="sc-lbl sc-title">ออเดอร์ทั้งหมด</div></div>
+          <div class="stat-card scard"><div class="sc-icon sc-y">⏳</div><div class="sc-val" id="s-pending">-</div><div class="sc-lbl sc-title">รอดำเนินการ</div></div>
+          
+          <div class="stat-card scard" style="grid-column: span 2;">
+            <div class="sc-icon sc-b">🗓️</div>
+            <div class="sc-val" id="s-today" style="font-size:20px !important;">-</div>
+            <div class="sc-lbl sc-title">ยอดขายและออเดอร์ของวันนี้</div>
+          </div>
+          
+          <div class="stat-card scard"><div class="sc-icon sc-g">💰</div><div class="sc-val" id="s-revenue">-</div><div class="sc-lbl sc-title">ยอดขายรวมสุทธิ (บาท)</div></div>
+          <div class="stat-card scard"><div class="sc-icon sc-b">💬</div><div class="sc-val" id="s-contacts">-</div><div class="sc-lbl sc-title">ข้อมูลติดต่อ</div></div>
         </div>
 
         <div class="tbl-wrap">
@@ -353,10 +334,7 @@ tr:hover td{background:#FAFAFA}
     </div>
 
     <div class="fg"><label>หน่วย (เช่น กระสอบ 5 กก.)</label><input type="text" id="ep-unit"></div>
-    <div class="fg">
-  <label>Badge (เช่น ขายดี / ใหม่)</label>
-  <input type="text" id="ep-badge" placeholder="เช่น ขายดี หรือ ใหม่">
-</div>
+    <div class="fg"><label>Badge (เช่น ขายดี / ใหม่)</label><input type="text" id="ep-badge" placeholder="เช่น ขายดี หรือ ใหม่"></div>
     <div class="fg"><label>ซื้อขั้นต่ำ (กระสอบ)</label><input type="number" id="ep-min" min="1"></div>
     <div class="fg"><label>รายละเอียด</label><textarea id="ep-desc"></textarea></div>
     <div class="fg">
@@ -366,11 +344,12 @@ tr:hover td{background:#FAFAFA}
         <option value="0">❌ ซ่อน</option>
       </select>
     </div>
-<div class="modal-actions">
-  <button class="btn btn-outline" style="color:var(--red); border-color:var(--red);" onclick="deleteProduct()">🗑 ลบสินค้า</button>
-  <div style="flex:1"></div> <button class="btn btn-outline" onclick="closeModal('editProductModal')">ยกเลิก</button>
-  <button class="btn btn-primary" onclick="saveProduct()">💾 บันทึก</button>
-</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" style="color:var(--red); border-color:var(--red);" onclick="deleteProduct()">🗑 ลบสินค้า</button>
+      <div style="flex:1"></div> 
+      <button class="btn btn-outline" onclick="closeModal('editProductModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 บันทึก</button>
+    </div>
   </div>
 </div>
 
@@ -420,16 +399,24 @@ tr:hover td{background:#FAFAFA}
   <div class="modal-box">
     <div class="modal-title">📦 รายละเอียดออเดอร์ <span id="od-id" style="color:var(--tx3);font-weight:400"></span></div>
     <div id="od-content"></div>
-    <div class="fg" style="margin-top:20px">
-      <label>เปลี่ยนสถานะ</label>
-      <select id="od-status">
-        <option>รอดำเนินการ</option>
-        <option>ยืนยันแล้ว</option>
-        <option>กำลังจัดส่ง</option>
-        <option>จัดส่งแล้ว</option>
-        <option>ยกเลิก</option>
-      </select>
+    
+    <div class="fg" style="margin-top:20px; display:flex; gap:12px; align-items:flex-end;">
+      <div style="flex:1">
+        <label>เปลี่ยนสถานะ</label>
+        <select id="od-status" onchange="toggleTrackingInput()">
+          <option value="รอดำเนินการ">รอดำเนินการ</option>
+          <option value="ยืนยันแล้ว">ยืนยันแล้ว</option>
+          <option value="กำลังจัดส่ง">กำลังจัดส่ง</option>
+          <option value="จัดส่งแล้ว">จัดส่งแล้ว</option>
+          <option value="ยกเลิก">ยกเลิก</option>
+        </select>
+      </div>
+      <div id="od-tracking-wrap" style="flex:2; display:none;">
+        <label>เลขพัสดุ (Tracking No.)</label>
+        <input type="text" id="od-tracking" placeholder="เช่น TH123456789">
+      </div>
     </div>
+
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('orderDetailModal')">ปิด</button>
       <button class="btn btn-primary" onclick="updateOrderStatus()">💾 บันทึกสถานะ</button>
@@ -445,7 +432,7 @@ let adminPw = '';
 let allOrders = [];
 let allProducts = []; 
 let currentOrderId = null;
-let prodSortable = null; // 🛡️ เพิ่มตัวแปรกัน Sortable ซ้ำซ้อน
+let prodSortable = null;
 
 // ===== MOBILE MENU TOGGLE =====
 function toggleMenu() {
@@ -516,7 +503,8 @@ async function loadDashboard() {
     const data = await res.json();
     document.getElementById('s-orders').textContent = data.totalOrders;
     document.getElementById('s-pending').textContent = data.pendingOrders;
-    document.getElementById('s-today').textContent = data.todayOrders;
+    // 📍 แสดงสถิติวันนี้ พร้อมยอดเงิน
+    document.getElementById('s-today').textContent = `${data.todayOrders} ออเดอร์ (฿${data.todayRevenue.toLocaleString()})`;
     document.getElementById('s-revenue').textContent = '฿' + data.totalRevenue.toLocaleString();
     document.getElementById('s-contacts').textContent = data.totalContacts;
 
@@ -581,12 +569,26 @@ function renderOrders(orders) {
   }).join('');
 }
 
+// 📍 ระบบแสดง/ซ่อน ช่องเลขพัสดุ
+function toggleTrackingInput() {
+  const status = document.getElementById('od-status').value;
+  const wrap = document.getElementById('od-tracking-wrap');
+  if (status === 'กำลังจัดส่ง' || status === 'จัดส่งแล้ว') {
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
 function openOrderDetail(id) {
   const o = allOrders.find(x => String(x.id) === String(id));
   if (!o) return;
   currentOrderId = id;
   document.getElementById('od-id').textContent = `#${o.id}`;
   document.getElementById('od-status').value = o.status;
+  document.getElementById('od-tracking').value = o.tracking_number || '';
+  toggleTrackingInput(); // เช็คสถานะเพื่อซ่อน/โชว์ช่องเลขพัสดุ
+
   const items = o.items.map(i => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:14px"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span style="font-weight:700;color:var(--green)">฿${(i.price*i.qty).toLocaleString()}</span></div>`).join('');
   document.getElementById('od-content').innerHTML = `
     <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px">
@@ -604,9 +606,11 @@ function openOrderDetail(id) {
 
 async function updateOrderStatus() {
   const status = document.getElementById('od-status').value;
+  const tracking_number = document.getElementById('od-tracking').value; // 📍 ดึงเลขพัสดุ
+  
   try {
     const res = await fetch(API + `/api/admin/orders/${currentOrderId}`, {
-      method: 'PATCH', headers: authHeader(), body: JSON.stringify({ status })
+      method: 'PATCH', headers: authHeader(), body: JSON.stringify({ status, tracking_number })
     });
     if (res.ok) {
       showToast('✅ อัปเดตสถานะสำเร็จ');
@@ -705,9 +709,7 @@ async function loadProducts() {
     }).join('');
 
     setTimeout(() => {
-      // 🛡️ ทำลาย Sortable เก่าทิ้งก่อนสร้างใหม่ ป้องกันบั๊กส่งข้อมูลซ้ำ
       if(prodSortable) { prodSortable.destroy(); }
-
       prodSortable = new Sortable(document.getElementById('prodGrid'), {
         animation: 150,
         handle: '.pac-drag',
@@ -717,18 +719,11 @@ async function loadProducts() {
 
           try {
             const res = await fetch(API + '/api/admin/products/reorder', {
-              method: 'PATCH',
-              headers: authHeader(),
-              body: JSON.stringify({ order: newOrder })
+              method: 'PATCH', headers: authHeader(), body: JSON.stringify({ order: newOrder })
             });
-            if (res.ok) {
-              showToast('✅ บันทึกลำดับสำเร็จ!');
-            } else {
-              showToast('❌ บันทึกลำดับไม่สำเร็จ');
-            }
-          } catch(e) {
-            showToast('❌ ระบบขัดข้อง');
-          }
+            if (res.ok) { showToast('✅ บันทึกลำดับสำเร็จ!'); } 
+            else { showToast('❌ บันทึกลำดับไม่สำเร็จ'); }
+          } catch(e) { showToast('❌ ระบบขัดข้อง'); }
         }
       });
     }, 100);
@@ -822,20 +817,11 @@ async function saveProduct() {
   
   try {
     const res = await fetch(API + `/api/admin/products/${id}`, { 
-      method: 'PATCH', 
-      headers: authHeader(), 
-      body: JSON.stringify(body) 
+      method: 'PATCH', headers: authHeader(), body: JSON.stringify(body) 
     });
-    if (res.ok) { 
-      showToast('✅ บันทึกสำเร็จ!'); 
-      closeModal('editProductModal'); 
-      loadProducts(); 
-    } else {
-      showToast('❌ บันทึกไม่สำเร็จ');
-    }
-  } catch(e) { 
-    showToast('❌ บันทึกไม่สำเร็จ'); 
-  }
+    if (res.ok) { showToast('✅ บันทึกสำเร็จ!'); closeModal('editProductModal'); loadProducts(); } 
+    else { showToast('❌ บันทึกไม่สำเร็จ'); }
+  } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
   btn.textContent = '💾 บันทึก'; btn.disabled = false;
 }
 
@@ -844,21 +830,10 @@ async function deleteProduct() {
   if (!confirm('⚠️ ยืนยันการลบสินค้านี้ใช่หรือไม่?')) return;
   
   try {
-    const res = await fetch(API + `/api/admin/products/${id}`, { 
-      method: 'DELETE', 
-      headers: authHeader() 
-    });
-    
-    if (res.ok) { 
-      showToast('✅ ลบสินค้าสำเร็จ!'); 
-      closeModal('editProductModal'); 
-      loadProducts(); 
-    } else {
-      showToast('❌ ลบไม่สำเร็จ');
-    }
-  } catch(e) { 
-    showToast('❌ ระบบขัดข้อง'); 
-  }
+    const res = await fetch(API + `/api/admin/products/${id}`, { method: 'DELETE', headers: authHeader() });
+    if (res.ok) { showToast('✅ ลบสินค้าสำเร็จ!'); closeModal('editProductModal'); loadProducts(); } 
+    else { showToast('❌ ลบไม่สำเร็จ'); }
+  } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
   
 // ===== CONTACTS & UTILS =====
