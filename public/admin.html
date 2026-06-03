@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Admin — บัวทองไรซ์</title>
@@ -320,6 +321,10 @@ tr:hover td{background:#FAFAFA}
     </div>
 
     <div class="fg"><label>หน่วย (เช่น กระสอบ 5 กก.)</label><input type="text" id="ep-unit"></div>
+    <div class="fg">
+  <label>Badge (เช่น ขายดี / ใหม่)</label>
+  <input type="text" id="ep-badge" placeholder="เช่น ขายดี หรือ ใหม่">
+</div>
     <div class="fg"><label>ซื้อขั้นต่ำ (กระสอบ)</label><input type="number" id="ep-min" min="1"></div>
     <div class="fg"><label>รายละเอียด</label><textarea id="ep-desc"></textarea></div>
     <div class="fg">
@@ -329,10 +334,11 @@ tr:hover td{background:#FAFAFA}
         <option value="0">❌ ซ่อน</option>
       </select>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('editProductModal')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveProduct()">💾 บันทึก</button>
-    </div>
+<div class="modal-actions">
+  <button class="btn btn-outline" style="color:var(--red); border-color:var(--red);" onclick="deleteProduct()">🗑 ลบสินค้า</button>
+  <div style="flex:1"></div> <button class="btn btn-outline" onclick="closeModal('editProductModal')">ยกเลิก</button>
+  <button class="btn btn-primary" onclick="saveProduct()">💾 บันทึก</button>
+</div>
   </div>
 </div>
 
@@ -631,12 +637,13 @@ function getTiers(modalId) {
   return JSON.stringify(tiers);
 }
 
+// ===== PRODUCTS, IMAGES & TIERED PRICING =====
+
 async function loadProducts() {
   try {
     const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
     allProducts = await res.json();
     
-    // 🛡️ ดักจับกรณี Server ส่ง Error กลับมา
     if (!Array.isArray(allProducts)) {
       document.getElementById('prodGrid').innerHTML = `<div class="empty-text">เกิดข้อผิดพลาดจากเซิร์ฟเวอร์</div>`;
       return;
@@ -645,14 +652,14 @@ async function loadProducts() {
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
     
     document.getElementById('prodGrid').innerHTML = allProducts.map(p => {
-      // 🛡️ ป้องกัน Null
       const price = p.price || 0;
       const minOrder = p.min_order || 1;
       const unit = p.unit || 'ชิ้น';
       const name = p.name || 'สินค้าไม่มีชื่อ';
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
       
-      return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}">
+      return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}" data-id="${p.id}">
+        <div class="pac-drag" style="position:absolute; top:8px; right:8px; cursor:grab; color:#888; font-size:18px; z-index:10;">☰</div>
         <div class="pac-top" style="overflow:hidden; padding:0;">${imgHtml}</div>
         <div class="pac-body">
           <div class="pac-cat">${catName[p.category] || p.category || 'ทั่วไป'} ${p.active ? '' : '· <span style="color:var(--red)">ซ่อนอยู่</span>'}</div>
@@ -665,17 +672,14 @@ async function loadProducts() {
         </div>
       </div>`;
     }).join('');
-  } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
-}
 
-function openAddProduct() {
-  document.getElementById('np-name').value = '';
-  document.getElementById('np-price').value = '';
-  document.getElementById('np-desc').value = '';
-  document.getElementById('np-image').value = '';
-  document.getElementById('np-preview').style.display = 'none';
-  document.querySelector('#addProductModal .tiers-container').innerHTML = ''; 
-  document.getElementById('addProductModal').classList.add('open');
+    // ระบบลากจัดลำดับ
+    new Sortable(document.getElementById('prodGrid'), {
+      animation: 150,
+      handle: '.pac-drag'
+    });
+
+  } catch(e) { showToast('❌ โหลดสินค้าไม่ได้'); }
 }
 
 async function addProduct() {
@@ -683,8 +687,6 @@ async function addProduct() {
   btn.textContent = '⏳ กำลังบันทึก...'; btn.disabled = true;
 
   const imageUrl = await uploadImage('np-image');
-  
-  // 🛡️ ป้องกัน Null
   const body = {
     name: document.getElementById('np-name').value || 'สินค้าใหม่',
     category: document.getElementById('np-cat').value || 'other',
@@ -710,12 +712,15 @@ function openEditProduct(id) {
   const p = allProducts.find(x => String(x.id) === String(id));
   if (!p) return;
   document.getElementById('ep-id').value = p.id;
-  document.getElementById('ep-name').value = p.name;
-  document.getElementById('ep-price').value = p.price;
-  document.getElementById('ep-unit').value = p.unit;
-  document.getElementById('ep-min').value = p.min_order;
+  document.getElementById('ep-name').value = p.name || '';
+  document.getElementById('ep-price').value = p.price || 0;
+  document.getElementById('ep-unit').value = p.unit || 'ชิ้น';
+  document.getElementById('ep-min').value = p.min_order || 1;
   document.getElementById('ep-desc').value = p.description || '';
   document.getElementById('ep-active').value = p.active ? "1" : "0";
+  
+  // 🛡️ เพิ่มส่วน Badge
+  document.getElementById('ep-badge').value = p.badge || '';
   
   document.getElementById('ep-image').value = '';
   document.getElementById('ep-image-url').value = p.image || '';
@@ -737,9 +742,11 @@ async function saveProduct() {
   const btn = document.querySelector('#editProductModal .btn-primary');
   btn.textContent = '⏳ กำลังบันทึก...'; btn.disabled = true;
   const id = document.getElementById('ep-id').value;
+  
   let imageUrl = await uploadImage('ep-image');
   if (!imageUrl) imageUrl = document.getElementById('ep-image-url').value; 
 
+  // 🛡️ รวม Badge เข้าไปใน Body
   const body = {
     name: document.getElementById('ep-name').value || 'ไม่มีชื่อ',
     price: parseFloat(document.getElementById('ep-price').value) || 0,
@@ -748,15 +755,29 @@ async function saveProduct() {
     description: document.getElementById('ep-desc').value || '',
     active: parseInt(document.getElementById('ep-active').value) || 0,
     image: imageUrl,
+    badge: document.getElementById('ep-badge').value || '', // เพิ่มช่องนี้
     price_tiers: getTiers('editProductModal')
   };
+  
   try {
-    const res = await fetch(API + `/api/admin/products/${id}`, { method: 'PATCH', headers: authHeader(), body: JSON.stringify(body) });
-    if (res.ok) { showToast('✅ บันทึกสำเร็จ!'); closeModal('editProductModal'); loadProducts(); } 
-  } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
+    const res = await fetch(API + `/api/admin/products/${id}`, { 
+      method: 'PATCH', 
+      headers: authHeader(), 
+      body: JSON.stringify(body) 
+    });
+    if (res.ok) { 
+      showToast('✅ บันทึกสำเร็จ!'); 
+      closeModal('editProductModal'); 
+      loadProducts(); 
+    } else {
+      showToast('❌ บันทึกไม่สำเร็จ');
+    }
+  } catch(e) { 
+    showToast('❌ บันทึกไม่สำเร็จ'); 
+  }
   btn.textContent = '💾 บันทึก'; btn.disabled = false;
 }
-
+  
 // ===== CONTACTS & UTILS =====
 async function loadContacts() {
   try {
@@ -779,24 +800,14 @@ async function loadContacts() {
 }
 
 function statusBadge(s) {
-  const map = {
-    'รอดำเนินการ':'s-wait', 'ยืนยันแล้ว':'s-confirm',
-    'กำลังจัดส่ง':'s-ship', 'จัดส่งแล้ว':'s-done', 'ยกเลิก':'s-cancel'
-  };
+  const map = { 'รอดำเนินการ':'s-wait', 'ยืนยันแล้ว':'s-confirm', 'กำลังจัดส่ง':'s-ship', 'จัดส่งแล้ว':'s-done', 'ยกเลิก':'s-cancel' };
   return `<span class="status ${map[s]||'s-wait'}">${s}</span>`;
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+document.querySelectorAll('.modal-bg').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }); });
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-document.querySelectorAll('.modal-bg').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-});
 </script>
 </body>
 </html>
