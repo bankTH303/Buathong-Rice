@@ -139,7 +139,17 @@ tr:hover td{background:#FAFAFA}
 .pac-actions{display:flex;gap:8px;margin-top:14px}
 .pac-actions button{flex:1;}
 .pac-inactive{opacity:0.5}
-
+.prod-admin-card {
+  position: relative; /* สำคัญมาก เพื่อให้ไอคอนแฮมเบอร์เกอร์วางตำแหน่งได้ */
+}
+.pac-drag {
+  display: flex !important; /* บังคับให้แสดง */
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+  
 /* CONTACT CARDS */
 .contact-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .ccard{background:#fff;border-radius:16px;border:1.5px solid var(--border);padding:20px;transition:all .25s}
