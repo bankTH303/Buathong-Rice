@@ -251,4 +251,4 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.listen(PORT, () => console.log(`🚀 บัวทองไรซ์ Backend รันอยู่ที่พอร์ต ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 บัวทองไรซ์ Backend รันอยู่ที่พอร์ต ${PORT} (บน 0.0.0.0)`));
