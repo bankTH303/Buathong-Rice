@@ -2,13 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto'); // ระบบเข้ารหัสผ่าน
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken'); // 🛡️ นำเข้าไลบรารีความปลอดภัย
 const { db } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// โฟลเดอร์สำหรับเก็บรูปภาพ
 const UPLOAD_DIR = path.join(__dirname, 'data', 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -21,6 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'buathong2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'BUATHONG_SUPER_SECRET_KEY_2026'; // 🔑 กุญแจเข้ารหัสลับ
 
 function checkAdmin(req, res, next) {
   if (req.headers['x-admin-password'] !== ADMIN_PASSWORD) {
@@ -29,9 +30,21 @@ function checkAdmin(req, res, next) {
   next();
 }
 
-// ฟังก์ชันเข้ารหัสผ่าน (SHA-256)
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+// 🛡️ ระบบนายทวาร: ตรวจสอบบัตรผ่าน (Token) ก่อนอนุญาตให้ดึงข้อมูล
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'ไม่พบ Token การยืนยันตัวตน' });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Token ไม่ถูกต้องหรือหมดอายุ โปรดล็อกอินใหม่' });
+    req.user = user; // ถ้าบัตรผ่านถูกต้อง ให้แนบชื่อคนที่ถือบัตรไปกับระบบ
+    next();
+  });
 }
 
 // ===== AUTH & USER API =====
@@ -41,7 +54,10 @@ app.post('/api/auth/register', (req, res) => {
     const hashedPw = hashPassword(password);
     const info = db.prepare(`INSERT INTO users (name, email, phone, password, province, district, subdistrict, zipcode, address_detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(name, email, phone, hashedPw, province, district, subdistrict, zipcode, address_detail);
     
-    res.json({ success: true, user: { id: info.lastInsertRowid, name, email, phone, province, district, subdistrict, zipcode, address_detail } });
+    // สร้าง Token อายุ 7 วัน
+    const token = jwt.sign({ id: info.lastInsertRowid, email }, JWT_SECRET, { expiresIn: '7d' }); 
+    
+    res.json({ success: true, user: { id: info.lastInsertRowid, name, email, phone, province, district, subdistrict, zipcode, address_detail }, token });
   } catch(e) {
     if(e.message.includes('UNIQUE constraint failed')) {
       res.status(400).json({ error: 'อีเมลนี้ถูกสมัครสมาชิกไปแล้ว' });
@@ -57,12 +73,17 @@ app.post('/api/auth/login', (req, res) => {
     const hashedPw = hashPassword(password);
     const user = db.prepare('SELECT id, name, email, phone, province, district, subdistrict, zipcode, address_detail FROM users WHERE email = ? AND password = ?').get(email, hashedPw);
     
-    if(user) res.json({ success: true, user });
+    if(user) {
+      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+      res.json({ success: true, user, token });
+    }
     else res.status(401).json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
   } catch(e) { res.status(500).json({ error: 'ระบบขัดข้อง' }); }
 });
 
-app.patch('/api/user/:id', (req, res) => {
+// 🛡️ ปิดช่องโหว่ IDOR: บังคับเช็ค Token และ ID ต้องตรงกันเท่านั้น
+app.patch('/api/user/:id', authenticateToken, (req, res) => {
+  if (req.user.id !== parseInt(req.params.id)) return res.status(403).json({ error: '🚨 ปฏิเสธการเข้าถึง!' });
   try {
     const { name, phone, province, district, subdistrict, zipcode, address_detail } = req.body;
     db.prepare(`UPDATE users SET name=?, phone=?, province=?, district=?, subdistrict=?, zipcode=?, address_detail=? WHERE id=?`)
@@ -72,7 +93,8 @@ app.patch('/api/user/:id', (req, res) => {
   } catch(e) { res.status(500).json({ error: 'อัปเดตข้อมูลไม่สำเร็จ' }); }
 });
 
-app.get('/api/user/:id/orders', (req, res) => {
+app.get('/api/user/:id/orders', authenticateToken, (req, res) => {
+  if (req.user.id !== parseInt(req.params.id)) return res.status(403).json({ error: '🚨 ปฏิเสธการเข้าถึง!' });
   try {
     const orders = db.prepare('SELECT id, total, status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC').all(req.params.id);
     const result = orders.map(o => {
@@ -94,10 +116,22 @@ app.get('/api/products', (req, res) => {
 app.post('/api/orders', (req, res) => {
   try {
     const { user_id, customer_name, customer_phone, customer_addr, note, items, total } = req.body;
+    const authHeader = req.headers['authorization'];
+    let finalUserId = null;
+
+    if (user_id) {
+      const token = authHeader && authHeader.split(' ')[1];
+      if (!token) return res.status(401).json({ error: 'ไม่พบ Token การยืนยันตัวตน' });
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.id !== parseInt(user_id)) return res.status(403).json({ error: '🚨 ปฏิเสธการเข้าถึง!' });
+        finalUserId = decoded.id;
+      } catch(err) { return res.status(403).json({ error: 'Token ไม่ถูกต้อง' }); }
+    }
     
     const insertOrder = db.transaction((orderData, itemsData) => {
       const stmt = db.prepare(`INSERT INTO orders (user_id, customer_name, customer_phone, customer_addr, note, total) VALUES (?, ?, ?, ?, ?, ?)`);
-      const info = stmt.run(orderData.user_id || null, orderData.name, orderData.phone, orderData.addr, orderData.note, orderData.total);
+      const info = stmt.run(orderData.user_id, orderData.name, orderData.phone, orderData.addr, orderData.note, orderData.total);
       
       const insertItem = db.prepare(`INSERT INTO order_items (order_id, product_id, name, emoji, image, qty, price) VALUES (?, ?, ?, ?, ?, ?, ?)`);
       itemsData.forEach(item => {
@@ -106,12 +140,9 @@ app.post('/api/orders', (req, res) => {
       return info.lastInsertRowid;
     });
 
-    const orderId = insertOrder({ user_id, name: customer_name, phone: customer_phone, addr: customer_addr, note: note || '', total }, items);
+    const orderId = insertOrder({ user_id: finalUserId, name: customer_name, phone: customer_phone, addr: customer_addr, note: note || '', total }, items);
     res.json({ success: true, order_id: orderId, message: `รับออเดอร์เรียบร้อยแล้ว!` });
-  } catch(e) { 
-    console.error(e);
-    res.status(500).json({ error: 'เกิดข้อผิดพลาด' }); 
-  }
+  } catch(e) { res.status(500).json({ error: 'เกิดข้อผิดพลาด' }); }
 });
 
 app.post('/api/contacts', (req, res) => {
@@ -126,7 +157,6 @@ app.get('/api/track/:phone', (req, res) => {
   try {
     const phone = req.params.phone.replace(/[^0-9]/g, '');
     if(phone.length !== 10) return res.status(400).json({ error: 'เบอร์โทรไม่ถูกต้อง' });
-    
     const orders = db.prepare('SELECT id, total, status, created_at FROM orders WHERE customer_phone = ? ORDER BY created_at DESC').all(phone);
     const result = orders.map(o => {
       const items = db.prepare('SELECT name, qty, price FROM order_items WHERE order_id = ?').all(o.id);
@@ -188,14 +218,11 @@ app.post('/api/admin/upload', checkAdmin, (req, res) => {
   try {
     const { imageBase64, fileName } = req.body;
     if (!imageBase64) return res.status(400).json({ error: 'ไม่มีรูปภาพ' });
-    
     const ext = path.extname(fileName) || '.jpg';
     const filename = Date.now() + ext;
     const filepath = path.join(UPLOAD_DIR, filename);
-    
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     fs.writeFileSync(filepath, base64Data, 'base64');
-    
     res.json({ success: true, url: '/uploads/' + filename });
   } catch(e) { res.status(500).json({ error: 'อัปโหลดไม่ได้' }); }
 });
@@ -214,7 +241,6 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
     const todayOrders = db.prepare("SELECT COUNT(*) as c FROM orders WHERE date(created_at) = date('now')").get().c;
     const totalContacts = db.prepare('SELECT COUNT(*) as c FROM contacts').get().c;
     const revenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE status != 'ยกเลิก'").get().s || 0;
-    
     res.json({ totalOrders, pendingOrders, todayOrders, totalRevenue: revenue, totalContacts });
   } catch(e) { res.status(500).json({ error: 'โหลดสถิติไม่ได้' }); }
 });
