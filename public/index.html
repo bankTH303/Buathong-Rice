@@ -222,6 +222,7 @@ section{padding:88px 5%}
 .portal-pane{display:none;}
 .portal-pane.active{display:block; animation:fadeIn 0.3s ease forwards;}
 .status-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; background: var(--goldb); color: #3E2723; }
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
 /* FOOTER */
 footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
@@ -258,10 +259,9 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 </head>
 <body>
 
-<!-- NAVIGATION -->
 <nav>
   <a class="logo" href="/">
-    <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);">
+    <img src="btrlogov2.jpg" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);">
     <div class="logo-text">บัวทองไรซ์<small>BUATHONG RICE Co.,Ltd.</small></div>
   </a>
   <ul class="nav-links">
@@ -273,12 +273,10 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   </ul>
   <div style="display:flex;align-items:center;gap:12px">
     
-    <!-- AUTH BUTTON AREA -->
     <div id="navAuthArea">
       <button class="auth-btn" onclick="openAuthModal()">เข้าสู่ระบบ</button>
     </div>
 
-    <!-- CART BUTTON WITH BASKET ICON -->
     <button class="nav-icon-btn" onclick="openCart()" title="ตะกร้าสินค้า">
       <img src="basket.png" alt="Cart" style="width:22px; height:22px; object-fit:contain;">
       <div class="cart-badge" id="cartBadge">0</div>
@@ -521,7 +519,6 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   </div>
 </footer>
 
-<!-- CART SIDEBAR -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
 <div class="cart-side" id="cartSide">
   <div class="cart-hdr">
@@ -547,7 +544,6 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   </div>
 </div>
 
-<!-- CHECKOUT MODAL -->
 <div class="modal-wrap" id="orderModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -624,7 +620,6 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   </div>
 </div>
 
-<!-- AUTH MODAL -->
 <div class="modal-wrap" id="authModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -632,7 +627,6 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
       <button class="close-x" onclick="document.getElementById('authModal').classList.remove('open')">✕</button>
     </div>
     
-    <!-- LOGIN FORM -->
     <div id="loginFormArea">
       <div class="fg"><label>อีเมล</label><input type="email" id="l-email" placeholder="email@example.com"></div>
       <div class="fg"><label>รหัสผ่าน</label><input type="password" id="l-password" placeholder="********"></div>
@@ -642,7 +636,6 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
       </div>
     </div>
 
-    <!-- REGISTER FORM -->
     <div id="registerFormArea" style="display:none;">
       <div class="frow">
         <div class="fg"><label>ชื่อ-นามสกุล *</label><input type="text" id="r-name" required></div>
@@ -672,7 +665,6 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   </div>
 </div>
 
-<!-- USER PORTAL MODAL -->
 <div class="modal-wrap" id="portalModal">
   <div class="modal" style="max-width:600px;">
     <div class="modal-hdr" style="margin-bottom:16px;">
@@ -719,7 +711,6 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   </div>
 </div>
 
-<!-- TRACKING MODAL (JS BASED) -->
 <div class="modal-wrap" id="trackModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -759,6 +750,62 @@ window.addEventListener('DOMContentLoaded', async () => {
     initAddressDropdowns('p'); // Profile
   } catch(e) { console.error('Address Data Error', e); }
 });
+
+// ===== TOAST UTILS =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ===== MOBILE MENU & UI UTILS =====
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.boxShadow = window.scrollY > 60 ? '0 4px 30px rgba(0,0,0,0.3)' : 'none';
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+// ===== FILTER & CONTACT =====
+function filterProd(cat, btn) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pcard').forEach(c => {
+    if (cat === 'all' || c.dataset.cat === cat) {
+      c.classList.remove('hidden');
+    } else {
+      c.classList.add('hidden');
+    }
+  });
+}
+
+async function sendInquiry() {
+  const name = document.getElementById('cf-name').value.trim();
+  const phone = document.getElementById('cf-phone').value.trim();
+  if (!name || !phone) return showToast('⚠️ กรุณากรอกชื่อและเบอร์โทรศัพท์');
+  try {
+    const res = await fetch('/api/contacts', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, phone })
+    });
+    if (res.ok) {
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('contactSuccess').style.display = '';
+    } else showToast('❌ เกิดข้อผิดพลาด');
+  } catch(e) { showToast('❌ ส่งข้อมูลไม่ได้'); }
+}
 
 // ===== ADDRESS DROPDOWN LOGIC =====
 function initAddressDropdowns(prefix) {
@@ -1026,6 +1073,33 @@ async function quickTrack() {
 // ===== CART LOGIC (WITH LOCALSTORAGE) =====
 function saveCart() { localStorage.setItem('btr_cart', JSON.stringify(cart)); }
 
+function openCart() {
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartSide').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCart() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartSide').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function changeQty(id, delta) {
+  id = String(id);
+  if (!cart[id]) return;
+  cart[id].qty += delta;
+  if (cart[id].qty <= 0) delete cart[id];
+  updateCartUI(); saveCart();
+  if(document.getElementById('orderModal').classList.contains('open')) calculateShipping();
+}
+
+function removeCart(id) {
+  id = String(id); delete cart[id]; updateCartUI(); saveCart();
+  if(document.getElementById('orderModal').classList.contains('open')) calculateShipping();
+  showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
+}
+
 function addCart(id, name, basePrice, emoji, image, safeTiers, btn) {
   id = String(id);
   const tiersStr = decodeURIComponent(safeTiers);
@@ -1114,6 +1188,7 @@ function updateCartUI() {
   document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
 }
 
+// ===== CHECKOUT MODAL & SHIPPING =====
 function calculateShipping() {
   const items = Object.values(cart);
   if (items.length === 0) return;
@@ -1164,7 +1239,6 @@ function openModal() {
   document.getElementById('orderSumItems').innerHTML = Object.values(cart).map(i => `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`).join('');
   calculateShipping(); 
   
-  // PREFILL IF LOGGED IN
   if(currentUser) {
     document.getElementById('o-name').value = currentUser.name;
     document.getElementById('o-phone').value = currentUser.phone;
@@ -1178,6 +1252,11 @@ function openModal() {
   document.getElementById('orderSuccess').style.display = 'none';
   document.getElementById('orderModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('orderModal').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 async function submitOrder() {
