@@ -5,6 +5,10 @@ const fs = require('fs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken'); 
 const { db } = require('./database');
+try {
+  // สร้างคอลัมน์เก็บลำดับสินค้า (ถ้ามีอยู่แล้วมันจะข้ามไปเอง)
+  db.prepare("ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0").run();
+} catch (e) {}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -104,7 +108,7 @@ app.get('/api/user/:id/orders', authenticateToken, (req, res) => {
 // ===== PUBLIC API =====
 app.get('/api/products', (req, res) => {
   try {
-    const products = db.prepare('SELECT * FROM products WHERE active = 1 ORDER BY created_at ASC').all();
+    const products = db.prepare('SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC, created_at ASC').all();
     res.json(products.map(p => ({ ...p, active: p.active === 1 })));
   } catch(e) { res.status(500).json({ error: 'โหลดสินค้าไม่ได้' }); }
 });
@@ -187,7 +191,7 @@ app.patch('/api/admin/orders/:id', checkAdmin, (req, res) => {
 
 app.get('/api/admin/products', checkAdmin, (req, res) => {
   try {
-    const products = db.prepare('SELECT * FROM products ORDER BY created_at ASC').all();
+    const products = db.prepare('SELECT * FROM products ORDER BY sort_order ASC, created_at ASC').all();
     res.json(products);
   } catch(e) { res.status(500).json({ error: 'โหลดสินค้าไม่ได้' }); }
 });
@@ -255,6 +259,19 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
     const revenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE status != 'ยกเลิก'").get().s || 0;
     res.json({ totalOrders, pendingOrders, todayOrders, totalRevenue: revenue, totalContacts });
   } catch(e) { res.status(500).json({ error: 'โหลดสถิติไม่ได้' }); }
+});
+
+// API สำหรับรับค่าลำดับสินค้าใหม่ไปเซฟลง Database
+app.patch('/api/admin/products/reorder', checkAdmin, (req, res) => {
+  try {
+    const { order } = req.body; // รับ Array ของ ID สินค้าที่เรียงแล้วมา
+    const updateOrder = db.transaction((ids) => {
+      const stmt = db.prepare('UPDATE products SET sort_order = ? WHERE id = ?');
+      ids.forEach((id, index) => stmt.run(index, id)); // ไล่เซฟลำดับ 0, 1, 2, ...
+    });
+    updateOrder(order);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'อัปเดตลำดับไม่ได้' }); }
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
