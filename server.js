@@ -256,7 +256,10 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
     const pendingOrders = db.prepare("SELECT COUNT(*) as c FROM orders WHERE status = 'รอดำเนินการ'").get().c;
     const todayOrders = db.prepare("SELECT COUNT(*) as c FROM orders WHERE date(created_at) = date('now')").get().c;
     const totalContacts = db.prepare('SELECT COUNT(*) as c FROM contacts').get().c;
-    const revenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE status != 'ยกเลิก'").get().s || 0;
+    
+    // 📍 แก้ไขสูตร: รวมยอดเฉพาะ 3 สถานะที่ได้เงินชัวร์ๆ
+    const revenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE status IN ('ยืนยันแล้ว', 'กำลังจัดส่ง', 'จัดส่งแล้ว')").get().s || 0;
+    
     res.json({ totalOrders, pendingOrders, todayOrders, totalRevenue: revenue, totalContacts });
   } catch(e) { res.status(500).json({ error: 'โหลดสถิติไม่ได้' }); }
 });
