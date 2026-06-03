@@ -737,34 +737,22 @@ let thaiAddressData = [];
 let currentShippingFee = 0;
 let cart = {};
 
-// 🛡️ แยกตะกร้า Guest กับตะกร้า User
+// 🛡️ ระบบตะกร้าอัจฉริยะ (แยก Guest/User)
 function getCartKey() { return currentUser ? 'btr_cart_user_' + currentUser.id : 'btr_cart_guest'; }
-function loadCart() { cart = JSON.parse(localStorage.getItem(getCartKey())) || {}; }
+function loadCart() { let saved = localStorage.getItem(getCartKey()); cart = saved ? JSON.parse(saved) : {}; }
 function saveCart() { localStorage.setItem(getCartKey(), JSON.stringify(cart)); }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  loadCart(); 
-  loadDynamicProducts();
-  updateCartUI();
-  updateAuthNavUI();
-  
+  loadCart(); loadDynamicProducts(); updateCartUI(); updateAuthNavUI();
   try {
     const res = await fetch('https://raw.githubusercontent.com/earthchie/jquery.Thailand.js/master/jquery.Thailand.js/database/raw_database/raw_database.json');
     thaiAddressData = await res.json();
-    initAddressDropdowns('o'); // Checkout
-    initAddressDropdowns('r'); // Register
-    initAddressDropdowns('p'); // Profile
+    initAddressDropdowns('o'); initAddressDropdowns('r'); initAddressDropdowns('p');
   } catch(e) { console.error('Address Data Error', e); }
 });
 
-// ===== TOAST UTILS =====
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// ===== MOBILE MENU & UI UTILS =====
+// ===== TOAST UTILS & MOBILE MENU =====
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2800); }
 function toggleMobile() { document.getElementById('mobileMenu').classList.toggle('open'); }
 window.addEventListener('scroll', () => { document.querySelector('nav').style.boxShadow = window.scrollY > 60 ? '0 4px 30px rgba(0,0,0,0.3)' : 'none'; });
 const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; } }); }, { threshold: 0.1 });
@@ -825,13 +813,11 @@ function setAddressValues(prefix, prov, dist, sub, zip) {
 // ===== AUTHENTICATION & PORTAL =====
 function updateAuthNavUI() {
   const authArea = document.getElementById('navAuthArea');
-  if(currentUser) {
-    authArea.innerHTML = `<button class="profile-btn" onclick="openPortalModal()"><div class="profile-btn-icon">👤</div><span class="profile-btn-name">${currentUser.name.split(' ')[0]}</span></button>`;
-  } else authArea.innerHTML = `<button class="auth-btn" onclick="openAuthModal()">เข้าสู่ระบบ</button>`;
+  if(currentUser) authArea.innerHTML = `<button class="profile-btn" onclick="openPortalModal()"><div class="profile-btn-icon">👤</div><span class="profile-btn-name">${currentUser.name.split(' ')[0]}</span></button>`;
+  else authArea.innerHTML = `<button class="auth-btn" onclick="openAuthModal()">เข้าสู่ระบบ</button>`;
 }
 
 function openAuthModal() { toggleAuthForm('login'); document.getElementById('authModal').classList.add('open'); }
-
 function toggleAuthForm(type) {
   if(type === 'login') { document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ'; document.getElementById('loginFormArea').style.display = 'block'; document.getElementById('registerFormArea').style.display = 'none'; } 
   else { document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก'; document.getElementById('loginFormArea').style.display = 'none'; document.getElementById('registerFormArea').style.display = 'block'; }
@@ -844,18 +830,16 @@ async function doLogin() {
     const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password}) });
     const data = await res.json();
     if(res.ok) {
-      // 🛡️ ผสานตะกร้า Guest เข้ากับ User
-      let guestCart = { ...cart }; currentUser = data.user;
-      localStorage.setItem('btr_user', JSON.stringify(currentUser));
-      localStorage.setItem('btr_token', data.token); 
+      saveCart(); // เซฟตะกร้า Guest เผื่อไว้
+      let guestCart = JSON.parse(JSON.stringify(cart)); // คัดลอก Guest แบบสมบูรณ์
+      currentUser = data.user;
+      localStorage.setItem('btr_user', JSON.stringify(currentUser)); localStorage.setItem('btr_token', data.token); 
       updateAuthNavUI();
       
-      loadCart(); // โหลดตะกร้าของ User
+      loadCart(); // โหลดตะกร้า User
       for(let k in guestCart) { if(cart[k]) cart[k].qty += guestCart[k].qty; else cart[k] = guestCart[k]; }
-      saveCart(); // เซฟตะกร้าที่รวมแล้วลง User
-      localStorage.removeItem('btr_cart_guest'); // ล้างตะกร้า Guest
-      updateCartUI();
-
+      saveCart(); // เซฟผสานเข้าบัญชี User
+      localStorage.removeItem('btr_cart_guest'); updateCartUI();
       document.getElementById('authModal').classList.remove('open'); showToast('✅ ยินดีต้อนรับกลับมาครับ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
@@ -869,32 +853,24 @@ async function doRegister() {
   const zipcode = document.getElementById('r-zipcode').value; const address_detail = document.getElementById('r-addr-detail').value;
   if(!name||!phone||!email||!password||!province||!district||!subdistrict||!zipcode||!address_detail) return showToast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
   if(password !== confirm) return showToast('⚠️ รหัสผ่านไม่ตรงกัน');
-
   try {
     const res = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, phone, password, province, district, subdistrict, zipcode, address_detail}) });
     const data = await res.json();
     if(res.ok) {
-      let guestCart = { ...cart }; currentUser = data.user;
-      localStorage.setItem('btr_user', JSON.stringify(currentUser));
-      localStorage.setItem('btr_token', data.token); 
-      updateAuthNavUI();
-      
-      loadCart();
-      for(let k in guestCart) { cart[k] = guestCart[k]; }
+      saveCart(); let guestCart = JSON.parse(JSON.stringify(cart)); currentUser = data.user;
+      localStorage.setItem('btr_user', JSON.stringify(currentUser)); localStorage.setItem('btr_token', data.token); updateAuthNavUI();
+      loadCart(); for(let k in guestCart) { cart[k] = guestCart[k]; }
       saveCart(); localStorage.removeItem('btr_cart_guest'); updateCartUI();
-
       document.getElementById('authModal').classList.remove('open'); showToast('🎉 สมัครสมาชิกสำเร็จ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
 
 function doLogout() {
-  currentUser = null; 
-  localStorage.removeItem('btr_user'); 
-  localStorage.removeItem('btr_token');
-  loadCart(); // สลับกลับไปใช้ตะกร้า Guest (ซึ่งจะว่างเปล่า)
-  updateCartUI(); 
-  updateAuthNavUI();
+  saveCart(); // เซฟตะกร้าก่อนออก
+  currentUser = null; localStorage.removeItem('btr_user'); localStorage.removeItem('btr_token');
+  loadCart(); // ดึงตะกร้า Guest ขึ้นมา (ว่างเปล่า)
+  updateCartUI(); updateAuthNavUI();
   document.getElementById('portalModal').classList.remove('open'); showToast('👋 ออกจากระบบแล้ว');
 }
 
