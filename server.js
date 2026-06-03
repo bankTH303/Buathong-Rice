@@ -232,6 +232,13 @@ app.post('/api/admin/upload', checkAdmin, (req, res) => {
   } catch(e) { res.status(500).json({ error: 'อัปโหลดไม่ได้' }); }
 });
 
+app.delete('/api/admin/products/:id', checkAdmin, (req, res) => {
+  try {
+    db.prepare('DELETE FROM products WHERE id = ?').run(req.params.id);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: 'ลบไม่ได้' }); }
+});
+
 app.get('/api/admin/contacts', checkAdmin, (req, res) => {
   try {
     const contacts = db.prepare('SELECT * FROM contacts ORDER BY created_at DESC').all();
