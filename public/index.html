@@ -34,31 +34,28 @@ nav{
 .nav-links{display:flex;gap:28px;list-style:none}
 .nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;font-size:14px;font-weight:400;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent}
 .nav-links a:hover{color:var(--goldc);border-bottom-color:var(--goldc)}
-.cart-btn{position:relative;background:var(--goldb);border:none;border-radius:50px;padding:9px 22px;color:var(--br1);font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'Noto Sans Thai',sans-serif;transition:all .25s;white-space:nowrap}
-.cart-btn:hover{background:var(--goldc);transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,148,11,0.4)}
-.cart-badge{position:absolute;top:-7px;right:-7px;background:var(--rd);color:#fff;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid rgba(13,43,26,0.97)}
+
+/* NEW NAV BUTTONS */
+.nav-icon-btn{position:relative;background:#fff;border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1);transition:all .25s;}
+.nav-icon-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.15);}
+.cart-badge{position:absolute;top:-4px;right:-4px;background:var(--rd);color:#fff;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid #fff}
 .cart-badge.show{display:flex}
+.auth-btn{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;}
+.auth-btn:hover{background:rgba(255,255,255,0.25);border-color:#fff;}
+.profile-btn{background:#fff;border:none;border-radius:50px;padding:6px 16px 6px 6px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.1);transition:all .25s;font-family:inherit;}
+.profile-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.15);}
+.profile-btn-icon{width:32px;height:32px;border-radius:50%;background:var(--g5);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.profile-btn-name{font-size:13px;font-weight:700;color:var(--g1);max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
-.mobile-menu{
-  display:none;position:fixed;top:68px;left:0;width:100%;
-  background:rgba(46, 125, 50, 0.98); 
-  z-index:999;flex-direction:column;padding:16px 5%;
-}
+.mobile-menu{display:none;position:fixed;top:68px;left:0;width:100%;background:rgba(46, 125, 50, 0.98);z-index:999;flex-direction:column;padding:16px 5%;}
 .mobile-menu.open{display:flex}
 .mobile-menu a{color:rgba(255,255,255,0.8);text-decoration:none;padding:14px 0;font-size:15px;border-bottom:1px solid rgba(255,255,255,0.08)}
 .mobile-menu a:last-child{border-bottom:none}
 
 /* HERO */
-.hero{
-  min-height:100vh;
-  background: linear-gradient(135deg, rgba(46, 125, 50, 0.8), rgba(245, 127, 23, 0.6)), url('BG.jpg') center/cover no-repeat;
-  display:flex;
-  align-items:center;
-  padding:100px 5% 60px;
-  position:relative;
-  overflow:hidden;
-}
+.hero{min-height:100vh;background: linear-gradient(135deg, rgba(46, 125, 50, 0.8), rgba(245, 127, 23, 0.6)), url('BG.jpg') center/cover no-repeat;display:flex;align-items:center;padding:100px 5% 60px;position:relative;overflow:hidden;}
 .hero-bg{position:absolute;inset:0;overflow:hidden}
 .hero-bg svg{position:absolute;right:-80px;top:50%;transform:translateY(-50%);opacity:0.055;width:700px}
 .hero-glow{position:absolute;right:0;top:0;width:60%;height:100%;background:radial-gradient(ellipse at 80% 40%,rgba(201,148,11,0.18) 0%,transparent 65%)}
@@ -73,9 +70,9 @@ nav{
 .hero-sub{font-size:clamp(16px,2vw,21px);color:rgba(255,255,255,0.75);margin-bottom:18px;font-weight:300}
 .hero-desc{font-size:15px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:44px;max-width:520px}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
-.btn-g{background:linear-gradient(135deg,var(--goldb),var(--gold));color:var(--br1);padding:14px 32px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all .3s;border:none;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;box-shadow:0 6px 24px rgba(201,148,11,0.35)}
+.btn-g{background:linear-gradient(135deg,var(--goldb),var(--gold));color:var(--br1);padding:14px 32px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;border:none;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;box-shadow:0 6px 24px rgba(201,148,11,0.35)}
 .btn-g:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(201,148,11,0.5)}
-.btn-w{background:transparent;color:#fff;padding:14px 32px;border-radius:50px;font-size:15px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:9px;transition:all .3s;border:1.5px solid rgba(255,255,255,0.35);cursor:pointer;font-family:'Noto Sans Thai',sans-serif}
+.btn-w{background:transparent;color:#fff;padding:14px 32px;border-radius:50px;font-size:15px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;border:1.5px solid rgba(255,255,255,0.35);cursor:pointer;font-family:'Noto Sans Thai',sans-serif}
 .btn-w:hover{background:rgba(255,255,255,0.1);border-color:#fff}
 .hero-stats{display:flex;gap:48px;margin-top:64px;padding-top:40px;border-top:1px solid rgba(255,255,255,0.1);flex-wrap:wrap}
 .hstat-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--goldb)}
@@ -119,7 +116,7 @@ section{padding:88px 5%}
 .add-btn.added{background:linear-gradient(135deg,var(--goldb),var(--gold));color:var(--br1)}
 .pcard.hidden{display:none}
 
-/* WHY */
+/* WHY & ABOUT & CONTACT */
 #why{background:var(--cream)}
 .why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:22px;margin-top:52px}
 .wcard{background:#fff;border-radius:20px;padding:34px 28px;border:1.5px solid #F0F0F0;transition:all .3s}
@@ -128,7 +125,6 @@ section{padding:88px 5%}
 .wtitle{font-size:17px;font-weight:800;color:var(--tx1);margin-bottom:10px}
 .wdesc{font-size:14px;color:var(--tx2);line-height:1.75}
 
-/* CONTACT */
 #contact{background:var(--g2);position:relative;overflow:hidden}
 #contact::before{content:'';position:absolute;top:-120px;right:-120px;width:450px;height:450px;background:radial-gradient(circle,rgba(201,148,11,0.18) 0%,transparent 65%)}
 #contact::after{content:'';position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(82,183,136,0.12) 0%,transparent 60%)}
@@ -148,6 +144,7 @@ section{padding:88px 5%}
 .cright{background:#fff;border-radius:24px;padding:36px}
 .form-title{font-size:21px;font-weight:800;color:var(--tx1);margin-bottom:6px}
 .form-sub{font-size:13px;color:var(--tx3);margin-bottom:24px}
+
 .fg{margin-bottom:16px}
 .fg label{display:block;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px}
 .fg input,.fg select,.fg textarea{width:100%;padding:12px 16px;border:1.5px solid #E5E7EB;border-radius:12px;font-size:14px;color:var(--tx1);font-family:'Noto Sans Thai',sans-serif;transition:border-color .2s;outline:none;background:#fff;appearance:none}
@@ -155,7 +152,6 @@ section{padding:88px 5%}
 .fg textarea{height:90px;resize:none}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-/* ABOUT */
 #about{background:#fff}
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
 .about-img-wrap{position:relative}
@@ -201,31 +197,34 @@ section{padding:88px 5%}
 .tot-amt{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--g2)}
 .co-btn{width:100%;background:var(--g2);color:#fff;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:all .25s;font-family:'Noto Sans Thai',sans-serif}
 .co-btn:hover{background:var(--g3)}
-.ln-btn{width:100%;background:var(--ln);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Noto Sans Thai',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
-.ln-btn:hover{background:#05a847}
 
-/* MODAL */
+/* MODALS GENERAL */
 .modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .3s}
 .modal-wrap.open{opacity:1;visibility:visible}
-.modal{background:#fff;border-radius:24px;padding:36px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;transform:scale(0.95);transition:transform .3s}
+.modal{background:#fff;border-radius:24px;padding:32px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;transform:scale(0.95);transition:transform .3s}
 .modal-wrap.open .modal{transform:scale(1)}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
 .modal-hdr h2{font-size:22px;font-weight:800;color:var(--tx1)}
+
+/* ORDER MODAL SPECIFIC */
 .order-sum{background:var(--cream);border-radius:16px;padding:20px;margin-bottom:24px}
 .order-sum h3{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
 .orow{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;color:var(--tx1)}
 .otot{display:flex;justify-content:space-between;font-size:17px;font-weight:800;padding-top:12px;margin-top:8px;border-top:1.5px solid #E5E7EB;color:var(--g2)}
 .success-msg{text-align:center;padding:20px 0}
 .success-icon{font-size:72px;margin-bottom:16px}
-.success-msg h3{font-size:22px;font-weight:800;color:var(--g2);margin-bottom:8px}
-.success-msg p{font-size:15px;color:var(--tx2);line-height:1.7}
+
+/* TRACK & PORTAL TABS */
+.track-icon{font-size:48px;text-align:center;margin-bottom:16px}
+.portal-tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:2px solid var(--g5);padding-bottom:12px;overflow-x:auto;}
+.ptab{padding:8px 16px;border-radius:50px;border:none;background:transparent;font-size:14px;font-weight:600;color:var(--tx2);cursor:pointer;white-space:nowrap;transition:0.2s;}
+.ptab.active{background:var(--g2);color:#fff;}
+.portal-pane{display:none;}
+.portal-pane.active{display:block; animation:fadeIn 0.3s ease forwards;}
+.status-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; background: var(--goldb); color: #3E2723; }
 
 /* FOOTER */
-footer{
-  background:#1B5E20;
-  color:rgba(255,255,255,0.7);
-  padding:56px 5% 32px;
-}
+footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:52px}
 .fbrand{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:12px}
 .fbd{font-size:14px;line-height:1.85;color:rgba(255,255,255,0.45);max-width:290px}
@@ -235,17 +234,10 @@ footer{
 .flinks a:hover{color:var(--goldc)}
 .fbot{border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:12px;flex-wrap:wrap;gap:10px}
 
-/* FLOAT */
-.fl-line{position:fixed;bottom:28px;right:28px;background:var(--ln);color:#fff;width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;box-shadow:0 8px 28px rgba(6,199,85,0.45);z-index:999;transition:all .3s;animation:pulse 2.5s infinite}
-.fl-line:hover{transform:scale(1.12);box-shadow:0 14px 40px rgba(6,199,85,0.6)}
-@keyframes pulse{0%,100%{box-shadow:0 8px 28px rgba(6,199,85,0.45)}50%{box-shadow:0 8px 44px rgba(6,199,85,0.75)}}
-.fl-tooltip{position:absolute;right:74px;background:#fff;color:var(--tx1);font-size:12px;font-weight:700;padding:6px 14px;border-radius:50px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.12);pointer-events:none}
-
 /* TOAST */
-.toast{position:fixed;bottom:108px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--g1);color:#fff;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:all .35s;white-space:nowrap;pointer-events:none}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx1);color:#fff;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:all .35s;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* RESPONSIVE */
 @media(max-width:900px){
   .nav-links{display:none}
   .hamburger{display:flex}
@@ -258,36 +250,40 @@ footer{
   section{padding:60px 5%}
   .hero-stats{gap:28px}
   .hero-cta{flex-direction:column}
-  .btn-g,.btn-w{justify-content:center}
-  .trust-bar{gap:20px;padding:12px 5%}
   .cart-side{width:100%}
   .modal{padding:24px}
   .frow{grid-template-columns:1fr}
-}
-@media(max-width:400px){
-  .hero h1{font-size:36px}
 }
 </style>
 </head>
 <body>
 
+<!-- NAVIGATION -->
 <nav>
-<a class="logo" href="/">
-  <img src="btrlogov2.png" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);">
-  <div class="logo-text">บัวทองไรซ์<small>BUATHONG RICE Co.,Ltd.</small></div>
-</a>
-<ul class="nav-links">
-  <li><a href="/#products">สินค้า</a></li>
-  <li><a href="/#why">ทำไมเลือกเรา</a></li>
-  <li><a href="/#about">เกี่ยวกับเรา</a></li>
-  <li><a href="/#contact">ติดต่อ</a></li>
-  <li><a href="/track.html" style="color: var(--goldc); font-weight: 700; border-bottom: 2px solid var(--goldc);">🔍 เช็คสถานะ</a></li>
-</ul>
+  <a class="logo" href="/">
+    <img src="btrlogov2.jpg" alt="โลโก้บัวทองไรซ์" style="width:44px; height:44px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(201,148,11,0.4);">
+    <div class="logo-text">บัวทองไรซ์<small>BUATHONG RICE Co.,Ltd.</small></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/#products">สินค้า</a></li>
+    <li><a href="/#why">ทำไมเลือกเรา</a></li>
+    <li><a href="/#about">เกี่ยวกับเรา</a></li>
+    <li><a href="/#contact">ติดต่อ</a></li>
+    <li><a href="#" onclick="openTrackModal(); return false;" style="color: var(--goldc); font-weight: 700; border-bottom: 2px solid var(--goldc);">🔍 เช็คสถานะ</a></li>
+  </ul>
   <div style="display:flex;align-items:center;gap:12px">
-    <button class="cart-btn" onclick="openCart()">
-      🛒 ตะกร้า
+    
+    <!-- AUTH BUTTON AREA -->
+    <div id="navAuthArea">
+      <button class="auth-btn" onclick="openAuthModal()">เข้าสู่ระบบ</button>
+    </div>
+
+    <!-- CART BUTTON WITH BASKET ICON -->
+    <button class="nav-icon-btn" onclick="openCart()" title="ตะกร้าสินค้า">
+      <img src="basket.png" alt="Cart" style="width:22px; height:22px; object-fit:contain;">
       <div class="cart-badge" id="cartBadge">0</div>
     </button>
+    
     <button class="hamburger" onclick="toggleMobile()" aria-label="เมนู">
       <span></span><span></span><span></span>
     </button>
@@ -299,7 +295,7 @@ footer{
   <a href="#why" onclick="toggleMobile()">⭐ ทำไมเลือกเรา</a>
   <a href="#about" onclick="toggleMobile()">🏢 เกี่ยวกับเรา</a>
   <a href="#contact" onclick="toggleMobile()">📞 ติดต่อ</a>
-  <a href="/track.html">🔍 เช็คสถานะออเดอร์</a>
+  <a href="#" onclick="toggleMobile(); openTrackModal(); return false;">🔍 เช็คสถานะออเดอร์</a>
 </div>
 
 <section class="hero" id="hero">
@@ -357,8 +353,7 @@ footer{
     </div>
   </div>
   
-  <div class="pgrid" id="productGrid">
-      </div>
+  <div class="pgrid" id="productGrid"></div>
   
   <div style="text-align:center;margin-top:48px">
     <p style="font-size:15px;color:var(--tx3);margin-bottom:16px">มีสินค้าอื่นๆ อีกมากมาย ติดต่อเพื่อสอบถามข้อมูลเพิ่มเติม</p>
@@ -409,14 +404,10 @@ footer{
 <section id="about">
   <div class="about-grid">
     <div class="about-img-wrap">
-      <div class="about-img">
-        🌾
+      <div class="about-img">🌾
         <div class="about-chip">
           <div class="about-chip-icon">🏅</div>
-          <div>
-            <strong>ก่อตั้งปี 2542</strong>
-            <small>ประสบการณ์กว่า 25 ปี</small>
-          </div>
+          <div><strong>ก่อตั้งปี 2542</strong><small>ประสบการณ์กว่า 25 ปี</small></div>
         </div>
       </div>
     </div>
@@ -445,30 +436,20 @@ footer{
         <a href="https://line.me/ti/p/~@buathongrice" class="citem" target="_blank">
           <div class="citem-icon ci-line">💚</div>
           <div class="citem-icon" style="background:none;width:auto;height:auto;border-radius:0;font-size:inherit;padding:0">
-            <strong>LINE Official</strong>
-            <small>@buathongrice — ตอบเร็วที่สุด</small>
+            <strong>LINE Official</strong><small>@buathongrice — ตอบเร็วที่สุด</small>
           </div>
         </a>
         <a href="tel:+66XXXXXXXXX" class="citem">
           <div class="citem-icon ci-phone">📞</div>
-          <div>
-            <strong>โทรศัพท์</strong>
-            <small>โทรหาเราได้เลย จันทร์–เสาร์ 8:00–17:00</small>
-          </div>
+          <div><strong>โทรศัพท์</strong><small>โทรหาเราได้เลย จันทร์–เสาร์ 8:00–17:00</small></div>
         </a>
         <a href="https://maps.app.goo.gl/oV8XPNYhnu6KvgTH6" class="citem" target="_blank">
           <div class="citem-icon ci-map">📍</div>
-          <div>
-            <strong>แผนที่</strong>
-            <small>คลิกดูตำแหน่งร้านบน Google Maps</small>
-          </div>
+          <div><strong>แผนที่</strong><small>คลิกดูตำแหน่งร้านบน Google Maps</small></div>
         </a>
         <a href="https://www.facebook.com/profile.php?id=100063940624893" class="citem" target="_blank">
           <div class="citem-icon" style="background:rgba(66,103,178,0.2)">👍</div>
-          <div>
-            <strong>Facebook</strong>
-            <small>ติดตามโปรโมชั่นและข่าวสาร</small>
-          </div>
+          <div><strong>Facebook</strong><small>ติดตามโปรโมชั่นและข่าวสาร</small></div>
         </a>
       </div>
     </div>
@@ -540,11 +521,7 @@ footer{
   </div>
 </footer>
 
-<a class="fl-line" href="https://www.facebook.com/profile.php?id=100063940624893" target="_blank" title="ติดต่อผ่าน Facebook">
-  <span style="font-size:28px">💬</span>
-  <div class="fl-tooltip">ติดต่อสั่งซื้อ</div>
-</a>
-
+<!-- CART SIDEBAR -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
 <div class="cart-side" id="cartSide">
   <div class="cart-hdr">
@@ -556,7 +533,7 @@ footer{
   </div>
   <div class="cart-body" id="cartBody">
     <div class="cart-empty" id="cartEmpty">
-      <div class="ce-icon">🛒</div>
+      <div class="ce-icon"><img src="basket.png" style="width:64px;opacity:0.5;"></div>
       <div class="ce-text">ตะกร้าของคุณว่างเปล่า</div>
       <div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div>
     </div>
@@ -570,6 +547,7 @@ footer{
   </div>
 </div>
 
+<!-- CHECKOUT MODAL -->
 <div class="modal-wrap" id="orderModal">
   <div class="modal">
     <div class="modal-hdr">
@@ -592,37 +570,29 @@ footer{
         <div class="fg"><label>ชื่อผู้สั่ง *</label><input type="text" id="o-name" placeholder="ชื่อ-นามสกุล" required></div>
         <div class="fg">
           <label>เบอร์โทร *</label>
-          <input type="tel" id="o-phone" placeholder="ระบุ 10 หลัก (08XXXXXXXX)" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+          <input type="tel" id="o-phone" placeholder="ระบุ 10 หลัก" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
         </div>
       </div>
 
       <div class="frow">
         <div class="fg">
           <label>จังหวัด *</label>
-          <select id="o-province" onchange="populateDistricts()" required>
-            <option value="">เลือกจังหวัด</option>
-          </select>
+          <select id="o-province" required><option value="">เลือกจังหวัด</option></select>
         </div>
         <div class="fg">
           <label>อำเภอ/เขต *</label>
-          <select id="o-district" onchange="populateSubdistricts()" required>
-            <option value="">เลือกอำเภอ/เขต</option>
-          </select>
+          <select id="o-district" required><option value="">เลือกอำเภอ/เขต</option></select>
         </div>
       </div>
 
       <div class="frow">
         <div class="fg">
           <label>ตำบล/แขวง *</label>
-          <select id="o-subdistrict" onchange="populateZipcode()" required>
-            <option value="">เลือกตำบล/แขวง</option>
-          </select>
+          <select id="o-subdistrict" required><option value="">เลือกตำบล/แขวง</option></select>
         </div>
         <div class="fg">
           <label>รหัสไปรษณีย์ *</label>
-          <select id="o-zipcode" onchange="calculateShipping()" required>
-            <option value="">รหัสไปรษณีย์</option>
-          </select>
+          <select id="o-zipcode" required><option value="">รหัสไปรษณีย์</option></select>
         </div>
       </div>
 
@@ -641,344 +611,442 @@ footer{
         <div class="success-icon">🎉</div>
         <h3 style="margin-bottom: 5px;">สั่งซื้อเรียบร้อย!</h3>
         <p style="color:var(--tx2); font-size: 15px;">ยอดชำระเงินทั้งหมด: <span id="pp-total" style="color:var(--rd); font-weight: 800; font-size: 22px;"></span> บาท</p>
-        
         <div style="margin: 20px auto; background: #fff; padding: 15px; border-radius: 16px; border: 2px solid var(--g3); display: inline-block;">
-        <p style="font-weight: 700; color: var(--g2); margin-bottom: 10px; font-size: 14px;">สแกนเพื่อชำระเงิน</p>
-        <img id="pp-qr" src="qr.jpg" alt="QR Code พร้อมเพย์" style="width: 100%; max-width: 220px; height: auto; border-radius: 8px;">
+          <p style="font-weight: 700; color: var(--g2); margin-bottom: 10px; font-size: 14px;">สแกนเพื่อชำระเงิน</p>
+          <img id="pp-qr" src="qr.jpg" alt="QR Code พร้อมเพย์" style="width: 100%; max-width: 220px; height: auto; border-radius: 8px;">
         </div>
-
         <div style="background: var(--g5); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-        <p style="font-size:14px; color:var(--tx1); font-weight: 600; line-height: 1.6;">
-          ขั้นตอนสุดท้าย: เมื่อโอนเงินแล้ว<br>
-          กรุณาส่ง <b>"สลิปโอนเงิน + แคปหน้าจอนี้"</b> มาทาง Messenger
-        </p>
+          <p style="font-size:14px; color:var(--tx1); font-weight: 600; line-height: 1.6;">ขั้นตอนสุดท้าย: เมื่อโอนเงินแล้ว<br>กรุณาส่ง <b>"สลิปโอนเงิน + แคปหน้าจอนี้"</b> มาทาง Messenger</p>
         </div>
-        
-        <button class="ln-btn" style="background:#0084FF; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3);" onclick="window.open('https://m.me/YOUR_FACEBOOK_PAGE_ID','_blank')">
-        💬 ส่งสลิปและยืนยันผ่าน Facebook
-        </button>
+        <button class="ln-btn" style="background:#0084FF; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3);" onclick="window.open('https://m.me/YOUR_FACEBOOK_PAGE_ID','_blank')">💬 ส่งสลิปและยืนยันผ่าน Facebook</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-wrap" id="authModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="authModalTitle">เข้าสู่ระบบ</h2>
+      <button class="close-x" onclick="document.getElementById('authModal').classList.remove('open')">✕</button>
+    </div>
+    
+    <!-- LOGIN FORM -->
+    <div id="loginFormArea">
+      <div class="fg"><label>อีเมล</label><input type="email" id="l-email" placeholder="email@example.com"></div>
+      <div class="fg"><label>รหัสผ่าน</label><input type="password" id="l-password" placeholder="********"></div>
+      <button class="btn-g" style="width:100%;justify-content:center;margin-top:10px" onclick="doLogin()">เข้าสู่ระบบ</button>
+      <div style="text-align:center; margin-top:20px; font-size:14px; color:var(--tx2);">
+        ยังไม่มีบัญชีใช่ไหม? <a href="#" onclick="toggleAuthForm('register'); return false;" style="color:var(--g1); font-weight:700;">สมัครสมาชิกเลย</a>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerFormArea" style="display:none;">
+      <div class="frow">
+        <div class="fg"><label>ชื่อ-นามสกุล *</label><input type="text" id="r-name" required></div>
+        <div class="fg"><label>เบอร์โทร *</label><input type="tel" id="r-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required></div>
+      </div>
+      <div class="fg"><label>อีเมล *</label><input type="email" id="r-email" required></div>
+      <div class="frow">
+        <div class="fg"><label>รหัสผ่าน *</label><input type="password" id="r-password" required></div>
+        <div class="fg"><label>ยืนยันรหัสผ่าน *</label><input type="password" id="r-confirm" required></div>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:var(--g1); margin:10px 0 5px; text-transform:uppercase;">ข้อมูลสำหรับจัดส่งสินค้า</div>
+      <div class="frow">
+        <div class="fg"><label>จังหวัด *</label><select id="r-province"><option value="">เลือกจังหวัด</option></select></div>
+        <div class="fg"><label>อำเภอ/เขต *</label><select id="r-district"><option value="">เลือกอำเภอ/เขต</option></select></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>ตำบล/แขวง *</label><select id="r-subdistrict"><option value="">เลือกตำบล/แขวง</option></select></div>
+        <div class="fg"><label>รหัสไปรษณีย์ *</label><select id="r-zipcode"><option value="">รหัสไปรษณีย์</option></select></div>
+      </div>
+      <div class="fg"><label>บ้านเลขที่, ถนน, หมู่บ้าน *</label><textarea id="r-addr-detail" required></textarea></div>
+      
+      <button class="btn-g" style="width:100%;justify-content:center;margin-top:10px" onclick="doRegister()">สมัครสมาชิก</button>
+      <div style="text-align:center; margin-top:20px; font-size:14px; color:var(--tx2);">
+        มีบัญชีอยู่แล้ว? <a href="#" onclick="toggleAuthForm('login'); return false;" style="color:var(--g1); font-weight:700;">เข้าสู่ระบบ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USER PORTAL MODAL -->
+<div class="modal-wrap" id="portalModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-hdr" style="margin-bottom:16px;">
+      <h2>👤 ข้อมูลส่วนตัว</h2>
+      <button class="close-x" onclick="document.getElementById('portalModal').classList.remove('open')">✕</button>
+    </div>
+    
+    <div class="portal-tabs">
+      <button class="ptab active" onclick="switchPortalTab('profile', this)">ข้อมูลโปรไฟล์</button>
+      <button class="ptab" onclick="switchPortalTab('privilege', this)">สิทธิพิเศษ</button>
+      <button class="ptab" onclick="switchPortalTab('history', this); loadMyOrders();">ประวัติสั่งซื้อ</button>
+      <button class="ptab" style="color:var(--rd);" onclick="doLogout()">ออกจากระบบ</button>
+    </div>
+
+    <div id="pane-profile" class="portal-pane active">
+      <div class="frow">
+        <div class="fg"><label>ชื่อ-นามสกุล</label><input type="text" id="p-name"></div>
+        <div class="fg"><label>เบอร์โทร</label><input type="tel" id="p-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>จังหวัด</label><select id="p-province"><option value="">เลือกจังหวัด</option></select></div>
+        <div class="fg"><label>อำเภอ/เขต</label><select id="p-district"><option value="">เลือกอำเภอ</option></select></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>ตำบล/แขวง</label><select id="p-subdistrict"><option value="">เลือกตำบล</option></select></div>
+        <div class="fg"><label>รหัสไปรษณีย์</label><select id="p-zipcode"><option value="">รหัส</option></select></div>
+      </div>
+      <div class="fg"><label>รายละเอียดที่อยู่</label><textarea id="p-addr-detail"></textarea></div>
+      <button class="btn-g" style="padding:10px 24px;" onclick="updateProfile()">💾 บันทึกข้อมูล</button>
+    </div>
+
+    <div id="pane-privilege" class="portal-pane">
+      <div style="text-align:center; padding:40px 20px;">
+        <div style="font-size:64px; margin-bottom:16px;">🌟</div>
+        <h3 style="color:var(--g1); font-size:20px; font-weight:800; margin-bottom:8px;">คะแนนสะสมของคุณ: 0 แต้ม</h3>
+        <p style="color:var(--tx3); font-size:14px;">ระบบสิทธิพิเศษและส่วนลดสมาชิกกำลังจะเปิดให้บริการเร็วๆ นี้ เตรียมตัวรอได้เลย!</p>
+      </div>
+    </div>
+
+    <div id="pane-history" class="portal-pane">
+      <div id="myOrdersWrap"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TRACKING MODAL (JS BASED) -->
+<div class="modal-wrap" id="trackModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>🔍 เช็คสถานะออเดอร์</h2>
+      <button class="close-x" onclick="document.getElementById('trackModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="track-icon">📦</div>
+    <p style="text-align:center; color:var(--tx2); margin-bottom:20px;">กรอกเบอร์โทรศัพท์ 10 หลักของคุณ เพื่อตรวจสอบสถานะล่าสุด</p>
+    <div style="display:flex; gap:10px; margin-bottom:20px;">
+      <input type="tel" id="trackPhone" placeholder="08X-XXX-XXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="flex:1; padding:12px; border:1.5px solid #ddd; border-radius:10px; outline:none;">
+      <button class="btn-g" style="padding:0 24px;" onclick="quickTrack()">ค้นหา</button>
+    </div>
+    <div id="trackLoading" style="display:none; text-align:center; color:var(--g2); font-weight:bold;">⏳ กำลังค้นหา...</div>
+    <div id="trackResult"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== THAI ADDRESS DATABASE & LOGIC =====
+// ===== GLOBAL STATE =====
+let cart = JSON.parse(localStorage.getItem('btr_cart')) || {};
+let currentUser = JSON.parse(localStorage.getItem('btr_user')) || null;
 let thaiAddressData = [];
+let currentShippingFee = 0;
 
 window.addEventListener('DOMContentLoaded', async () => {
   loadDynamicProducts();
-  // โหลดฐานข้อมูลที่อยู่ประเทศไทยแบบดิบ (JSON)
+  updateCartUI();
+  updateAuthNavUI();
+  
   try {
     const res = await fetch('https://raw.githubusercontent.com/earthchie/jquery.Thailand.js/master/jquery.Thailand.js/database/raw_database/raw_database.json');
     thaiAddressData = await res.json();
-    const provSelect = document.getElementById('o-province');
-    // ดึงเฉพาะชื่อจังหวัดที่ไม่ซ้ำกัน
-    const provs = [...new Set(thaiAddressData.map(item => item.province))].sort();
-    provSelect.innerHTML = '<option value="">เลือกจังหวัด</option>' + provs.map(p => `<option value="${p}">${p}</option>`).join('');
-  } catch(e) {
-    console.error('ไม่สามารถโหลดข้อมูลที่อยู่ได้', e);
-  }
+    initAddressDropdowns('o'); // Checkout
+    initAddressDropdowns('r'); // Register
+    initAddressDropdowns('p'); // Profile
+  } catch(e) { console.error('Address Data Error', e); }
 });
 
-// ฟังก์ชันสร้างตัวเลือก อำเภอ
-function populateDistricts() {
-  const prov = document.getElementById('o-province').value;
-  const distSelect = document.getElementById('o-district');
-  const dists = [...new Set(thaiAddressData.filter(i => i.province === prov).map(i => i.amphoe))].sort();
-  distSelect.innerHTML = '<option value="">เลือกอำเภอ/เขต</option>' + dists.map(d => `<option value="${d}">${d}</option>`).join('');
-  populateSubdistricts(); // รีเซ็ตตำบลเมื่อเปลี่ยนอำเภอ
-  calculateShipping(); // คำนวณค่าส่งใหม่
-}
+// ===== ADDRESS DROPDOWN LOGIC =====
+function initAddressDropdowns(prefix) {
+  const p = document.getElementById(`${prefix}-province`);
+  const d = document.getElementById(`${prefix}-district`);
+  const s = document.getElementById(`${prefix}-subdistrict`);
+  const z = document.getElementById(`${prefix}-zipcode`);
 
-// ฟังก์ชันสร้างตัวเลือก ตำบล
-function populateSubdistricts() {
-  const prov = document.getElementById('o-province').value;
-  const dist = document.getElementById('o-district').value;
-  const subdSelect = document.getElementById('o-subdistrict');
-  const subds = [...new Set(thaiAddressData.filter(i => i.province === prov && i.amphoe === dist).map(i => i.district))].sort();
-  subdSelect.innerHTML = '<option value="">เลือกตำบล/แขวง</option>' + subds.map(s => `<option value="${s}">${s}</option>`).join('');
-  populateZipcode(); // รีเซ็ตรหัสไปรษณีย์
-}
+  const provs = [...new Set(thaiAddressData.map(i => i.province))].sort();
+  p.innerHTML = '<option value="">เลือกจังหวัด</option>' + provs.map(x => `<option value="${x}">${x}</option>`).join('');
 
-// ฟังก์ชันดึงและเลือกรหัสไปรษณีย์
-function populateZipcode() {
-  const prov = document.getElementById('o-province').value;
-  const dist = document.getElementById('o-district').value;
-  const subd = document.getElementById('o-subdistrict').value;
-  const zipSelect = document.getElementById('o-zipcode');
-  const zips = [...new Set(thaiAddressData.filter(i => i.province === prov && i.amphoe === dist && i.district === subd).map(i => i.zipcode))].sort();
-  zipSelect.innerHTML = '<option value="">รหัสไปรษณีย์</option>' + zips.map(z => `<option value="${z}">${z}</option>`).join('');
-  
-  // ถ้ามีรหัสเดียวให้เลือกให้อัตโนมัติ
-  if(zips.length === 1) { zipSelect.value = zips[0]; }
-  calculateShipping();
-}
+  p.addEventListener('change', () => {
+    const dists = [...new Set(thaiAddressData.filter(i => i.province === p.value).map(i => i.amphoe))].sort();
+    d.innerHTML = '<option value="">เลือกอำเภอ/เขต</option>' + dists.map(x => `<option value="${x}">${x}</option>`).join('');
+    s.innerHTML = '<option value="">เลือกตำบล/แขวง</option>';
+    z.innerHTML = '<option value="">รหัสไปรษณีย์</option>';
+    if(prefix === 'o') calculateShipping();
+  });
 
+  d.addEventListener('change', () => {
+    const subds = [...new Set(thaiAddressData.filter(i => i.province === p.value && i.amphoe === d.value).map(i => i.district))].sort();
+    s.innerHTML = '<option value="">เลือกตำบล/แขวง</option>' + subds.map(x => `<option value="${x}">${x}</option>`).join('');
+    z.innerHTML = '<option value="">รหัสไปรษณีย์</option>';
+    if(prefix === 'o') calculateShipping();
+  });
 
-// ===== CART STATE =====
-let cart = {};
-let currentShippingFee = 0;
-
-function changeQty(id, delta) {
-  id = String(id);
-  if (!cart[id]) return;
-  cart[id].qty += delta;
-  if (cart[id].qty <= 0) delete cart[id];
-  updateCartUI();
-  calculateShipping();
-}
-
-function removeCart(id) {
-  id = String(id); delete cart[id]; updateCartUI();
-  calculateShipping();
-  showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว');
-}
-
-function openCart() {
-  document.getElementById('cartOverlay').classList.add('open');
-  document.getElementById('cartSide').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeCart() {
-  document.getElementById('cartOverlay').classList.remove('open');
-  document.getElementById('cartSide').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// ===== SHIPPING CALCULATION (FLASH EXPRESS) =====
-function calculateShipping() {
-  const items = Object.values(cart);
-  if (items.length === 0) return;
-  
-  const totalSacks = items.reduce((s, i) => s + i.qty, 0);
-  const totalWeight = (totalSacks * 5) + 0.5;
-  
-  const prov = document.getElementById('o-province').value;
-  const zip = document.getElementById('o-zipcode').value;
-  
-  if (!prov || !zip || zip.length < 5) {
-      document.getElementById('orderShippingFee').textContent = 'รอระบุที่อยู่...';
-      currentShippingFee = 0;
-      updateOrderTotalUI();
-      return;
-  }
-
-  const isBkkMetro = ["กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี", "สมุทรปราการ"].includes(prov);
-  
-  const upcRates = [0,35,40,45,50,60,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,420,430,440,450,460,500,510,520,530,540,550,560,570,580,590];
-  const bkkRates = [0,25,30,35,45,55,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,425,440,455,470,485,500,515,530,545,560,575,590,605,620,635];
-
-  let baseFee = 0;
-  let remainingWeight = Math.ceil(totalWeight);
-  
-  while (remainingWeight > 0) {
-      let checkW = remainingWeight > 50 ? 50 : remainingWeight;
-      baseFee += isBkkMetro ? bkkRates[checkW] : upcRates[checkW];
-      remainingWeight -= 50;
-  }
-
-  let surcharge = 0;
-  const remoteProvinces = ['แม่ฮ่องสอน', 'นราธิวาส', 'ปัตตานี', 'ยะลา'];
-  const islandZips = ['84280', '84320', '84330', '20120', '23120', '82160', '81150', '21160', '83000', '83100', '83110', '83120', '83130', '83150'];
-  const touristProvinces = ['ภูเก็ต', 'กระบี่'];
-
-  if (islandZips.includes(zip)) {
-      surcharge += 80; 
-  } else if (remoteProvinces.includes(prov)) {
-      surcharge += 50; 
-  }
-
-  if (touristProvinces.includes(prov)) {
-      if (totalWeight > 20) surcharge += 200;
-      else if (totalWeight > 7) surcharge += 100;
-  }
-
-  currentShippingFee = baseFee + surcharge;
-  document.getElementById('orderShippingFee').textContent = `฿${currentShippingFee.toLocaleString()}`;
-  updateOrderTotalUI();
-}
-
-function updateOrderTotalUI() {
-  const items = Object.values(cart);
-  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const finalTotal = subtotal + currentShippingFee;
-  document.getElementById('orderTotal').textContent = `฿${finalTotal.toLocaleString()}`;
-}
-
-// ===== MODAL =====
-function openModal() {
-  if (Object.keys(cart).length === 0) { showToast('⚠️ กรุณาเพิ่มสินค้าก่อน'); return; }
-  closeCart();
-  
-  const items = Object.values(cart);
-  let html = '';
-  items.forEach(i => {
-    html += `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`;
+  s.addEventListener('change', () => {
+    const zips = [...new Set(thaiAddressData.filter(i => i.province === p.value && i.amphoe === d.value && i.district === s.value).map(i => i.zipcode))].sort();
+    z.innerHTML = '<option value="">รหัสไปรษณีย์</option>' + zips.map(x => `<option value="${x}">${x}</option>`).join('');
+    if(zips.length === 1) z.value = zips[0];
+    if(prefix === 'o') calculateShipping();
   });
   
-  document.getElementById('orderSumItems').innerHTML = html;
-  calculateShipping(); 
-  
-  document.getElementById('orderFormWrap').style.display = '';
-  document.getElementById('orderSuccess').style.display = 'none';
-  document.getElementById('orderModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  z.addEventListener('change', () => { if(prefix === 'o') calculateShipping(); });
 }
 
-function closeModal() {
-  document.getElementById('orderModal').classList.remove('open');
-  document.body.style.overflow = '';
+function setAddressValues(prefix, prov, dist, sub, zip) {
+  if(!prov) return;
+  const p = document.getElementById(`${prefix}-province`);
+  p.value = prov; p.dispatchEvent(new Event('change'));
+  setTimeout(() => {
+    const d = document.getElementById(`${prefix}-district`);
+    d.value = dist; d.dispatchEvent(new Event('change'));
+    setTimeout(() => {
+      const s = document.getElementById(`${prefix}-subdistrict`);
+      s.value = sub; s.dispatchEvent(new Event('change'));
+      setTimeout(() => {
+        const z = document.getElementById(`${prefix}-zipcode`);
+        z.value = zip;
+        if(prefix === 'o') calculateShipping();
+      }, 50);
+    }, 50);
+  }, 50);
 }
 
-async function submitOrder() {
-  const name = document.getElementById('o-name').value.trim();
-  const phone = document.getElementById('o-phone').value.trim();
-  const prov = document.getElementById('o-province').value;
-  const dist = document.getElementById('o-district').value.trim();
-  const subdist = document.getElementById('o-subdistrict').value.trim();
-  const zip = document.getElementById('o-zipcode').value.trim();
-  const detail = document.getElementById('o-addr-detail').value.trim();
-  const note = document.getElementById('o-note') ? document.getElementById('o-note').value.trim() : '';
-  
-  if (!name || phone.length !== 10 || !prov || !dist || !subdist || zip.length !== 5 || !detail) { 
-    showToast('⚠️ กรุณากรอกข้อมูลและที่อยู่ให้ครบถ้วน'); return; 
+// ===== AUTHENTICATION & PORTAL =====
+function updateAuthNavUI() {
+  const authArea = document.getElementById('navAuthArea');
+  if(currentUser) {
+    authArea.innerHTML = `
+      <button class="profile-btn" onclick="openPortalModal()">
+        <div class="profile-btn-icon">👤</div>
+        <span class="profile-btn-name">${currentUser.name.split(' ')[0]}</span>
+      </button>
+    `;
+  } else {
+    authArea.innerHTML = `<button class="auth-btn" onclick="openAuthModal()">เข้าสู่ระบบ</button>`;
   }
+}
 
-  const fullAddr = `${detail} ต.${subdist} อ.${dist} จ.${prov} ${zip}`;
+function openAuthModal() {
+  toggleAuthForm('login');
+  document.getElementById('authModal').classList.add('open');
+}
 
-  const itemsToSubmit = [...Object.values(cart)];
-  if (currentShippingFee > 0) {
-      itemsToSubmit.push({
-          id: 'SHIP',
-          name: 'ค่าจัดส่ง (Flash Express)',
-          price: currentShippingFee,
-          qty: 1,
-          emoji: '🚚',
-          image: null
-      });
+function toggleAuthForm(type) {
+  if(type === 'login') {
+    document.getElementById('authModalTitle').textContent = 'เข้าสู่ระบบ';
+    document.getElementById('loginFormArea').style.display = 'block';
+    document.getElementById('registerFormArea').style.display = 'none';
+  } else {
+    document.getElementById('authModalTitle').textContent = 'สมัครสมาชิก';
+    document.getElementById('loginFormArea').style.display = 'none';
+    document.getElementById('registerFormArea').style.display = 'block';
   }
-  
-  const finalTotal = itemsToSubmit.reduce((s, i) => s + i.price * i.qty, 0);
+}
 
+async function doLogin() {
+  const email = document.getElementById('l-email').value;
+  const password = document.getElementById('l-password').value;
+  if(!email || !password) return showToast('⚠️ กรุณากรอกอีเมลและรหัสผ่าน');
+  
   try {
-    const res = await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer_name: name, customer_phone: phone, customer_addr: fullAddr, note, items: itemsToSubmit, total: finalTotal })
+    const res = await fetch('/api/auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password})
     });
     const data = await res.json();
-    if (res.ok) {
-      document.getElementById('orderFormWrap').style.display = 'none';
-      document.getElementById('orderSuccess').style.display = '';
-      
-      document.getElementById('pp-total').textContent = finalTotal.toLocaleString();
-      
-      cart = {}; 
-      updateCartUI();
-      showToast('✅ ' + data.message);
-    } else {
-      showToast('❌ ' + (data.error || 'เกิดข้อผิดพลาด'));
-    }
-  } catch(e) {
-    showToast('❌ ไม่สามารถส่งออเดอร์ได้ กรุณาลองใหม่');
-  }
+    if(res.ok) {
+      currentUser = data.user;
+      localStorage.setItem('btr_user', JSON.stringify(currentUser));
+      updateAuthNavUI();
+      document.getElementById('authModal').classList.remove('open');
+      showToast('✅ ยินดีต้อนรับกลับมาครับ!');
+    } else showToast('❌ ' + data.error);
+  } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
 
-// ===== FILTER =====
-function filterProd(cat, btn) {
-  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.pcard').forEach(c => {
-    if (cat === 'all' || c.dataset.cat === cat) {
-      c.classList.remove('hidden');
-    } else {
-      c.classList.add('hidden');
-    }
-  });
-}
+async function doRegister() {
+  const name = document.getElementById('r-name').value;
+  const phone = document.getElementById('r-phone').value;
+  const email = document.getElementById('r-email').value;
+  const password = document.getElementById('r-password').value;
+  const confirm = document.getElementById('r-confirm').value;
+  const province = document.getElementById('r-province').value;
+  const district = document.getElementById('r-district').value;
+  const subdistrict = document.getElementById('r-subdistrict').value;
+  const zipcode = document.getElementById('r-zipcode').value;
+  const address_detail = document.getElementById('r-addr-detail').value;
 
-// ===== CONTACT FORM =====
-async function sendInquiry() {
-  const name = document.getElementById('cf-name').value.trim();
-  const phone = document.getElementById('cf-phone').value.trim();
-  if (!name || !phone) { showToast('⚠️ กรุณากรอกชื่อและเบอร์โทรศัพท์'); return; }
+  if(!name||!phone||!email||!password||!province||!district||!subdistrict||!zipcode||!address_detail) return showToast('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
+  if(password !== confirm) return showToast('⚠️ รหัสผ่านไม่ตรงกัน');
+
   try {
-    const res = await fetch('/api/contacts', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ name, phone })
+    const res = await fetch('/api/auth/register', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, email, phone, password, province, district, subdistrict, zipcode, address_detail})
     });
-    if (res.ok) {
-      document.getElementById('contactForm').style.display = 'none';
-      document.getElementById('contactSuccess').style.display = '';
-    } else { showToast('❌ เกิดข้อผิดพลาด'); }
-  } catch(e) { showToast('❌ ส่งข้อมูลไม่ได้'); }
+    const data = await res.json();
+    if(res.ok) {
+      currentUser = data.user;
+      localStorage.setItem('btr_user', JSON.stringify(currentUser));
+      updateAuthNavUI();
+      document.getElementById('authModal').classList.remove('open');
+      showToast('🎉 สมัครสมาชิกสำเร็จ!');
+    } else showToast('❌ ' + data.error);
+  } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
 
-// ===== TOAST =====
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('btr_user');
+  updateAuthNavUI();
+  document.getElementById('portalModal').classList.remove('open');
+  showToast('👋 ออกจากระบบแล้ว');
 }
 
-// ===== MOBILE MENU =====
-function toggleMobile() {
-  document.getElementById('mobileMenu').classList.toggle('open');
-}
-
-// ===== NAV SCROLL =====
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('nav');
-  if (window.scrollY > 60) {
-    nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.3)';
-  } else {
-    nav.style.boxShadow = 'none';
+function openPortalModal() {
+  if(!currentUser) return;
+  document.getElementById('p-name').value = currentUser.name;
+  document.getElementById('p-phone').value = currentUser.phone;
+  document.getElementById('p-addr-detail').value = currentUser.address_detail || '';
+  if(thaiAddressData.length > 0) {
+    setAddressValues('p', currentUser.province, currentUser.district, currentUser.subdistrict, currentUser.zipcode);
   }
-});
+  switchPortalTab('profile', document.querySelectorAll('.ptab')[0]);
+  document.getElementById('portalModal').classList.add('open');
+}
 
-// ===== SCROLL REVEAL =====
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.style.opacity = '1';
-      e.target.style.transform = 'translateY(0)';
+function switchPortalTab(paneId, btn) {
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.portal-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pane-' + paneId).classList.add('active');
+}
+
+async function updateProfile() {
+  const name = document.getElementById('p-name').value;
+  const phone = document.getElementById('p-phone').value;
+  const province = document.getElementById('p-province').value;
+  const district = document.getElementById('p-district').value;
+  const subdistrict = document.getElementById('p-subdistrict').value;
+  const zipcode = document.getElementById('p-zipcode').value;
+  const address_detail = document.getElementById('p-addr-detail').value;
+
+  try {
+    const res = await fetch(`/api/user/${currentUser.id}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, phone, province, district, subdistrict, zipcode, address_detail})
+    });
+    const data = await res.json();
+    if(res.ok) {
+      currentUser = data.user;
+      localStorage.setItem('btr_user', JSON.stringify(currentUser));
+      updateAuthNavUI();
+      showToast('✅ บันทึกข้อมูลสำเร็จ');
     }
-  });
-}, { threshold: 0.1 });
+  } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
+}
 
-// ===== DYNAMIC PRODUCTS & TIERED PRICING =====
+async function loadMyOrders() {
+  const wrap = document.getElementById('myOrdersWrap');
+  wrap.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">⏳ กำลังโหลด...</div>';
+  try {
+    const res = await fetch(`/api/user/${currentUser.id}/orders`);
+    const orders = await res.json();
+    if(orders.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">คุณยังไม่มีประวัติการสั่งซื้อ</div>';
+      return;
+    }
+    wrap.innerHTML = orders.map(o => {
+      let itemsHtml = o.items.map(i => `<div style="font-size:13px; color:var(--tx2); margin-top:4px;">- ${i.name} × ${i.qty}</div>`).join('');
+      return `
+        <div style="border:1.5px solid #eee; border-radius:16px; padding:16px; margin-bottom:12px; background:#fff;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span style="font-size:12px; color:var(--tx3); font-weight:700;">ออเดอร์ #${o.id} <br><span style="font-weight:400">${o.created_at}</span></span>
+            <span class="status-badge">${o.status}</span>
+          </div>
+          ${itemsHtml}
+          <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--g1); margin-top:12px; border-top:1px dashed #eee; padding-top:12px;">
+            <span>ยอดรวม</span><span>฿${o.total.toLocaleString()}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) { wrap.innerHTML = '<div style="color:red; text-align:center;">โหลดไม่สำเร็จ</div>'; }
+}
+
+// ===== TRACKING MODAL =====
+function openTrackModal() {
+  document.getElementById('trackResult').innerHTML = '';
+  document.getElementById('trackPhone').value = '';
+  document.getElementById('trackModal').classList.add('open');
+}
+
+async function quickTrack() {
+  const phone = document.getElementById('trackPhone').value;
+  const resDiv = document.getElementById('trackResult');
+  const loading = document.getElementById('trackLoading');
+  
+  if(phone.length !== 10) return showToast("⚠️ กรุณากรอกเบอร์โทร 10 หลัก");
+  resDiv.innerHTML = ''; loading.style.display = 'block';
+
+  try {
+    const res = await fetch('/api/track/' + phone);
+    const data = await res.json();
+    loading.style.display = 'none';
+
+    if(data.error || data.length === 0) {
+      resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E; padding: 20px 0; font-weight:700;">ไม่พบข้อมูลออเดอร์ของเบอร์นี้</div>`;
+      return;
+    }
+
+    data.forEach(o => {
+      let itemsHtml = o.items.map(i => `<div style="font-size:13px; color:#666;">- ${i.name} × ${i.qty}</div>`).join('');
+      resDiv.innerHTML += `
+        <div style="border: 1.5px solid #eee; border-radius: 16px; padding: 16px; margin-bottom: 12px; background: #fafafa;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+            <span style="font-size:12px; color:#888;">ออเดอร์ #${o.id}</span>
+            <span class="status-badge">${o.status}</span>
+          </div>
+          <div style="margin-bottom: 8px;">${itemsHtml}</div>
+          <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; border-top: 1px solid #ddd; padding-top: 8px;">
+            <span>ยอดรวม</span><span style="color:var(--g1)">฿${o.total.toLocaleString()}</span>
+          </div>
+        </div>
+      `;
+    });
+  } catch(e) {
+    loading.style.display = 'none';
+    resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E;">เกิดข้อผิดพลาดในการเชื่อมต่อ</div>`;
+  }
+}
+
+// ===== CART LOGIC (WITH LOCALSTORAGE) =====
+function saveCart() { localStorage.setItem('btr_cart', JSON.stringify(cart)); }
+
 function addCart(id, name, basePrice, emoji, image, safeTiers, btn) {
   id = String(id);
   const tiersStr = decodeURIComponent(safeTiers);
   if (cart[id]) { cart[id].qty += 1; } 
   else { cart[id] = { id, name, basePrice, price: basePrice, emoji, image, tiersStr, qty: 1 }; }
   
-  updateCartUI();
+  updateCartUI(); saveCart();
   btn.classList.add('added'); btn.textContent = '✅ เพิ่มแล้ว';
   setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+ เพิ่มลงตะกร้า'; }, 1800);
-  showToast('✅ เพิ่ม "' + name + '" ลงตะกร้าแล้ว!');
+  showToast('✅ เพิ่มลงตะกร้าแล้ว!');
 }
 
 function updateCartUI() {
   const items = Object.values(cart);
-  
   items.forEach(item => {
     let currentPrice = item.basePrice;
-    let tiers = [];
-    try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
-    
-    const descTiers = [...tiers].sort((a,b) => b.qty - a.qty);
-    for(let t of descTiers) {
-      if(item.qty >= t.qty) {
-        currentPrice = t.price;
-        break;
-      }
-    }
+    try { 
+      let tiers = JSON.parse(item.tiersStr || '[]'); 
+      const descTiers = [...tiers].sort((a,b) => b.qty - a.qty);
+      for(let t of descTiers) { if(item.qty >= t.qty) { currentPrice = t.price; break; } }
+    } catch(e){}
     item.price = currentPrice;
   });
 
@@ -996,7 +1064,7 @@ function updateCartUI() {
     footer.style.display = 'none';
     body.innerHTML = `
       <div class="cart-empty" id="cartEmpty">
-        <div class="ce-icon">🛒</div>
+        <div class="ce-icon"><img src="basket.png" style="width:64px;opacity:0.5;"></div>
         <div class="ce-text">ตะกร้าของคุณว่างเปล่า</div>
         <div class="ce-sub">เลือกสินค้าที่ต้องการแล้วกด "เพิ่มลงตะกร้า"</div>
       </div>
@@ -1004,17 +1072,14 @@ function updateCartUI() {
     return;
   }
 
-  footer.style.display = '';
-  body.innerHTML = '';
+  footer.style.display = ''; body.innerHTML = '';
   
   items.forEach(item => {
     let tiers = [];
     try { tiers = JSON.parse(item.tiersStr || '[]'); } catch(e){}
     let nextTier = null;
     const ascTiers = [...tiers].sort((a,b) => a.qty - b.qty);
-    for(let t of ascTiers) {
-      if(item.qty < t.qty) { nextTier = t; break; }
-    }
+    for(let t of ascTiers) { if(item.qty < t.qty) { nextTier = t; break; } }
 
     let upsellHtml = '';
     if(nextTier) {
@@ -1049,70 +1114,136 @@ function updateCartUI() {
   document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
 }
 
+function calculateShipping() {
+  const items = Object.values(cart);
+  if (items.length === 0) return;
+  const totalWeight = (items.reduce((s, i) => s + i.qty, 0) * 5) + 0.5;
+  const prov = document.getElementById('o-province').value;
+  const zip = document.getElementById('o-zipcode').value;
+  
+  if (!prov || !zip || zip.length < 5) {
+      document.getElementById('orderShippingFee').textContent = 'รอระบุที่อยู่...';
+      currentShippingFee = 0; updateOrderTotalUI(); return;
+  }
+
+  const isBkkMetro = ["กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี", "สมุทรปราการ"].includes(prov);
+  const upcRates = [0,35,40,45,50,60,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,420,430,440,450,460,500,510,520,530,540,550,560,570,580,590];
+  const bkkRates = [0,25,30,35,45,55,70,80,95,105,115,135,145,155,165,175,190,200,210,220,230,250,260,270,280,290,300,310,320,330,340,370,380,390,400,410,425,440,455,470,485,500,515,530,545,560,575,590,605,620,635];
+
+  let baseFee = 0; let remainingWeight = Math.ceil(totalWeight);
+  while (remainingWeight > 0) {
+      let checkW = remainingWeight > 50 ? 50 : remainingWeight;
+      baseFee += isBkkMetro ? bkkRates[checkW] : upcRates[checkW];
+      remainingWeight -= 50;
+  }
+
+  let surcharge = 0;
+  if (['84280','84320','84330','20120','23120','82160','81150','21160','83000','83100','83110','83120','83130','83150'].includes(zip)) surcharge += 80; 
+  else if (['แม่ฮ่องสอน','นราธิวาส','ปัตตานี','ยะลา'].includes(prov)) surcharge += 50; 
+
+  if (['ภูเก็ต','กระบี่'].includes(prov)) {
+      if (totalWeight > 20) surcharge += 200;
+      else if (totalWeight > 7) surcharge += 100;
+  }
+
+  currentShippingFee = baseFee + surcharge;
+  document.getElementById('orderShippingFee').textContent = `฿${currentShippingFee.toLocaleString()}`;
+  updateOrderTotalUI();
+}
+
+function updateOrderTotalUI() {
+  const items = Object.values(cart);
+  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('orderTotal').textContent = `฿${(subtotal + currentShippingFee).toLocaleString()}`;
+}
+
+function openModal() {
+  if (Object.keys(cart).length === 0) return showToast('⚠️ กรุณาเพิ่มสินค้าก่อน');
+  closeCart();
+  
+  document.getElementById('orderSumItems').innerHTML = Object.values(cart).map(i => `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`).join('');
+  calculateShipping(); 
+  
+  // PREFILL IF LOGGED IN
+  if(currentUser) {
+    document.getElementById('o-name').value = currentUser.name;
+    document.getElementById('o-phone').value = currentUser.phone;
+    document.getElementById('o-addr-detail').value = currentUser.address_detail || '';
+    if(thaiAddressData.length > 0 && currentUser.province) {
+      setAddressValues('o', currentUser.province, currentUser.district, currentUser.subdistrict, currentUser.zipcode);
+    }
+  }
+
+  document.getElementById('orderFormWrap').style.display = '';
+  document.getElementById('orderSuccess').style.display = 'none';
+  document.getElementById('orderModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function submitOrder() {
+  const name = document.getElementById('o-name').value.trim();
+  const phone = document.getElementById('o-phone').value.trim();
+  const prov = document.getElementById('o-province').value;
+  const dist = document.getElementById('o-district').value.trim();
+  const subdist = document.getElementById('o-subdistrict').value.trim();
+  const zip = document.getElementById('o-zipcode').value.trim();
+  const detail = document.getElementById('o-addr-detail').value.trim();
+  const note = document.getElementById('o-note') ? document.getElementById('o-note').value.trim() : '';
+  
+  if (!name || phone.length !== 10 || !prov || !dist || !subdist || zip.length !== 5 || !detail) return showToast('⚠️ กรุณากรอกข้อมูลและที่อยู่ให้ครบถ้วน'); 
+
+  const itemsToSubmit = [...Object.values(cart)];
+  if (currentShippingFee > 0) itemsToSubmit.push({ id: 'SHIP', name: 'ค่าจัดส่ง (Flash Express)', price: currentShippingFee, qty: 1, emoji: '🚚', image: null });
+  const finalTotal = itemsToSubmit.reduce((s, i) => s + i.price * i.qty, 0);
+
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser ? currentUser.id : null, customer_name: name, customer_phone: phone, customer_addr: `${detail} ต.${subdist} อ.${dist} จ.${prov} ${zip}`, note, items: itemsToSubmit, total: finalTotal })
+    });
+    if (res.ok) {
+      document.getElementById('orderFormWrap').style.display = 'none';
+      document.getElementById('orderSuccess').style.display = '';
+      document.getElementById('pp-total').textContent = finalTotal.toLocaleString();
+      cart = {}; updateCartUI(); saveCart();
+    } else showToast('❌ เกิดข้อผิดพลาด');
+  } catch(e) { showToast('❌ ไม่สามารถส่งออเดอร์ได้'); }
+}
+
 async function loadDynamicProducts() {
   try {
     const res = await fetch('/api/products');
     const products = await res.json();
-    
     const grid = document.getElementById('productGrid');
-    if (!products || products.length === 0) {
-      grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--tx3); padding:40px;">กำลังอัปเดตระบบสินค้า กรุณารอสักครู่...</p>`;
-      return;
-    }
-
+    if (!products || products.length === 0) return grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--tx3); padding:40px;">กำลังอัปเดตระบบสินค้า กรุณารอสักครู่...</p>`;
+    
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
-
     grid.innerHTML = products.map(p => {
-      const badgeHTML = p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : '';
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
-      const safeName = p.name.replace(/'/g, "\\'");
-      const safeEmoji = p.emoji ? p.emoji.replace(/'/g, "\\'") : '🌾';
-      const safeImage = p.image ? p.image.replace(/'/g, "\\'") : '';
-      
-      const safeTiers = encodeURIComponent(p.price_tiers || '[]');
-      
       let tierInfoHtml = '';
       try {
         let tArr = JSON.parse(p.price_tiers || '[]');
         if (tArr.length > 0) {
           tArr.sort((a,b) => a.qty - b.qty);
-          tierInfoHtml = `<div style="background:var(--g5); padding:8px 12px; border-radius:10px; margin-bottom:12px; border:1px dashed var(--g3);">
-            <strong style="color:var(--g2); font-size:11px; display:block; margin-bottom:4px;">✨ โปรราคาส่ง:</strong>`;
+          tierInfoHtml = `<div style="background:var(--g5); padding:8px 12px; border-radius:10px; margin-bottom:12px; border:1px dashed var(--g3);"><strong style="color:var(--g2); font-size:11px; display:block; margin-bottom:4px;">✨ โปรราคาส่ง:</strong>`;
           tArr.forEach(t => { tierInfoHtml += `<div style="font-size:12px; color:var(--tx2); display:flex; justify-content:space-between;"><span>ซื้อ ${t.qty} ${p.unit} ขึ้นไป</span><strong style="color:var(--g1)">฿${t.price}</strong></div>`; });
           tierInfoHtml += `</div>`;
         }
       } catch(e){}
-      
       return `
         <div class="pcard" data-cat="${p.category}">
-          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">
-            ${imgHtml}
-            ${badgeHTML}
-          </div>
+          <div class="pcard-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9); padding:0; overflow:hidden;">${imgHtml}${p.badge ? `<span class="pbadge ${p.badge_type || 'hot'}">${p.badge}</span>` : ''}</div>
           <div class="pcard-body">
             <div class="pcat">${catName[p.category] || p.category}</div>
             <div class="pname">${p.name}</div>
             <div class="pdesc">${p.description || ''}</div>
-            <div class="pprow">
-              <span class="pprice">฿${p.price.toLocaleString()}</span>
-              <span class="punit">/ ${p.unit}</span>
-            </div>
+            <div class="pprow"><span class="pprice">฿${p.price.toLocaleString()}</span><span class="punit">/ ${p.unit}</span></div>
             ${tierInfoHtml}
             <div class="pmin">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
-            <button class="add-btn" onclick="addCart('${p.id}', '${safeName}', ${p.price}, '${safeEmoji}', '${safeImage}', '${safeTiers}', this)">+ เพิ่มลงตะกร้า</button>
+            <button class="add-btn" onclick="addCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${(p.emoji||'🌾').replace(/'/g, "\\'")}', '${p.image||''}', '${encodeURIComponent(p.price_tiers || '[]')}', this)">+ เพิ่มลงตะกร้า</button>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
-
-    if (typeof observer !== 'undefined') {
-      document.querySelectorAll('.pcard').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        observer.observe(el);
-      });
-    }
   } catch (e) { console.error('Error Dynamic Product:', e); }
 }
 </script>
