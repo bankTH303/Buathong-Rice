@@ -813,6 +813,28 @@ async function saveProduct() {
   }
   btn.textContent = '💾 บันทึก'; btn.disabled = false;
 }
+
+async function deleteProduct() {
+  const id = document.getElementById('ep-id').value;
+  if (!confirm('⚠️ ยืนยันการลบสินค้านี้ใช่หรือไม่?')) return;
+  
+  try {
+    const res = await fetch(API + `/api/admin/products/${id}`, { 
+      method: 'DELETE', 
+      headers: authHeader() 
+    });
+    
+    if (res.ok) { 
+      showToast('✅ ลบสินค้าสำเร็จ!'); 
+      closeModal('editProductModal'); 
+      loadProducts(); 
+    } else {
+      showToast('❌ ลบไม่สำเร็จ');
+    }
+  } catch(e) { 
+    showToast('❌ ระบบขัดข้อง'); 
+  }
+}
   
 // ===== CONTACTS & UTILS =====
 async function loadContacts() {
