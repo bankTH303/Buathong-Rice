@@ -636,17 +636,30 @@ async function loadProducts() {
   try {
     const res = await fetch(API + '/api/admin/products', { headers: authHeader() });
     allProducts = await res.json();
+    
+    // 🛡️ ดักจับกรณี Server ส่ง Error กลับมา
+    if (!Array.isArray(allProducts)) {
+      document.getElementById('prodGrid').innerHTML = `<div class="empty-text">เกิดข้อผิดพลาดจากเซิร์ฟเวอร์</div>`;
+      return;
+    }
+
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
     
     document.getElementById('prodGrid').innerHTML = allProducts.map(p => {
+      // 🛡️ Defensive: ป้องกันค่า Null ทุกจุด
+      const price = p.price || 0;
+      const minOrder = p.min_order || 1;
+      const unit = p.unit || 'ชิ้น';
+      const name = p.name || 'สินค้าไม่มีชื่อ';
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
+      
       return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}">
         <div class="pac-top" style="overflow:hidden; padding:0;">${imgHtml}</div>
         <div class="pac-body">
-          <div class="pac-cat">${catName[p.category] || p.category} ${p.active ? '' : '· <span style="color:var(--red)">ซ่อนอยู่</span>'}</div>
-          <div class="pac-name">${p.name}</div>
-          <div style="margin-top:8px"><span class="pac-price">฿${p.price.toLocaleString()}</span> <span class="pac-unit">/ ${p.unit}</span></div>
-          <div style="font-size:12px;color:var(--tx3);margin-top:4px">สั่งขั้นต่ำ ${p.min_order} ${p.unit}</div>
+          <div class="pac-cat">${catName[p.category] || p.category || 'ทั่วไป'} ${p.active ? '' : '· <span style="color:var(--red)">ซ่อนอยู่</span>'}</div>
+          <div class="pac-name">${name}</div>
+          <div style="margin-top:8px"><span class="pac-price">฿${price.toLocaleString()}</span> <span class="pac-unit">/ ${unit}</span></div>
+          <div style="font-size:12px;color:var(--tx3);margin-top:4px">สั่งขั้นต่ำ ${minOrder} ${unit}</div>
           <div class="pac-actions">
             <button class="btn btn-sm btn-outline" onclick="openEditProduct('${p.id}')">✏️ แก้ไข</button>
           </div>
@@ -671,18 +684,27 @@ async function addProduct() {
   btn.textContent = '⏳ กำลังบันทึก...'; btn.disabled = true;
 
   const imageUrl = await uploadImage('np-image');
+  // 🛡️ ดักกรอกค่าว่างให้เป็นตัวเลข 0 หรือ 1 เสมอ
   const body = {
-    name: document.getElementById('np-name').value,
-    category: document.getElementById('np-cat').value,
-    price: parseFloat(document.getElementById('np-price').value),
-    unit: document.getElementById('np-unit').value,
-    min_order: parseInt(document.getElementById('np-min').value),
-    emoji: document.getElementById('np-emoji').value,
-    badge: document.getElementById('np-badge').value,
-    description: document.getElementById('np-desc').value,
+    name: document.getElementById('np-name').value || 'สินค้าใหม่',
+    category: document.getElementById('np-cat').value || 'other',
+    price: parseFloat(document.getElementById('np-price').value) || 0,
+    unit: document.getElementById('np-unit').value || 'กระสอบ 5 กก.',
+    min_order: parseInt(document.getElementById('np-min').value) || 1,
+    emoji: document.getElementById('np-emoji').value || '🌾',
+    badge: document.getElementById('np-badge').value || '',
+    description: document.getElementById('np-desc').value || '',
     image: imageUrl,
     price_tiers: getTiers('addProductModal')
   };
+  
+  try {
+    const res = await fetch(API + '/api/admin/products', { method: 'POST', headers: authHeader(), body: JSON.stringify(body) });
+    if (res.ok) { showToast('✅ เพิ่มสินค้าสำเร็จ'); closeModal('addProductModal'); loadProducts(); } 
+    else showToast('❌ เกิดข้อผิดพลาด');
+  } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
+  btn.textContent = '➕ เพิ่มสินค้า'; btn.disabled = false;
+}
   
   try {
     const res = await fetch(API + '/api/admin/products', { method: 'POST', headers: authHeader(), body: JSON.stringify(body) });
@@ -727,13 +749,14 @@ async function saveProduct() {
   let imageUrl = await uploadImage('ep-image');
   if (!imageUrl) imageUrl = document.getElementById('ep-image-url').value; 
 
+  // 🛡️ ป้องกัน Null ตอนกด Save
   const body = {
-    name: document.getElementById('ep-name').value,
-    price: parseFloat(document.getElementById('ep-price').value),
-    unit: document.getElementById('ep-unit').value,
-    min_order: parseInt(document.getElementById('ep-min').value),
-    description: document.getElementById('ep-desc').value,
-    active: parseInt(document.getElementById('ep-active').value),
+    name: document.getElementById('ep-name').value || 'ไม่มีชื่อ',
+    price: parseFloat(document.getElementById('ep-price').value) || 0,
+    unit: document.getElementById('ep-unit').value || 'ชิ้น',
+    min_order: parseInt(document.getElementById('ep-min').value) || 1,
+    description: document.getElementById('ep-desc').value || '',
+    active: parseInt(document.getElementById('ep-active').value) || 0,
     image: imageUrl,
     price_tiers: getTiers('editProductModal')
   };
