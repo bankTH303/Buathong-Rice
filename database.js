@@ -33,6 +33,7 @@ db.exec(`
     user_id INTEGER,
     customer_name TEXT, customer_phone TEXT, customer_addr TEXT,
     note TEXT, total REAL, status TEXT DEFAULT 'รอดำเนินการ', 
+    tracking_number TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -55,6 +56,7 @@ try { db.prepare('ALTER TABLE order_items ADD COLUMN image TEXT').run(); } catch
 try { db.prepare('ALTER TABLE products ADD COLUMN price_tiers TEXT DEFAULT "[]"').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE orders ADD COLUMN user_id INTEGER').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE orders ADD COLUMN tracking_number TEXT').run(); } catch (e) {}
 
 // เพิ่มข้อมูลสินค้าเริ่มต้น
 const checkProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
