@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const jwt = require('jsonwebtoken'); // 🛡️ นำเข้าไลบรารีความปลอดภัย
+const jwt = require('jsonwebtoken'); 
 const { db } = require('./database');
 
 const app = express();
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'buathong2024';
-const JWT_SECRET = process.env.JWT_SECRET || 'BUATHONG_SUPER_SECRET_KEY_2026'; // 🔑 กุญแจเข้ารหัสลับ
+const JWT_SECRET = process.env.JWT_SECRET || 'BUATHONG_SUPER_SECRET_KEY_2026'; 
 
 function checkAdmin(req, res, next) {
   if (req.headers['x-admin-password'] !== ADMIN_PASSWORD) {
@@ -34,7 +34,6 @@ function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-// 🛡️ ระบบนายทวาร: ตรวจสอบบัตรผ่าน (Token) ก่อนอนุญาตให้ดึงข้อมูล
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -42,7 +41,7 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ error: 'Token ไม่ถูกต้องหรือหมดอายุ โปรดล็อกอินใหม่' });
-    req.user = user; // ถ้าบัตรผ่านถูกต้อง ให้แนบชื่อคนที่ถือบัตรไปกับระบบ
+    req.user = user; 
     next();
   });
 }
@@ -54,9 +53,7 @@ app.post('/api/auth/register', (req, res) => {
     const hashedPw = hashPassword(password);
     const info = db.prepare(`INSERT INTO users (name, email, phone, password, province, district, subdistrict, zipcode, address_detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(name, email, phone, hashedPw, province, district, subdistrict, zipcode, address_detail);
     
-    // สร้าง Token อายุ 7 วัน
     const token = jwt.sign({ id: info.lastInsertRowid, email }, JWT_SECRET, { expiresIn: '7d' }); 
-    
     res.json({ success: true, user: { id: info.lastInsertRowid, name, email, phone, province, district, subdistrict, zipcode, address_detail }, token });
   } catch(e) {
     if(e.message.includes('UNIQUE constraint failed')) {
@@ -81,7 +78,6 @@ app.post('/api/auth/login', (req, res) => {
   } catch(e) { res.status(500).json({ error: 'ระบบขัดข้อง' }); }
 });
 
-// 🛡️ ปิดช่องโหว่ IDOR: บังคับเช็ค Token และ ID ต้องตรงกันเท่านั้น
 app.patch('/api/user/:id', authenticateToken, (req, res) => {
   if (req.user.id !== parseInt(req.params.id)) return res.status(403).json({ error: '🚨 ปฏิเสธการเข้าถึง!' });
   try {
@@ -221,14 +217,20 @@ app.post('/api/admin/upload', checkAdmin, (req, res) => {
     
     const ext = path.extname(fileName).toLowerCase() || '.jpg';
     
-    // 🛡️ เพิ่มระบบตรวจสอบนามสกุลไฟล์ตรงนี้
+    // 🛡️ ป้องกันอัปโหลดสคริปต์อันตราย
     const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
     if (!allowedExts.includes(ext)) {
       return res.status(400).json({ error: '🚨 ไม่อนุญาตให้อัปโหลดไฟล์ประเภทนี้' });
     }
 
     const filename = Date.now() + ext;
-    // ... โค้ดเดิม
+    const filepath = path.join(UPLOAD_DIR, filename);
+    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+    fs.writeFileSync(filepath, base64Data, 'base64');
+    
+    res.json({ success: true, url: '/uploads/' + filename });
+  } catch(e) { res.status(500).json({ error: 'อัปโหลดไม่ได้' }); }
+});
 
 app.get('/api/admin/contacts', checkAdmin, (req, res) => {
   try {
