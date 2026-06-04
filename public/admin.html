@@ -63,6 +63,7 @@ body{font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);colo
 .now-time{font-size:12px;color:var(--tx3);background:var(--bg);padding:6px 14px;border-radius:8px}
 .content{padding:28px;flex:1;}
 
+/* STATS CARDS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;margin-bottom:28px}
 .stat-card{background:#fff;border-radius:18px;padding:22px;border:1.5px solid var(--border);transition:all .3s}
 .stat-card:hover{border-color:var(--green3);transform:translateY(-3px);box-shadow:0 12px 40px rgba(27,67,50,0.1)}
@@ -112,7 +113,7 @@ tr:hover td{background:#FAFAFA}
 .fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:var(--tx1);appearance:none;} 
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--green2)}
 .fg textarea{height:80px;resize:none}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
 .frow .fg{margin-bottom:0;}
 .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
 
@@ -171,6 +172,17 @@ tr:hover td{background:#FAFAFA}
 .sc-icon { width: 44px !important; height: 44px !important; font-size: 20px !important; border-radius: 12px !important; }
 .sc-title { font-size: 13px !important; margin-bottom: 6px !important; }
 .sc-val { font-size: 24px !important; }
+
+/* 📍 CSS สำหรับส่วน Web Edit */
+.we-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.we-card { background: #fff; border-radius: 18px; padding: 24px; border: 1.5px solid var(--border); }
+.we-card h3 { font-size: 15px; margin-bottom: 16px; color: var(--green); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.img-upload-box { border: 2px dashed var(--border); border-radius: 12px; padding: 12px; text-align: center; position: relative; overflow: hidden; height: 120px; display: flex; align-items: center; justify-content: center; background: #fafafa; cursor: pointer; margin-bottom: 12px; }
+.img-upload-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
+.img-upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; }
+.img-upload-box span { color: var(--tx3); font-size: 13px; font-weight: 600; z-index: 0; }
+.saving-indicator { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.8); color: #fff; padding: 8px 16px; border-radius: 50px; font-size: 12px; font-weight: 700; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.saving-indicator.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -212,6 +224,9 @@ tr:hover td{background:#FAFAFA}
       <button class="sb-item" onclick="goPage('contacts',this)">
         <span class="sb-item-icon">💬</span> ข้อมูลติดต่อ
       </button>
+      <button class="sb-item" onclick="goPage('webedit',this)">
+        <span class="sb-item-icon">🎨</span> ตกแต่งหน้าเว็บ
+      </button>
     </nav>
     <div class="sb-footer">
       <button class="logout-btn" onclick="doLogout()">🚪 ออกจากระบบ</button>
@@ -236,11 +251,13 @@ tr:hover td{background:#FAFAFA}
         <div class="stats-grid sgrid" id="statsGrid">
           <div class="stat-card scard"><div class="sc-icon sc-g">📦</div><div class="sc-val" id="s-orders">-</div><div class="sc-lbl sc-title">ออเดอร์ทั้งหมด</div></div>
           <div class="stat-card scard"><div class="sc-icon sc-y">⏳</div><div class="sc-val" id="s-pending">-</div><div class="sc-lbl sc-title">รอดำเนินการ</div></div>
+          
           <div class="stat-card scard" style="grid-column: span 2;">
             <div class="sc-icon sc-b">🗓️</div>
             <div class="sc-val" id="s-today" style="font-size:20px !important;">-</div>
             <div class="sc-lbl sc-title">ยอดขายและออเดอร์ของวันนี้</div>
           </div>
+          
           <div class="stat-card scard"><div class="sc-icon sc-g">💰</div><div class="sc-val" id="s-revenue">-</div><div class="sc-lbl sc-title">ยอดขายรวมสุทธิ (บาท)</div></div>
           <div class="stat-card scard"><div class="sc-icon sc-b">💬</div><div class="sc-val" id="s-contacts">-</div><div class="sc-lbl sc-title">ข้อมูลติดต่อ</div></div>
         </div>
@@ -292,6 +309,78 @@ tr:hover td{background:#FAFAFA}
         <div class="contact-cards" id="contactGrid"></div>
       </div>
 
+      <div class="page" id="page-webedit">
+        <div class="section-hdr" style="margin-bottom:8px;">
+          <div class="section-title">🎨 จัดการหน้าแรก (Web Edit)</div>
+        </div>
+        <p style="color:var(--tx3); font-size:13px; margin-bottom:24px;">แก้ไขรูปภาพสไลด์และข้อความหน้าแรก ระบบจะ <b>บันทึกอัตโนมัติทันที (Auto-Save)</b> เมื่อคุณหยุดพิมพ์</p>
+
+        <div class="we-grid">
+          <div class="we-card">
+            <h3>📸 รูปภาพสไลด์โชว์ (สลับหน้าอัตโนมัติ)</h3>
+            
+            <label style="font-size:12px; font-weight:bold; color:var(--tx2); margin-bottom:6px; display:block;">รูปที่ 1 (รูปหลัก) *</label>
+            <div class="img-upload-box">
+              <span>คลิกเพื่อเปลี่ยนรูปที่ 1</span>
+              <img id="we-s1-preview">
+              <input type="file" accept="image/*" onchange="uploadSlideImage(this, 'we-s1-preview', 'slide1')">
+            </div>
+
+            <label style="font-size:12px; font-weight:bold; color:var(--tx2); margin-bottom:6px; display:block;">รูปที่ 2 (ไม่บังคับ)</label>
+            <div class="img-upload-box">
+              <span>คลิกเพื่อเปลี่ยนรูปที่ 2</span>
+              <img id="we-s2-preview">
+              <input type="file" accept="image/*" onchange="uploadSlideImage(this, 'we-s2-preview', 'slide2')">
+            </div>
+
+            <label style="font-size:12px; font-weight:bold; color:var(--tx2); margin-bottom:6px; display:block;">รูปที่ 3 (ไม่บังคับ)</label>
+            <div class="img-upload-box">
+              <span>คลิกเพื่อเปลี่ยนรูปที่ 3</span>
+              <img id="we-s3-preview">
+              <input type="file" accept="image/*" onchange="uploadSlideImage(this, 'we-s3-preview', 'slide3')">
+            </div>
+          </div>
+
+          <div class="we-card">
+            <h3>✍️ ข้อความหน้าแรก (Hero Section)</h3>
+            <div class="fg">
+              <label>หัวข้อหลัก (ใช้วงเล็บปีกกา <span class="em">...</span> เพื่อเน้นสีทอง)</label>
+              <input type="text" id="we-title" placeholder="เช่น ข้าวสารคุณภาพ<span class='em'>บัวทองไรซ์</span>" oninput="triggerAutoSave()">
+            </div>
+            <div class="fg">
+              <label>หัวข้อย่อย</label>
+              <input type="text" id="we-sub" placeholder="เช่น ส่งตรงจากโรงสี สู่มือคุณ" oninput="triggerAutoSave()">
+            </div>
+            <div class="fg">
+              <label>รายละเอียด / คำอธิบาย</label>
+              <textarea id="we-desc" placeholder="อธิบายจุดเด่นของร้าน..." oninput="triggerAutoSave()"></textarea>
+            </div>
+
+            <h3 style="margin-top:28px;">🔘 ปุ่มกด (Buttons)</h3>
+            <div class="frow">
+              <div class="fg">
+                <label>ข้อความปุ่มที่ 1</label>
+                <input type="text" id="we-b1-txt" placeholder="เช่น 🌾 ดูสินค้าทั้งหมด" oninput="triggerAutoSave()">
+              </div>
+              <div class="fg">
+                <label>ลิงก์ปุ่มที่ 1 (URL)</label>
+                <input type="text" id="we-b1-url" placeholder="เช่น #products" oninput="triggerAutoSave()">
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label>ข้อความปุ่มที่ 2</label>
+                <input type="text" id="we-b2-txt" placeholder="เช่น 📞 ติดต่อสั่งซื้อ" oninput="triggerAutoSave()">
+              </div>
+              <div class="fg">
+                <label>ลิงก์ปุ่มที่ 2 (URL)</label>
+                <input type="text" id="we-b2-url" placeholder="เช่น https://line.me/..." oninput="triggerAutoSave()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -300,7 +389,6 @@ tr:hover td{background:#FAFAFA}
   <div class="modal-box">
     <div class="modal-title">✏️ แก้ไขสินค้า</div>
     <input type="hidden" id="ep-id">
-    
     <div class="fg"><label>ชื่อสินค้า</label><input type="text" id="ep-name"></div>
     
     <div class="fg">
@@ -324,14 +412,14 @@ tr:hover td{background:#FAFAFA}
     </div>
 
     <div class="frow">
-      <div class="fg"><label>หน่วย</label><input type="text" id="ep-unit" placeholder="เช่น กระสอบ 5 กก."></div>
+      <div class="fg"><label>หน่วย (เช่น กระสอบ 5 กก.)</label><input type="text" id="ep-unit"></div>
       <div class="fg"><label>ซื้อขั้นต่ำ</label><input type="number" id="ep-min" min="1"></div>
     </div>
 
     <div class="frow">
       <div class="fg"><label>น้ำหนัก / ชิ้น (กก.) <span style="color:var(--tx3); font-weight:normal">*ใช้คิดค่าส่ง</span></label><input type="number" id="ep-weight" min="0.1" step="0.1"></div>
       <div class="fg">
-        <label>สถานะสินค้า</label>
+        <label>สถานะ</label>
         <select id="ep-active">
           <option value="1">✅ แสดงบนเว็บ</option>
           <option value="0">❌ ซ่อน</option>
@@ -347,9 +435,9 @@ tr:hover td{background:#FAFAFA}
         <input type="text" id="ep-badge" placeholder="ข้อความ Badge (เว้นว่างได้)" style="flex:1;">
       </div>
     </div>
-
+    
     <div class="fg"><label>รายละเอียด</label><textarea id="ep-desc"></textarea></div>
-
+    
     <div class="modal-actions">
       <button class="btn btn-outline" style="color:var(--red); border-color:var(--red);" onclick="deleteProduct()">🗑 ลบสินค้า</button>
       <div style="flex:1"></div> 
@@ -379,7 +467,7 @@ tr:hover td{background:#FAFAFA}
         <option value="other">อื่นๆ</option>
       </select>
     </div>
-
+    
     <div class="frow">
       <div class="fg"><label>ราคา (บาท) *</label><input type="number" id="np-price" min="0" placeholder="0"></div>
       <div class="fg"><label>ราคาเก่า (บาท) <span style="color:var(--tx3); font-weight:normal">(ถ้ามี)</span></label><input type="number" id="np-old-price" min="0" placeholder="0"></div>
@@ -450,6 +538,7 @@ tr:hover td{background:#FAFAFA}
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="saving-indicator" id="savingToast">⏳ กำลังบันทึก...</div>
 
 <script>
 const API = '';  
@@ -458,6 +547,7 @@ let allOrders = [];
 let allProducts = []; 
 let currentOrderId = null;
 let prodSortable = null;
+let webSettings = {}; // 📍 เก็บข้อมูล Web Edit
 
 function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sbOverlay').classList.toggle('show'); }
 
@@ -475,12 +565,95 @@ function startClock() { function tick() { const now = new Date(); document.getEl
 function goPage(page, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active'); if(btn) btn.classList.add('active');
-  const titles = { dashboard:'ภาพรวม', orders:'จัดการออเดอร์', products:'สินค้า & ราคา', contacts:'ข้อมูลติดต่อ' };
+  const titles = { dashboard:'ภาพรวม', orders:'จัดการออเดอร์', products:'สินค้า & ราคา', contacts:'ข้อมูลติดต่อ', webedit:'ตกแต่งหน้าเว็บ' };
   document.getElementById('pageTitle').textContent = titles[page];
+  
   if(window.innerWidth <= 850) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('show'); }
-  if (page === 'dashboard') loadDashboard(); if (page === 'orders') loadOrders(); if (page === 'products') loadProducts(); if (page === 'contacts') loadContacts();
+
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'orders') loadOrders();
+  if (page === 'products') loadProducts();
+  if (page === 'contacts') loadContacts();
+  if (page === 'webedit') loadWebSettings(); // 📍 โหลดการตั้งค่า
 }
 
+// 📍 ระบบ Web Edit Auto-Save
+let autoSaveTimer;
+function triggerAutoSave() {
+  clearTimeout(autoSaveTimer);
+  document.getElementById('savingToast').textContent = '⏳ กำลังบันทึก...';
+  document.getElementById('savingToast').classList.add('show');
+  autoSaveTimer = setTimeout(saveWebSettings, 1000); // ดีเลย์ 1 วิหลังหยุดพิมพ์
+}
+
+async function loadWebSettings() {
+  try {
+    const res = await fetch(API + '/api/web-settings');
+    webSettings = await res.json();
+    document.getElementById('we-title').value = webSettings.title || '';
+    document.getElementById('we-sub').value = webSettings.sub || '';
+    document.getElementById('we-desc').value = webSettings.desc || '';
+    document.getElementById('we-b1-txt').value = webSettings.btn1_text || '';
+    document.getElementById('we-b1-url').value = webSettings.btn1_url || '';
+    document.getElementById('we-b2-txt').value = webSettings.btn2_text || '';
+    document.getElementById('we-b2-url').value = webSettings.btn2_url || '';
+
+    // โชว์รูป
+    const s1 = document.getElementById('we-s1-preview'); if(webSettings.slide1) { s1.src = webSettings.slide1; s1.style.display = 'block'; }
+    const s2 = document.getElementById('we-s2-preview'); if(webSettings.slide2) { s2.src = webSettings.slide2; s2.style.display = 'block'; }
+    const s3 = document.getElementById('we-s3-preview'); if(webSettings.slide3) { s3.src = webSettings.slide3; s3.style.display = 'block'; }
+  } catch(e) { console.log('Error loading web settings'); }
+}
+
+async function saveWebSettings() {
+  const body = {
+    title: document.getElementById('we-title').value,
+    sub: document.getElementById('we-sub').value,
+    desc: document.getElementById('we-desc').value,
+    btn1_text: document.getElementById('we-b1-txt').value,
+    btn1_url: document.getElementById('we-b1-url').value,
+    btn2_text: document.getElementById('we-b2-txt').value,
+    btn2_url: document.getElementById('we-b2-url').value,
+    slide1: webSettings.slide1 || '',
+    slide2: webSettings.slide2 || '',
+    slide3: webSettings.slide3 || ''
+  };
+
+  try {
+    const res = await fetch(API + '/api/admin/web-settings', {
+      method: 'PATCH', headers: authHeader(), body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      document.getElementById('savingToast').textContent = '✅ บันทึกแล้ว';
+      setTimeout(() => { document.getElementById('savingToast').classList.remove('show'); }, 1500);
+    }
+  } catch(e) { document.getElementById('savingToast').textContent = '❌ บันทึกไม่สำเร็จ'; setTimeout(() => { document.getElementById('savingToast').classList.remove('show'); }, 2000); }
+}
+
+async function uploadSlideImage(input, previewId, settingKey) {
+  const file = input.files[0]; if(!file) return;
+  document.getElementById('savingToast').textContent = '⏳ กำลังอัปโหลด...';
+  document.getElementById('savingToast').classList.add('show');
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const res = await fetch(API + '/api/admin/upload', {
+        method: 'POST', headers: authHeader(), body: JSON.stringify({ imageBase64: e.target.result, fileName: file.name })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById(previewId).src = data.url;
+        document.getElementById(previewId).style.display = 'block';
+        webSettings[settingKey] = data.url; // อัปเดตตัวแปร
+        triggerAutoSave(); // ทริกเกอร์เซฟทันที
+      }
+    } catch(err) { showToast('❌ อัปโหลดรูปล้มเหลว'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== DASHBOARD =====
 async function loadDashboard() {
   try {
     const res = await fetch(API + '/api/admin/stats', { headers: authHeader() }); const data = await res.json();
@@ -542,8 +715,6 @@ async function loadProducts() {
     document.getElementById('prodGrid').innerHTML = allProducts.map(p => {
       const price = p.price || 0; const minOrder = p.min_order || 1; const unit = p.unit || 'ชิ้น'; const name = p.name || 'สินค้าไม่มีชื่อ';
       const imgHtml = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `${p.emoji || '🌾'}`;
-      
-      // 📍 แสดงราคาเก่าให้แอดมินเห็น
       const oldPriceHtml = p.old_price > 0 ? `<span style="font-size:14px; color:var(--tx3); text-decoration:line-through; margin-left:6px;">฿${p.old_price.toLocaleString()}</span>` : '';
 
       return `<div class="prod-admin-card ${p.active ? '' : 'pac-inactive'}" data-id="${p.id}" style="position:relative;">
@@ -585,14 +756,14 @@ async function addProduct() {
   const body = {
     name: document.getElementById('np-name').value || 'สินค้าใหม่', category: document.getElementById('np-cat').value || 'other',
     price: parseFloat(document.getElementById('np-price').value) || 0,
-    old_price: parseFloat(document.getElementById('np-old-price').value) || 0, // 📍 ราคาเก่า
+    old_price: parseFloat(document.getElementById('np-old-price').value) || 0, 
     unit: document.getElementById('np-unit').value || 'กระสอบ 5 กก.',
     min_order: parseInt(document.getElementById('np-min').value) || 1,
-    weight: parseFloat(document.getElementById('np-weight').value) || 5, // 📍 น้ำหนัก
+    weight: parseFloat(document.getElementById('np-weight').value) || 5, 
     emoji: document.getElementById('np-emoji').value || '🌾',
     badge: document.getElementById('np-badge').value || '',
-    badge_color: document.getElementById('np-badge-bg').value || '#E53E3E', // 📍 สีพื้นหลัง
-    badge_text_color: document.getElementById('np-badge-text').value || '#FFFFFF', // 📍 สีตัวอักษร
+    badge_color: document.getElementById('np-badge-bg').value || '#E53E3E', 
+    badge_text_color: document.getElementById('np-badge-text').value || '#FFFFFF', 
     description: document.getElementById('np-desc').value || '', image: imageUrl, price_tiers: getTiers('addProductModal')
   };
   try { const res = await fetch(API + '/api/admin/products', { method: 'POST', headers: authHeader(), body: JSON.stringify(body) }); if (res.ok) { showToast('✅ เพิ่มสินค้าสำเร็จ'); closeModal('addProductModal'); loadProducts(); } else showToast('❌ เกิดข้อผิดพลาด'); } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
@@ -603,14 +774,14 @@ function openEditProduct(id) {
   const p = allProducts.find(x => String(x.id) === String(id)); if (!p) return;
   document.getElementById('ep-id').value = p.id; document.getElementById('ep-name').value = p.name || '';
   document.getElementById('ep-price').value = p.price || 0; 
-  document.getElementById('ep-old-price').value = p.old_price || 0; // 📍 ดึงราคาเก่า
+  document.getElementById('ep-old-price').value = p.old_price || 0; 
   document.getElementById('ep-unit').value = p.unit || 'ชิ้น'; 
   document.getElementById('ep-min').value = p.min_order || 1;
-  document.getElementById('ep-weight').value = p.weight || 5; // 📍 ดึงน้ำหนัก
+  document.getElementById('ep-weight').value = p.weight || 5; 
   document.getElementById('ep-desc').value = p.description || ''; document.getElementById('ep-active').value = p.active ? "1" : "0";
   document.getElementById('ep-badge').value = p.badge || '';
-  document.getElementById('ep-badge-bg').value = p.badge_color || '#E53E3E'; // 📍 สีพื้นหลัง
-  document.getElementById('ep-badge-text').value = p.badge_text_color || '#FFFFFF'; // 📍 สีตัวอักษร
+  document.getElementById('ep-badge-bg').value = p.badge_color || '#E53E3E'; 
+  document.getElementById('ep-badge-text').value = p.badge_text_color || '#FFFFFF'; 
   
   document.getElementById('ep-image').value = ''; document.getElementById('ep-image-url').value = p.image || ''; const preview = document.getElementById('ep-preview'); if (p.image) { preview.src = p.image; preview.style.display = 'block'; } else { preview.style.display = 'none'; }
   const tContainer = document.querySelector('#editProductModal .tiers-container'); tContainer.innerHTML = ''; try { const tArr = JSON.parse(p.price_tiers || '[]'); tArr.forEach(t => addTierRow(tContainer, t.qty, t.price)); } catch(e){}
@@ -623,14 +794,14 @@ async function saveProduct() {
   const body = {
     name: document.getElementById('ep-name').value || 'ไม่มีชื่อ', 
     price: parseFloat(document.getElementById('ep-price').value) || 0,
-    old_price: parseFloat(document.getElementById('ep-old-price').value) || 0, // 📍 บันทึกราคาเก่า
+    old_price: parseFloat(document.getElementById('ep-old-price').value) || 0, 
     unit: document.getElementById('ep-unit').value || 'ชิ้น', 
     min_order: parseInt(document.getElementById('ep-min').value) || 1,
-    weight: parseFloat(document.getElementById('ep-weight').value) || 5, // 📍 บันทึกน้ำหนัก
+    weight: parseFloat(document.getElementById('ep-weight').value) || 5, 
     description: document.getElementById('ep-desc').value || '', active: parseInt(document.getElementById('ep-active').value) || 0, image: imageUrl,
     badge: document.getElementById('ep-badge').value || '', 
-    badge_color: document.getElementById('ep-badge-bg').value || '#E53E3E', // 📍 บันทึกสี
-    badge_text_color: document.getElementById('ep-badge-text').value || '#FFFFFF', // 📍 บันทึกสี
+    badge_color: document.getElementById('ep-badge-bg').value || '#E53E3E', 
+    badge_text_color: document.getElementById('ep-badge-text').value || '#FFFFFF', 
     price_tiers: getTiers('editProductModal')
   };
   try { const res = await fetch(API + `/api/admin/products/${id}`, { method: 'PATCH', headers: authHeader(), body: JSON.stringify(body) }); if (res.ok) { showToast('✅ บันทึกสำเร็จ!'); closeModal('editProductModal'); loadProducts(); } else { showToast('❌ บันทึกไม่สำเร็จ'); } } catch(e) { showToast('❌ บันทึกไม่สำเร็จ'); }
@@ -652,7 +823,6 @@ async function loadContacts() {
 
 function statusBadge(s) { const map = { 'รอดำเนินการ':'s-wait', 'ยืนยันแล้ว':'s-confirm', 'กำลังจัดส่ง':'s-ship', 'จัดส่งแล้ว':'s-done', 'ยกเลิก':'s-cancel' }; return `<span class="status ${map[s]||'s-wait'}">${s}</span>`; }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 document.querySelectorAll('.modal-bg').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }); });
 </script>
 </body>
