@@ -89,7 +89,6 @@ app.patch('/api/user/:id', authenticateToken, (req, res) => {
 app.get('/api/user/:id/orders', authenticateToken, (req, res) => {
   if (req.user.id !== parseInt(req.params.id)) return res.status(403).json({ error: '🚨 ปฏิเสธการเข้าถึง!' });
   try {
-    // 🛡️ เพิ่มการดึง tracking_number ด้วย
     const orders = db.prepare('SELECT id, total, status, tracking_number, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC').all(req.params.id);
     const result = orders.map(o => {
       const items = db.prepare('SELECT name, qty, price, image, emoji FROM order_items WHERE order_id = ?').all(o.id);
@@ -151,7 +150,6 @@ app.get('/api/track/:phone', (req, res) => {
   try {
     const phone = req.params.phone.replace(/[^0-9]/g, '');
     if(phone.length !== 10) return res.status(400).json({ error: 'เบอร์โทรไม่ถูกต้อง' });
-    // 🛡️ เพิ่มการดึง tracking_number ด้วย
     const orders = db.prepare('SELECT id, total, status, tracking_number, created_at FROM orders WHERE customer_phone = ? ORDER BY created_at DESC').all(phone);
     const result = orders.map(o => {
       const items = db.prepare('SELECT name, qty, price FROM order_items WHERE order_id = ?').all(o.id);
@@ -177,7 +175,6 @@ app.get('/api/admin/orders', checkAdmin, (req, res) => {
   } catch(e) { res.status(500).json({ error: 'โหลดออเดอร์ไม่ได้' }); }
 });
 
-// 🛡️ อัปเดตให้แอดมินเซฟ tracking_number ได้
 app.patch('/api/admin/orders/:id', checkAdmin, (req, res) => {
   try {
     const { status, tracking_number } = req.body;
@@ -205,20 +202,22 @@ app.patch('/api/admin/products/reorder', checkAdmin, (req, res) => {
   } catch(e) { res.status(500).json({ error: 'อัปเดตลำดับไม่ได้' }); }
 });
 
+// 📍 อัปเดต API ให้อ่านและบันทึกค่า ราคาเก่า, สี, และน้ำหนัก
 app.patch('/api/admin/products/:id', checkAdmin, (req, res) => {
   try {
-    const { name, price, unit, min_order, description, active, image, badge, price_tiers } = req.body;
-    db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=?, badge=?, price_tiers=? WHERE id=?`)
-      .run(name, price, unit, min_order, description, active, image, badge || '', price_tiers || "[]", req.params.id);
+    const { name, price, unit, min_order, description, active, image, badge, price_tiers, old_price, badge_color, badge_text_color, weight } = req.body;
+    db.prepare(`UPDATE products SET name=?, price=?, unit=?, min_order=?, description=?, active=?, image=?, badge=?, price_tiers=?, old_price=?, badge_color=?, badge_text_color=?, weight=? WHERE id=?`)
+      .run(name, price, unit, min_order, description, active, image, badge || '', price_tiers || "[]", old_price || 0, badge_color || '#E53E3E', badge_text_color || '#FFFFFF', weight || 5, req.params.id);
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'อัปเดตไม่ได้' }); }
 });
 
+// 📍 อัปเดต API ให้เพิ่มค่า ราคาเก่า, สี, และน้ำหนัก ตอนสร้างใหม่
 app.post('/api/admin/products', checkAdmin, (req, res) => {
   try {
-    const { name, category, price, unit, min_order, emoji, image, badge, description, price_tiers } = req.body;
-    const info = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, image, badge, description, active, price_tiers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`)
-      .run(name, category, price, unit||'กระสอบ 5 กก.', min_order||1, emoji||'🌾', image||null, badge||null, description||'', price_tiers || "[]");
+    const { name, category, price, unit, min_order, emoji, image, badge, description, price_tiers, old_price, badge_color, badge_text_color, weight } = req.body;
+    const info = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, image, badge, description, active, price_tiers, old_price, badge_color, badge_text_color, weight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)`)
+      .run(name, category, price, unit||'กระสอบ 5 กก.', min_order||1, emoji||'🌾', image||null, badge||null, description||'', price_tiers || "[]", old_price || 0, badge_color || '#E53E3E', badge_text_color || '#FFFFFF', weight || 5);
     res.json({ success: true, id: info.lastInsertRowid });
   } catch(e) { res.status(500).json({ error: 'เพิ่มสินค้าไม่ได้' }); }
 });
@@ -263,8 +262,6 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
     const todayOrders = db.prepare("SELECT COUNT(*) as c FROM orders WHERE date(created_at) = date('now')").get().c;
     const totalContacts = db.prepare('SELECT COUNT(*) as c FROM contacts').get().c;
     const revenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE status IN ('ยืนยันแล้ว', 'กำลังจัดส่ง', 'จัดส่งแล้ว')").get().s || 0;
-    
-    // 🛡️ คำนวณยอดขายเฉพาะของ "วันนี้" (เฉพาะสถานะที่ได้เงินแล้ว)
     const todayRevenue = db.prepare("SELECT SUM(total) as s FROM orders WHERE date(created_at) = date('now') AND status IN ('ยืนยันแล้ว', 'กำลังจัดส่ง', 'จัดส่งแล้ว')").get().s || 0;
     
     res.json({ totalOrders, pendingOrders, todayOrders, todayRevenue, totalRevenue: revenue, totalContacts });
