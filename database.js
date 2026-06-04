@@ -25,6 +25,10 @@ db.exec(`
     min_order INTEGER, emoji TEXT, image TEXT, badge TEXT, badge_type TEXT,
     description TEXT, active INTEGER DEFAULT 1, price_tiers TEXT DEFAULT '[]',
     sort_order INTEGER DEFAULT 0,
+    old_price REAL DEFAULT 0,
+    badge_color TEXT DEFAULT '#E53E3E',
+    badge_text_color TEXT DEFAULT '#FFFFFF',
+    weight REAL DEFAULT 5,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -58,14 +62,20 @@ try { db.prepare('ALTER TABLE orders ADD COLUMN user_id INTEGER').run(); } catch
 try { db.prepare('ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE orders ADD COLUMN tracking_number TEXT').run(); } catch (e) {}
 
+// 📍 คอลัมน์ใหม่สำหรับการอัปเกรดล่าสุด
+try { db.prepare('ALTER TABLE products ADD COLUMN old_price REAL DEFAULT 0').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE products ADD COLUMN badge_color TEXT DEFAULT "#E53E3E"').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE products ADD COLUMN badge_text_color TEXT DEFAULT "#FFFFFF"').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE products ADD COLUMN weight REAL DEFAULT 5').run(); } catch (e) {}
+
 // เพิ่มข้อมูลสินค้าเริ่มต้น
 const checkProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
 if (checkProducts.count === 0) {
-  const insertStmt = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, badge, badge_type, description, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  const insertStmt = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, badge, badge_type, description, sort_order, old_price, badge_color, badge_text_color, weight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
   
   const initialProducts = [
-    ['ข้าวหอมมะลิ 100% ตรา ดอกบัวรวง', 'jasmine', 320, 'กระสอบ 5 กก.', 10, '🌾', 'ขายดีสุด', 'hot', 'ข้าวหอมมะลิแท้ 100% จากทุ่งกุลาร้องไห้', 1],
-    ['ข้าวเสาไห้ ตราดอกบัว', 'saohai', 370, 'กระสอบ 5 กก.', 10, '🌻', null, null, 'ข้าวเสาไห้แท้ หุงนุ่ม เมล็ดสวย', 2]
+    ['ข้าวหอมมะลิ 100% ตรา ดอกบัวรวง', 'jasmine', 320, 'กระสอบ 5 กก.', 10, '🌾', 'ขายดีสุด', 'hot', 'ข้าวหอมมะลิแท้ 100% จากทุ่งกุลาร้องไห้', 1, 350, '#E53E3E', '#FFFFFF', 5],
+    ['ข้าวเสาไห้ ตราดอกบัว', 'saohai', 370, 'กระสอบ 5 กก.', 10, '🌻', null, null, 'ข้าวเสาไห้แท้ หุงนุ่ม เมล็ดสวย', 2, 0, '#E53E3E', '#FFFFFF', 5]
   ];
 
   initialProducts.forEach(p => insertStmt.run(p));
