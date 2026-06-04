@@ -592,6 +592,7 @@ let currentUser = JSON.parse(localStorage.getItem('btr_user')) || null;
 let thaiAddressData = [];
 let currentShippingFee = 0;
 let cart = {};
+let globalProducts = []; // 📍 ไว้เก็บข้อมูลสินค้าล่าสุดจากเซิร์ฟเวอร์
 
 function getCartKey(userObj) { return (userObj && userObj.id) ? 'btr_cart_user_' + userObj.id : 'btr_cart_guest'; }
 function loadCart() { let saved = localStorage.getItem(getCartKey(currentUser)); cart = saved ? JSON.parse(saved) : {}; }
@@ -610,7 +611,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 function showToast(msg, duration = 2800) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), duration); }
 function toggleMobile() { document.getElementById('mobileMenu').classList.toggle('open'); }
 window.addEventListener('scroll', () => { document.querySelector('nav').style.boxShadow = window.scrollY > 60 ? '0 4px 30px rgba(0,0,0,0.3)' : 'none'; });
-const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; } }); }, { threshold: 0.1 });
 
 // ===== FILTER & CONTACT =====
 function filterProd(cat, btn) {
@@ -689,7 +689,8 @@ async function doLogin() {
       let guestCart = { ...cart }; 
       currentUser = data.user; localStorage.setItem('btr_user', JSON.stringify(currentUser)); localStorage.setItem('btr_token', data.token); updateAuthNavUI();
       loadCart(); for(let k in guestCart) { if(cart[k]) cart[k].qty += guestCart[k].qty; else cart[k] = guestCart[k]; }
-      saveCart(); localStorage.removeItem('btr_cart_guest'); updateCartUI();
+      saveCart(); localStorage.removeItem('btr_cart_guest'); 
+      syncCartWithServer(); // 📍 ซิงค์ทันทีเมื่อล็อกอิน
       document.getElementById('authModal').classList.remove('open'); showToast('✅ ยินดีต้อนรับกลับมาครับ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
@@ -710,7 +711,8 @@ async function doRegister() {
       let guestCart = { ...cart }; 
       currentUser = data.user; localStorage.setItem('btr_user', JSON.stringify(currentUser)); localStorage.setItem('btr_token', data.token); updateAuthNavUI();
       loadCart(); for(let k in guestCart) { cart[k] = guestCart[k]; }
-      saveCart(); localStorage.removeItem('btr_cart_guest'); updateCartUI();
+      saveCart(); localStorage.removeItem('btr_cart_guest'); 
+      syncCartWithServer(); // 📍 ซิงค์ทันทีเมื่อสมัครสมาชิก
       document.getElementById('authModal').classList.remove('open'); showToast('🎉 สมัครสมาชิกสำเร็จ!');
     } else showToast('❌ ' + data.error);
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
@@ -781,20 +783,51 @@ async function quickTrack() {
   } catch(e) { loading.style.display = 'none'; resDiv.innerHTML = `<div style="text-align:center; color:#E53E3E;">เกิดข้อผิดพลาดในการเชื่อมต่อ</div>`; }
 }
 
+// 📍 ระบบซิงค์ข้อมูลตะกร้าอัจฉริยะ (ป้องกันบั๊กสินค้าโดนลบ/เปลี่ยนราคา)
+function syncCartWithServer() {
+  if (!globalProducts || globalProducts.length === 0) {
+    if (Object.keys(cart).length > 0) { cart = {}; saveCart(); updateCartUI(); }
+    return;
+  }
+  let cartChanged = false;
+  let removedItems = false;
+  
+  for (let id in cart) {
+    const liveProd = globalProducts.find(p => String(p.id) === String(id));
+    if (!liveProd) {
+      delete cart[id];
+      cartChanged = true; removedItems = true;
+    } else {
+      cart[id].name = liveProd.name;
+      cart[id].basePrice = liveProd.price || 0;
+      cart[id].emoji = liveProd.emoji || '🌾';
+      cart[id].image = liveProd.image || null;
+      cart[id].min_order = liveProd.min_order || 1;
+      cart[id].weight = liveProd.weight || 5;
+      cart[id].tiersStr = encodeURIComponent(liveProd.price_tiers || '[]');
+      cartChanged = true;
+    }
+  }
+  
+  if (cartChanged) {
+    saveCart(); updateCartUI();
+    if (removedItems) showToast('⚠️ สินค้าบางรายการถูกนำออกจากตะกร้า เนื่องจากสินค้าหมดหรือยกเลิกขาย', 4000);
+    if (document.getElementById('orderModal').classList.contains('open')) {
+      calculateShipping();
+      document.getElementById('orderSumItems').innerHTML = Object.values(cart).map(i => `<div class="orow"><span>${i.emoji||'🌾'} ${i.name} × ${i.qty}</span><span>฿${(i.price * i.qty).toLocaleString()}</span></div>`).join('');
+    }
+  }
+}
+
 // ===== CART LOGIC =====
 function openCart() { document.getElementById('cartOverlay').classList.add('open'); document.getElementById('cartSide').classList.add('open'); document.body.style.overflow = 'hidden'; }
 function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartSide').classList.remove('open'); document.body.style.overflow = ''; }
 function changeQty(id, delta) { id = String(id); if (!cart[id]) return; cart[id].qty += delta; if (cart[id].qty <= 0) delete cart[id]; updateCartUI(); saveCart(); if(document.getElementById('orderModal').classList.contains('open')) calculateShipping(); }
 function removeCart(id) { id = String(id); delete cart[id]; updateCartUI(); saveCart(); if(document.getElementById('orderModal').classList.contains('open')) calculateShipping(); showToast('🗑 ลบสินค้าออกจากตะกร้าแล้ว'); }
 
-// 📍 อัปเกรดข้อ 2 & 6: รับค่า minOrder และ weight
 function addCart(id, name, basePrice, emoji, image, safeTiers, minOrder, weight, btn) {
   id = String(id); const tiersStr = decodeURIComponent(safeTiers);
-  if (cart[id]) { 
-    cart[id].qty += 1; 
-  } else { 
-    cart[id] = { id, name, basePrice, price: basePrice, emoji, image, tiersStr, min_order: minOrder, weight: weight, qty: 1 }; 
-  }
+  if (cart[id]) { cart[id].qty += 1; } else { cart[id] = { id, name, basePrice, price: basePrice, emoji, image, tiersStr, min_order: minOrder, weight: weight, qty: 1 }; }
   updateCartUI(); saveCart();
   btn.classList.add('added'); btn.textContent = '✅ เพิ่มแล้ว';
   setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+ เพิ่มลงตะกร้า'; }, 1800); showToast('✅ เพิ่มลงตะกร้าแล้ว!');
@@ -830,7 +863,6 @@ function updateCartUI() {
       upsellHtml = `<div style="font-size:12px; color:#C9940B; font-weight:700; background:#FFF8E1; padding:4px 8px; border-radius:6px; margin-top:6px; display:inline-block; border: 1px solid #FBC02D;">🚀 เพิ่มอีก ${diff} ชิ้น ลดเหลือ ฿${nextTier.price}/ชิ้น!</div>`;
     }
 
-    // 📍 อัปเกรดข้อ 2: แจ้งเตือนขั้นต่ำในตะกร้า
     const mo = item.min_order || 1;
     let minWarnHtml = '';
     if(item.qty < mo) {
@@ -847,14 +879,13 @@ function updateCartUI() {
   document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString();
 }
 
-// 📍 อัปเกรดข้อ 2: เช็คขั้นต่ำก่อนกดชำระเงิน
 function attemptCheckout() {
   const invalidItem = Object.values(cart).find(i => i.qty < (i.min_order || 1));
   if (invalidItem) {
     const warnBox = document.getElementById('cartCheckoutWarn');
     warnBox.innerHTML = `⚠️ [${invalidItem.name}]<br>มีขั้นต่ำในการสั่ง ${invalidItem.min_order} ชิ้นครับ โปรดตรวจสอบอีกครั้ง`;
     warnBox.style.display = 'block';
-    setTimeout(() => { warnBox.style.display = 'none'; }, 5000); // แสดง 5 วิแล้วหาย
+    setTimeout(() => { warnBox.style.display = 'none'; }, 5000);
     return;
   }
   openModal();
@@ -863,7 +894,6 @@ function attemptCheckout() {
 // ===== CHECKOUT MODAL & SHIPPING =====
 function calculateShipping() {
   const items = Object.values(cart); if (items.length === 0) return;
-  // 📍 อัปเกรดข้อ 6: ใช้น้ำหนักจริง (weight) จากระบบคำนวณ
   const totalWeight = (items.reduce((s, i) => s + (i.qty * (i.weight || 5)), 0)) + 0.5;
   const prov = document.getElementById('o-province').value; const zip = document.getElementById('o-zipcode').value;
   
@@ -949,13 +979,16 @@ async function loadDynamicProducts() {
     const products = await res.json(); 
     const grid = document.getElementById('productGrid');
     
-    if (!products || !Array.isArray(products) || products.length === 0) {
+    globalProducts = products || [];
+    syncCartWithServer(); // 📍 เรียกฟังก์ชันซิงค์ข้อมูลตะกร้าทันทีที่ดึงข้อมูลเสร็จ
+
+    if (!globalProducts || globalProducts.length === 0) {
       return grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--tx3); padding:40px;">กำลังอัปเดตระบบสินค้า กรุณารอสักครู่...</p>`;
     }
 
     const catName = { jasmine:'ข้าวหอมมะลิ', saohai:'ข้าวเสาไห้', sticky:'ข้าวเหนียว', other:'อื่นๆ' };
     
-    grid.innerHTML = products.map(p => {
+    grid.innerHTML = globalProducts.map(p => {
       const price = p.price || 0;
       const minOrder = p.min_order || 1;
       const unit = p.unit || 'ชิ้น';
@@ -966,22 +999,20 @@ async function loadDynamicProducts() {
       const safeEmoji = (p.emoji || '🌾').replace(/'/g, "\\'").replace(/"/g, '\"');
       const safeImage = (p.image || '').replace(/'/g, "\\'");
       
-      // 📍 อัปเกรดข้อ 3: สี Custom Badge
       const badgeColor = p.badge_color || '#E53E3E';
       const badgeText = p.badge_text_color || '#FFFFFF';
       const badgeHtml = p.badge ? `<span class="pbadge" style="background:${badgeColor}; color:${badgeText};">${p.badge}</span>` : '';
 
-      // 📍 อัปเกรดข้อ 5: ราคาเก่าแบบจิตวิทยา
+// 📍 อัปเกรดข้อ 5: ราคาเก่าแบบจิตวิทยา (เปลี่ยนตัวหนังสือขีดฆ่าเป็นสีแดง)
       let oldPriceHtml = '';
       if (p.old_price && p.old_price > price) {
           const discount = Math.round(((p.old_price - price) / p.old_price) * 100);
-          oldPriceHtml = `<div style="font-size:12px; color:var(--tx3); margin-bottom:2px; display:flex; align-items:center; gap:6px;">
-              <span style="text-decoration:line-through;">เดิม ฿${p.old_price.toLocaleString()}</span>
+          oldPriceHtml = `<div style="font-size:12px; margin-bottom:2px; display:flex; align-items:center; gap:6px;">
+              <span style="text-decoration:line-through; color:var(--rd);">เดิม ฿${p.old_price.toLocaleString()}</span>
               <span style="background:var(--goldc); color:#B45309; padding:2px 6px; border-radius:4px; font-weight:800;">-${discount}%</span>
           </div>`;
       }
 
-      // 📍 อัปเกรดข้อ 2: ซ่อนคำว่าขั้นต่ำ 1 กระสอบ
       const minOrderHtml = minOrder > 1 ? `<div class="pmin">สั่งขั้นต่ำ ${minOrder} ${unit}</div>` : '';
       
       let tierInfoHtml = '';
