@@ -52,6 +52,15 @@ db.exec(`
     name TEXT, phone TEXT, business TEXT, message TEXT, 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  -- 📍 ตารางใหม่สำหรับเก็บการตั้งค่าหน้าเว็บ (Web Edit)
+  CREATE TABLE IF NOT EXISTS web_settings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    slide1 TEXT, slide2 TEXT, slide3 TEXT,
+    title TEXT, sub TEXT, desc TEXT,
+    btn1_text TEXT, btn1_url TEXT,
+    btn2_text TEXT, btn2_url TEXT
+  );
 `);
 
 // อัปเดตตารางเก่าให้รองรับฟีเจอร์ใหม่
@@ -61,12 +70,17 @@ try { db.prepare('ALTER TABLE products ADD COLUMN price_tiers TEXT DEFAULT "[]"'
 try { db.prepare('ALTER TABLE orders ADD COLUMN user_id INTEGER').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE orders ADD COLUMN tracking_number TEXT').run(); } catch (e) {}
-
-// 📍 คอลัมน์ใหม่สำหรับการอัปเกรดล่าสุด
 try { db.prepare('ALTER TABLE products ADD COLUMN old_price REAL DEFAULT 0').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN badge_color TEXT DEFAULT "#E53E3E"').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN badge_text_color TEXT DEFAULT "#FFFFFF"').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN weight REAL DEFAULT 5').run(); } catch (e) {}
+
+// 📍 ตั้งค่าเริ่มต้นของหน้าเว็บ (ถ้าเปิดระบบครั้งแรก)
+const checkSettings = db.prepare('SELECT COUNT(*) as count FROM web_settings').get();
+if (checkSettings.count === 0) {
+  db.prepare(`INSERT INTO web_settings (id, slide1, slide2, slide3, title, sub, desc, btn1_text, btn1_url, btn2_text, btn2_url) 
+              VALUES (1, 'BG.jpg', '', '', 'ข้าวสารคุณภาพ<span class="em">บัวทองไรซ์</span>', 'ส่งตรงจากโรงสี สู่มือคุณ', 'ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว และข้าวอีกหลากหลายชนิด คัดสรรคุณภาพทุกเมล็ด พร้อมบริการขายส่งและขายปลีกสำหรับร้านค้า ห้างสรรพสินค้า และครัวเรือนทั่วไป', '🌾 ดูสินค้าทั้งหมด', '#products', '📞 ติดต่อสั่งซื้อ', 'https://line.me/ti/p/8LkqNjSM_T')`).run();
+}
 
 // เพิ่มข้อมูลสินค้าเริ่มต้น
 const checkProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
