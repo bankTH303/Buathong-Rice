@@ -53,13 +53,13 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
-  -- 📍 ตารางใหม่สำหรับเก็บการตั้งค่าหน้าเว็บ (Web Edit)
   CREATE TABLE IF NOT EXISTS web_settings (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     slide1 TEXT, slide2 TEXT, slide3 TEXT,
     title TEXT, sub TEXT, desc TEXT,
     btn1_text TEXT, btn1_url TEXT,
-    btn2_text TEXT, btn2_url TEXT
+    btn2_text TEXT, btn2_url TEXT,
+    slides_data TEXT DEFAULT '[]'
   );
 `);
 
@@ -74,24 +74,47 @@ try { db.prepare('ALTER TABLE products ADD COLUMN old_price REAL DEFAULT 0').run
 try { db.prepare('ALTER TABLE products ADD COLUMN badge_color TEXT DEFAULT "#E53E3E"').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN badge_text_color TEXT DEFAULT "#FFFFFF"').run(); } catch (e) {}
 try { db.prepare('ALTER TABLE products ADD COLUMN weight REAL DEFAULT 5').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE web_settings ADD COLUMN slides_data TEXT DEFAULT "[]"').run(); } catch (e) {}
 
-// 📍 ตั้งค่าเริ่มต้นของหน้าเว็บ (ถ้าเปิดระบบครั้งแรก)
+// ตั้งค่าเริ่มต้นของหน้าเว็บ (สไลด์หลักชุดที่ 1)
+const defaultSlide = {
+  image: 'BG.jpg',
+  font: 'Playfair Display',
+  pill_text: 'ข้าวคุณภาพพรีเมียม ตั้งแต่ปี 2542',
+  pill_color: '#FFF176',
+  title: 'ข้าวสารคุณภาพ<span class="em">บัวทองไรซ์</span>',
+  title_color: '#FFFFFF',
+  sub: 'ส่งตรงจากโรงสี สู่มือคุณ',
+  sub_color: '#FFFFFF',
+  desc: 'ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว และข้าวอีกหลากหลายชนิด คัดสรรคุณภาพทุกเมล็ด พร้อมบริการขายส่งและขายปลีกสำหรับร้านค้า ห้างสรรพสินค้า และครัวเรือนทั่วไป',
+  desc_color: '#E5E7EB',
+  btn1_text: '🌾 ดูสินค้าทั้งหมด',
+  btn1_url: '#products',
+  btn1_bg: '#E8AB14',
+  btn1_color: '#FFFFFF',
+  btn2_text: '📞 ติดต่อสั่งซื้อ',
+  btn2_url: 'https://line.me/ti/p/8LkqNjSM_T',
+  btn2_bg: 'transparent',
+  btn2_color: '#FFFFFF',
+  stat1_num: '20+', stat1_lbl: 'ปีประสบการณ์',
+  stat2_num: '500+', stat2_lbl: 'ร้านค้าที่ไว้วางใจ',
+  stat3_num: '10+', stat3_lbl: 'ชนิดข้าว'
+};
+
 const checkSettings = db.prepare('SELECT COUNT(*) as count FROM web_settings').get();
 if (checkSettings.count === 0) {
-  db.prepare(`INSERT INTO web_settings (id, slide1, slide2, slide3, title, sub, desc, btn1_text, btn1_url, btn2_text, btn2_url) 
-              VALUES (1, 'BG.jpg', '', '', 'ข้าวสารคุณภาพ<span class="em">บัวทองไรซ์</span>', 'ส่งตรงจากโรงสี สู่มือคุณ', 'ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว และข้าวอีกหลากหลายชนิด คัดสรรคุณภาพทุกเมล็ด พร้อมบริการขายส่งและขายปลีกสำหรับร้านค้า ห้างสรรพสินค้า และครัวเรือนทั่วไป', '🌾 ดูสินค้าทั้งหมด', '#products', '📞 ติดต่อสั่งซื้อ', 'https://line.me/ti/p/8LkqNjSM_T')`).run();
+  const defaultSlidesData = JSON.stringify([defaultSlide]);
+  db.prepare(`INSERT INTO web_settings (id, slides_data) VALUES (1, ?)`).run(defaultSlidesData);
 }
 
 // เพิ่มข้อมูลสินค้าเริ่มต้น
 const checkProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
 if (checkProducts.count === 0) {
   const insertStmt = db.prepare(`INSERT INTO products (name, category, price, unit, min_order, emoji, badge, badge_type, description, sort_order, old_price, badge_color, badge_text_color, weight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-  
   const initialProducts = [
     ['ข้าวหอมมะลิ 100% ตรา ดอกบัวรวง', 'jasmine', 320, 'กระสอบ 5 กก.', 10, '🌾', 'ขายดีสุด', 'hot', 'ข้าวหอมมะลิแท้ 100% จากทุ่งกุลาร้องไห้', 1, 350, '#E53E3E', '#FFFFFF', 5],
     ['ข้าวเสาไห้ ตราดอกบัว', 'saohai', 370, 'กระสอบ 5 กก.', 10, '🌻', null, null, 'ข้าวเสาไห้แท้ หุงนุ่ม เมล็ดสวย', 2, 0, '#E53E3E', '#FFFFFF', 5]
   ];
-
   initialProducts.forEach(p => insertStmt.run(p));
 }
 
