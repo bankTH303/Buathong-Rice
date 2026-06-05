@@ -7,8 +7,7 @@
 <meta name="description" content="บริษัท บัวทองไรซ์ จำกัด จำหน่ายข้าวสารคุณภาพพรีเมียม ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว ขายส่ง-ขายปลีก ราคาโรงสี">
 <link rel="icon" type="image/png" href="btrlogov2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- 📍 โหลดสคริปต์ Google reCAPTCHA -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -48,35 +47,37 @@ nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(46, 125, 50, 0.
 .mobile-menu a{color:rgba(255,255,255,0.8);text-decoration:none;padding:14px 0;font-size:15px;border-bottom:1px solid rgba(255,255,255,0.08)}
 .mobile-menu a:last-child{border-bottom:none}
 
-/* HERO SLIDER */
+/* HERO SLIDER (อัปเกรดให้แต่ละสไลด์มีข้อความแยกอิสระ) */
 .hero-wrapper{position:relative; height:100vh; min-height:600px; overflow:hidden; background:var(--g1);}
-.hero-bg-container{position:absolute; inset:0; z-index:0;}
-.hero-slide{position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity 1s ease-in-out;}
-.hero-slide.active{opacity:1;}
-.hero-slide::after{content:''; position:absolute; inset:0; background:linear-gradient(135deg, rgba(46,125,50,0.85), rgba(245,127,23,0.65));}
-.hero{position:relative; z-index:1; height:100%; display:flex; align-items:center; justify-content:center; padding:100px 5% 60px; text-align:center;}
-.hero-glow{position:absolute;right:0;top:0;width:60%;height:100%;background:radial-gradient(ellipse at 80% 40%,rgba(201,148,11,0.18) 0%,transparent 65%); z-index:0; pointer-events:none;}
-.hero-glow2{position:absolute;left:0;bottom:0;width:40%;height:60%;background:radial-gradient(ellipse at 20% 80%,rgba(82,183,136,0.1) 0%,transparent 60%); z-index:0; pointer-events:none;}
-.hero-content{max-width:680px;position:relative;z-index:2;animation:fadeUp 1s ease forwards}
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-.hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(201,148,11,0.15);border:1px solid rgba(201,148,11,0.4);color:var(--goldc);padding:7px 18px;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:28px;letter-spacing:0.8px}
-.hero-pill span{width:6px;height:6px;border-radius:50%;background:var(--goldc);animation:blink 1.5s infinite}
+.hero-slider-container{position:absolute; inset:0; width:100%; height:100%;}
+.hero-slide{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:100px 5% 60px; opacity:0; transition:opacity 1s ease-in-out; z-index:1;}
+.hero-slide.active{opacity:1; z-index:2;}
+.hero-slide-bg{position:absolute; inset:0; background-size:cover; background-position:center; z-index:-2;}
+.hero-slide-overlay{position:absolute; inset:0; background:linear-gradient(135deg, rgba(46,125,50,0.85), rgba(245,127,23,0.65)); z-index:-1;}
+.hero-content{max-width:680px;position:relative;z-index:3; width:100%;}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 18px;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:28px;letter-spacing:0.8px; border:1px solid transparent;}
+.hero-pill span{width:6px;height:6px;border-radius:50%;animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(40px,6.5vw,82px);font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px}
-.hero h1 .em{color:var(--goldb);display:block}
-.hero-sub{font-size:clamp(16px,2vw,21px);color:rgba(255,255,255,0.75);margin-bottom:18px;font-weight:300}
-.hero-desc{font-size:15px;color:rgba(255,255,255,0.55);line-height:1.85;margin-bottom:44px;max-width:520px; margin-left:auto; margin-right:auto;}
+.hero-title{font-size:clamp(40px,6.5vw,82px);font-weight:900;line-height:1.05;margin-bottom:6px}
+.hero-title .em{display:block}
+.hero-sub{font-size:clamp(16px,2vw,21px);margin-bottom:18px;font-weight:300}
+.hero-desc{font-size:15px;line-height:1.85;margin-bottom:44px;max-width:520px; margin-left:auto; margin-right:auto;}
 .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+.btn-g{padding:14px 32px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;border:none;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,0.2)}
+.btn-g:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,0.3)}
+.btn-w{padding:14px 32px;border-radius:50px;font-size:15px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;border:1.5px solid currentColor;cursor:pointer;}
+.btn-w:hover{opacity:0.8;}
+
+.hero-stats{display:flex;gap:48px;margin-top:64px;padding-top:40px;border-top:1px solid rgba(255,255,255,0.2);flex-wrap:wrap;justify-content:center;}
+.hstat-num{font-size:38px;font-weight:700;}
+.hstat-lbl{font-size:12px;margin-top:5px;letter-spacing:0.5px; opacity:0.8;}
+
 .slide-arrow{position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; z-index:10; transition:all 0.3s; opacity:0;}
 .hero-wrapper:hover .slide-arrow{opacity:1;}
 .slide-arrow:hover{background:rgba(255,255,255,0.3);}
 .slide-prev{left:20px;}
 .slide-next{right:20px;}
-
-.btn-g{background:linear-gradient(135deg,var(--goldb),var(--gold));color:var(--br1);padding:14px 32px;border-radius:50px;font-size:15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;border:none;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;box-shadow:0 6px 24px rgba(201,148,11,0.35)}
-.btn-g:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(201,148,11,0.5)}
-.btn-w{background:transparent;color:#fff;padding:14px 32px;border-radius:50px;font-size:15px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;border:1.5px solid rgba(255,255,255,0.35);cursor:pointer;font-family:'Noto Sans Thai',sans-serif}
-.btn-w:hover{background:rgba(255,255,255,0.1);border-color:#fff}
 
 .trust-bar{background:linear-gradient(135deg,var(--goldb),var(--gold));padding:16px 5%;display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap}
 .trust-item{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--br1);white-space:nowrap}
@@ -109,7 +110,7 @@ section{padding:88px 5%}
 .pcat{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g3);margin-bottom:6px}
 .pname{font-size:18px;font-weight:800;color:var(--tx1);margin-bottom:6px;line-height:1.3}
 .pdesc{font-size:13px;color:var(--tx3);line-height:1.65;margin-bottom:16px;flex-grow:1;}
-.pcard-bottom{margin-top:auto;} /* 📍 ดันราคาและปุ่มให้ชิดขอบล่างเท่ากัน */
+.pcard-bottom{margin-top:auto;} 
 .pprow{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
 .pprice{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--g2)}
 .punit{font-size:13px;color:var(--tx3)}
@@ -208,14 +209,12 @@ section{padding:88px 5%}
 .tot-amt{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--g2)}
 .co-btn{width:100%;background:var(--g2);color:#fff;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:all .25s;font-family:'Noto Sans Thai',sans-serif}
 .co-btn:hover{background:var(--g3)}
-
 .modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .3s}
 .modal-wrap.open{opacity:1;visibility:visible}
 .modal{background:#fff;border-radius:24px;padding:32px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;transform:scale(0.95);transition:transform .3s}
 .modal-wrap.open .modal{transform:scale(1)}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
 .modal-hdr h2{font-size:22px;font-weight:800;color:var(--tx1)}
-
 .order-sum{background:var(--cream);border-radius:16px;padding:20px;margin-bottom:24px}
 .order-sum h3{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
 .orow{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;color:var(--tx1)}
@@ -230,8 +229,6 @@ section{padding:88px 5%}
 .portal-pane.active{display:block; animation:fadeIn 0.3s ease forwards;}
 .status-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; background: var(--goldb); color: #3E2723; }
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
-/* FOOTER */
 footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:52px}
 .fbrand{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:12px}
@@ -241,20 +238,10 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 .flinks a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:14px;transition:color .2s}
 .flinks a:hover{color:var(--goldc)}
 .fbot{border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:12px;flex-wrap:wrap;gap:10px}
-
-/* TOAST */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--tx1);color:#fff;padding:12px 28px;border-radius:50px;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:all .35s;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* 📍 MOBILE RESPONSIVE UPGRADE */
-@media(max-width:900px){
-  .nav-links{display:none}
-  .hamburger{display:flex}
-  .cgrid{grid-template-columns:1fr}
-  .about-grid{grid-template-columns:1fr}
-  .fgrid{grid-template-columns:1fr}
-  .fgrid>*:not(:first-child){display:none}
-}
+@media(max-width:900px){.nav-links{display:none}.hamburger{display:flex}.cgrid{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.fgrid>*:not(:first-child){display:none}}
 @media(max-width:600px){
   section{padding:50px 5%}
   .hero-stats{gap:28px}
@@ -263,7 +250,7 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   .modal{padding:24px}
   .frow{grid-template-columns:1fr}
   
-  /* 📍 ข้อ 1: โชว์การ์ด 2 ชิ้นต่อแถว ในมือถือ */
+  /* 📍 Mobile Grid 2 ชิ้นต่อแถว */
   .pgrid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .pcard-body { padding: 14px; }
   .pname { font-size: 14px; margin-bottom: 4px; }
@@ -312,32 +299,13 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   <a href="#" onclick="toggleMobile(); openTrackModal(); return false;">🔍 เช็คสถานะออเดอร์</a>
 </div>
 
-<!-- 📍 ข้อ 5: ระบบสไลด์โชว์หน้าแรก -->
+<!-- 📍 ระบบสไลด์หน้าแรก (ดึงข้อมูล JSON มาสร้างสไลด์) -->
 <div class="hero-wrapper" id="heroWrapper">
-  <div class="hero-bg-container" id="hero-bg-container">
-    <div class="hero-slide active" style="background-image:url('BG.jpg')"></div>
+  <div class="hero-slider-container" id="hero-slider-container">
+    <!-- สไลด์จะถูกสร้างผ่าน JS ที่นี่ -->
   </div>
-  <button class="slide-arrow slide-prev" id="hero-nav-prev" style="display:none;" onclick="changeSlide(-1)">❮</button>
-  <button class="slide-arrow slide-next" id="hero-nav-next" style="display:none;" onclick="changeSlide(1)">❯</button>
-  
-  <section class="hero" id="hero">
-    <div class="hero-glow"></div><div class="hero-glow2"></div>
-    <div class="hero-content">
-      <div class="hero-pill"><span></span>ข้าวคุณภาพพรีเมียม ตั้งแต่ปี 2542</div>
-      <h1 id="hero-title">ข้าวสารคุณภาพ<span class="em">บัวทองไรซ์</span></h1>
-      <p class="hero-sub" id="hero-sub">ส่งตรงจากโรงสี สู่มือคุณ</p>
-      <p class="hero-desc" id="hero-desc">ข้าวหอมมะลิ ข้าวเสาไห้ ข้าวเหนียว และข้าวอีกหลากหลายชนิด คัดสรรคุณภาพทุกเมล็ด พร้อมบริการขายส่งและขายปลีกสำหรับร้านค้า ห้างสรรพสินค้า และครัวเรือนทั่วไป</p>
-      <div class="hero-cta">
-        <a href="#products" class="btn-g" id="hero-btn1">🌾 ดูสินค้าทั้งหมด</a>
-        <a href="https://line.me/ti/p/8LkqNjSM_T" target="_blank" class="btn-w" id="hero-btn2">📞 ติดต่อสั่งซื้อ</a>
-      </div>
-      <div class="hero-stats">
-        <div><div class="hstat-num">20+</div><div class="hstat-lbl">ปีประสบการณ์</div></div>
-        <div><div class="hstat-num">500+</div><div class="hstat-lbl">ร้านค้าที่ไว้วางใจ</div></div>
-        <div><div class="hstat-num">10+</div><div class="hstat-lbl">ชนิดข้าว</div></div>
-      </div>
-    </div>
-  </section>
+  <button class="slide-arrow slide-prev" id="hero-nav-prev" onclick="changeSlide(-1)">❮</button>
+  <button class="slide-arrow slide-next" id="hero-nav-next" onclick="changeSlide(1)">❯</button>
 </div>
 
 <div class="trust-bar">
@@ -349,7 +317,7 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
 </div>
 
 <section id="products">
-  <!-- 📍 ข้อ 2: ช่องค้นหาข้าว -->
+  <!-- 📍 ช่องค้นหาสินค้า -->
   <div class="search-wrap">
     <div class="search-box">
       <span style="font-size:18px;">🔍</span>
@@ -462,7 +430,7 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
         </div>
         <div class="fg"><label>ข้อความ / ปริมาณที่ต้องการ</label><textarea id="cf-msg" placeholder="เช่น ต้องการข้าวหอมมะลิ 50 กระสอบ ทุกเดือน..."></textarea></div>
         
-        <!-- 📍 ข้อ 7: กล่อง reCAPTCHA -->
+        <!-- 📍 กล่อง reCAPTCHA -->
         <div class="fg" style="margin-bottom:20px;">
           <!-- แทนที่ data-sitekey ด้วยคีย์จริงของคุณ -->
           <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
@@ -617,7 +585,7 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
       </div>
       <div class="fg"><label>บ้านเลขที่, ถนน, หมู่บ้าน *</label><textarea id="r-addr-detail" required></textarea></div>
       
-      <!-- 📍 ข้อ 6: กล่องติ๊กยอมรับเงื่อนไข Privacy Policy -->
+      <!-- 📍 Checkbox ยอมรับเงื่อนไข Privacy Policy -->
       <div class="fg" style="display:flex; align-items:flex-start; gap:8px; margin-top:12px;">
         <input type="checkbox" id="r-terms" style="width:18px; height:18px; margin-top:2px; flex-shrink:0;" onchange="toggleRegisterBtn(this.checked)">
         <label for="r-terms" style="font-size:12px; font-weight:normal; text-transform:none; color:var(--tx2); cursor:pointer;">
@@ -681,7 +649,7 @@ footer{background:#1B5E20;color:rgba(255,255,255,0.7);padding:56px 5% 32px;}
   </div>
 </div>
 
-<!-- 📍 ข้อ 4: Lightbox Modal สำหรับขยายรูปดูชัดๆ -->
+<!-- 📍 Lightbox Modal -->
 <div class="lightbox-wrap" id="lightboxModal" onclick="closeLightbox(event)">
   <div class="lightbox-content">
     <button class="lb-close" onclick="closeLightbox(event)">✕</button>
@@ -697,6 +665,8 @@ let thaiAddressData = [];
 let currentShippingFee = 0;
 let cart = {};
 let globalProducts = []; 
+let currentSlide = 0;
+let slideInterval;
 
 function getCartKey(userObj) { return (userObj && userObj.id) ? 'btr_cart_user_' + userObj.id : 'btr_cart_guest'; }
 function loadCart() { let saved = localStorage.getItem(getCartKey(currentUser)); cart = saved ? JSON.parse(saved) : {}; }
@@ -716,33 +686,52 @@ function toggleMobile() { document.getElementById('mobileMenu').classList.toggle
 window.addEventListener('scroll', () => { document.querySelector('nav').style.boxShadow = window.scrollY > 60 ? '0 4px 30px rgba(0,0,0,0.3)' : 'none'; });
 const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; } }); }, { threshold: 0.1 });
 
-// 📍 ข้อ 5: โหลดข้อมูลสไลด์โชว์หน้าแรก
-let currentSlide = 0;
-let heroSlides = [];
+// 📍 ระบบดึงข้อมูลสไลด์ (JSON Array)
 async function loadWebSettings() {
   try {
     const res = await fetch('/api/web-settings');
     const settings = await res.json();
-    if(settings) {
-      document.getElementById('hero-title').innerHTML = settings.title || 'ข้าวสารคุณภาพ<span class="em">บัวทองไรซ์</span>';
-      document.getElementById('hero-sub').textContent = settings.sub || 'ส่งตรงจากโรงสี สู่มือคุณ';
-      document.getElementById('hero-desc').textContent = settings.desc || '';
+    if(settings && settings.slides_data) {
+      const slides = JSON.parse(settings.slides_data);
+      const container = document.getElementById('hero-slider-container');
       
-      const b1 = document.getElementById('hero-btn1'); b1.textContent = settings.btn1_text || '🌾 ดูสินค้าทั้งหมด'; b1.href = settings.btn1_url || '#products';
-      const b2 = document.getElementById('hero-btn2'); b2.textContent = settings.btn2_text || '📞 ติดต่อสั่งซื้อ'; b2.href = settings.btn2_url || 'https://line.me/ti/p/8LkqNjSM_T';
+      if(slides.length > 0) {
+        container.innerHTML = slides.map((s, i) => {
+          let btn1Html = s.btn1_text ? `<a href="${s.btn1_url||'#'}" class="btn-g" style="background:${s.btn1_bg}; color:${s.btn1_color};">${s.btn1_text}</a>` : '';
+          let btn2Html = s.btn2_text ? `<a href="${s.btn2_url||'#'}" class="btn-w" style="background:${s.btn2_bg}; color:${s.btn2_color};">${s.btn2_text}</a>` : '';
+          let pillHtml = s.pill_text ? `<div class="hero-pill" style="color:${s.pill_color}; border-color:${s.pill_color}"><span style="background:${s.pill_color}"></span>${s.pill_text}</div>` : '';
+          
+          let statHtml = '';
+          if(s.stat1_num || s.stat2_num || s.stat3_num) {
+            statHtml = `<div class="hero-stats">`;
+            if(s.stat1_num) statHtml += `<div><div class="hstat-num" style="color:${s.pill_color}">${s.stat1_num}</div><div class="hstat-lbl" style="color:${s.sub_color}">${s.stat1_lbl}</div></div>`;
+            if(s.stat2_num) statHtml += `<div><div class="hstat-num" style="color:${s.pill_color}">${s.stat2_num}</div><div class="hstat-lbl" style="color:${s.sub_color}">${s.stat2_lbl}</div></div>`;
+            if(s.stat3_num) statHtml += `<div><div class="hstat-num" style="color:${s.pill_color}">${s.stat3_num}</div><div class="hstat-lbl" style="color:${s.sub_color}">${s.stat3_lbl}</div></div>`;
+            statHtml += `</div>`;
+          }
 
-      if(settings.slide1) heroSlides.push(settings.slide1);
-      if(settings.slide2) heroSlides.push(settings.slide2);
-      if(settings.slide3) heroSlides.push(settings.slide3);
-      if(heroSlides.length === 0) heroSlides.push('BG.jpg');
-      
-      const bgContainer = document.getElementById('hero-bg-container');
-      bgContainer.innerHTML = heroSlides.map((s, i) => `<div class="hero-slide ${i===0?'active':''}" style="background-image:url('${s}')"></div>`).join('');
-      
-      if(heroSlides.length > 1) {
-        document.getElementById('hero-nav-prev').style.display = 'flex';
-        document.getElementById('hero-nav-next').style.display = 'flex';
-        setInterval(() => changeSlide(1), 5000); 
+          return `
+            <div class="hero-slide ${i === 0 ? 'active' : ''}" style="font-family:${s.font};">
+              <div class="hero-slide-bg" style="background-image:url('${s.image||'BG.jpg'}');"></div>
+              <div class="hero-slide-overlay"></div>
+              <div class="hero-content">
+                ${pillHtml}
+                <h1 class="hero-title" style="color:${s.title_color}">${s.title}</h1>
+                <p class="hero-sub" style="color:${s.sub_color}">${s.sub}</p>
+                <p class="hero-desc" style="color:${s.desc_color}">${s.desc}</p>
+                <div class="hero-cta">${btn1Html}${btn2Html}</div>
+                ${statHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        if(slides.length > 1) {
+          slideInterval = setInterval(() => changeSlide(1), 10000); // 📍 หน่วงเวลา 10 วินาที
+        } else {
+          document.getElementById('hero-nav-prev').style.display = 'none';
+          document.getElementById('hero-nav-next').style.display = 'none';
+        }
       }
     }
   } catch(e) {}
@@ -752,11 +741,14 @@ function changeSlide(dir) {
   const slideEls = document.querySelectorAll('.hero-slide');
   if(slideEls.length <= 1) return;
   slideEls[currentSlide].classList.remove('active');
-  currentSlide = (currentSlide + dir + heroSlides.length) % heroSlides.length;
+  currentSlide = (currentSlide + dir + slideEls.length) % slideEls.length;
   slideEls[currentSlide].classList.add('active');
+  
+  clearInterval(slideInterval);
+  slideInterval = setInterval(() => changeSlide(1), 10000);
 }
 
-// 📍 ข้อ 4: ฟังก์ชัน Lightbox Modal
+// 📍 Lightbox ดูรูปใหญ่
 function openLightbox(imgUrl) {
   if(!imgUrl || imgUrl === 'null') return;
   document.getElementById('lightboxImg').src = imgUrl;
@@ -764,12 +756,12 @@ function openLightbox(imgUrl) {
   document.body.style.overflow = 'hidden';
 }
 function closeLightbox(e) {
-  if (e && e.target.id === 'lightboxImg') return; // กันคลิกที่รูปแล้วปิด
+  if (e && e.target.id === 'lightboxImg') return; 
   document.getElementById('lightboxModal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-// 📍 ข้อ 2: ฟังก์ชันค้นหาข้าวสาร
+// 📍 Search สินค้า
 function searchProducts(keyword) {
   const kw = keyword.toLowerCase();
   document.querySelectorAll('.pcard').forEach(c => {
@@ -786,7 +778,7 @@ function searchProducts(keyword) {
 
 function filterProd(cat, btn) {
   document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active')); btn.classList.add('active');
-  document.getElementById('searchInput').value = ''; // เคลียร์ช่องเสิช
+  document.getElementById('searchInput').value = ''; 
   document.querySelectorAll('.pcard').forEach(c => { 
     c.classList.remove('hidden'); c.classList.remove('hidden-search');
     if(cat!=='all' && c.dataset.cat!==cat) c.classList.add('hidden'); 
@@ -796,10 +788,7 @@ function filterProd(cat, btn) {
 async function sendInquiry() {
   const name = document.getElementById('cf-name').value.trim(); const phone = document.getElementById('cf-phone').value.trim();
   if (!name || !phone) return showToast('⚠️ กรุณากรอกชื่อและเบอร์โทรศัพท์');
-
-  // ดึงค่า reCAPTCHA Token
   const recaptchaResponse = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
-  
   try {
     const res = await fetch('/api/contacts', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, phone, recaptchaToken: recaptchaResponse || 'no_captcha' }) });
     if (res.ok) { document.getElementById('contactForm').style.display = 'none'; document.getElementById('contactSuccess').style.display = ''; } 
@@ -872,7 +861,6 @@ async function doLogin() {
   } catch(e) { showToast('❌ ระบบขัดข้อง'); }
 }
 
-// 📍 ข้อ 6: ควบคุมปุ่มสมัครสมาชิกตาม Checkbox
 function toggleRegisterBtn(isChecked) {
   const btn = document.getElementById('btn-register');
   btn.disabled = !isChecked;
@@ -1163,7 +1151,6 @@ async function loadDynamicProducts() {
       const badgeText = p.badge_text_color || '#FFFFFF';
       const badgeHtml = p.badge ? `<span class="pbadge" style="background:${badgeColor}; color:${badgeText};">${p.badge}</span>` : '';
 
-      // 📍 ราคาเก่าจิตวิทยาขีดฆ่าสีแดง
       let oldPriceHtml = '';
       if (p.old_price && p.old_price > price) {
           const discount = Math.round(((p.old_price - price) / p.old_price) * 100);
@@ -1173,7 +1160,6 @@ async function loadDynamicProducts() {
           </div>`;
       }
 
-      // 📍 ซ่อนขั้นต่ำถ้าตั้งค่าไว้ 1
       const minOrderHtml = minOrder > 1 ? `<div class="pmin">สั่งขั้นต่ำ ${minOrder} ${unit}</div>` : '';
       
       let tierInfoHtml = '';
