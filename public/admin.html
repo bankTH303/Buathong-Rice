@@ -926,15 +926,15 @@ function statusBadge(s) { const map = { 'รอดำเนินการ':'s-w
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-bg').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }); });
 
-function showToast(msg) { 
+
+  function showToast(msg, duration = 2800) { 
   const t = document.getElementById('toast'); 
   if(t) {
     t.textContent = msg; 
     t.classList.add('show'); 
-    setTimeout(() => t.classList.remove('show'), 3000); 
+    setTimeout(() => t.classList.remove('show'), duration); 
   }
 }
-  
 </script>
 </body>
 </html>
