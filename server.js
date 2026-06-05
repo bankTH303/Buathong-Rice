@@ -100,7 +100,7 @@ app.get('/api/user/:id/orders', authenticateToken, (req, res) => {
 
 // ===== PUBLIC API =====
 
-// 📍 API สำหรับดึงการตั้งค่าหน้าเว็บ
+// 📍 API โหลด Web Settings (ดึง JSON Array ออกไปโชว์)
 app.get('/api/web-settings', (req, res) => {
   try {
     const settings = db.prepare('SELECT * FROM web_settings WHERE id = 1').get();
@@ -147,15 +147,11 @@ app.post('/api/orders', (req, res) => {
   } catch(e) { res.status(500).json({ error: 'เกิดข้อผิดพลาด' }); }
 });
 
-// 📍 อัปเกรด: รับ reCAPTCHA Token จากหน้าฟอร์มติดต่อ
+// ตรวจจับ reCAPTCHA
 app.post('/api/contacts', (req, res) => {
   try {
     const { name, phone, business, message, recaptchaToken } = req.body;
-    
-    if(!recaptchaToken) {
-      return res.status(400).json({ error: 'กรุณายืนยันว่าคุณไม่ใช่บอท (reCAPTCHA)' });
-    }
-
+    if(!recaptchaToken) return res.status(400).json({ error: 'กรุณายืนยันว่าคุณไม่ใช่บอท (reCAPTCHA)' });
     db.prepare(`INSERT INTO contacts (name, phone, business, message) VALUES (?, ?, ?, ?)`).run(name, phone, business||'', message||'');
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'เกิดข้อผิดพลาด' }); }
@@ -179,12 +175,11 @@ app.post('/api/admin/login', (req, res) => {
   req.body.password === ADMIN_PASSWORD ? res.json({ success: true }) : res.status(401).json({ error: 'รหัสผ่านไม่ถูกต้อง' });
 });
 
-// 📍 API สำหรับแก้ไขการตั้งค่าหน้าเว็บ (แอดมิน)
+// 📍 API สำหรับเซฟ Web Settings (รับเป็น JSON Array)
 app.patch('/api/admin/web-settings', checkAdmin, (req, res) => {
   try {
-    const { slide1, slide2, slide3, title, sub, desc, btn1_text, btn1_url, btn2_text, btn2_url } = req.body;
-    db.prepare(`UPDATE web_settings SET slide1=?, slide2=?, slide3=?, title=?, sub=?, desc=?, btn1_text=?, btn1_url=?, btn2_text=?, btn2_url=? WHERE id=1`)
-      .run(slide1||'', slide2||'', slide3||'', title||'', sub||'', desc||'', btn1_text||'', btn1_url||'', btn2_text||'', btn2_url||'');
+    const { slides_data } = req.body;
+    db.prepare(`UPDATE web_settings SET slides_data=? WHERE id=1`).run(slides_data || '[]');
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: 'อัปเดตการตั้งค่าไม่ได้' }); }
 });
